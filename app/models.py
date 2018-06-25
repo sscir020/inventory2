@@ -1,6 +1,28 @@
-from app import db
-# from datetime import datetime
-# from . import db
+from .__init__ import db
+from datetime import datetime
+
+class User(db.Model):
+    __tablename__ = 'users'
+    user_id=db.Column(db.Integer,nullable=False,primary_key=True)
+    user_name=db.Column(db.String(64),nullable=False, unique=True, index=True)
+    user_pass = db.Column(db.String(64),nullable=False)
+
+    # def __init__(self,**kwargs):
+    #     # self.user_name=username
+    #     # self.user_pass=userpass
+    #     super(User, self).__init__(**kwargs)
+    # def __init__(self, **kwargs):
+    #     super(User, self).__init__(**kwargs)
+    def verify_pass(self,password):
+        return self.user_pass==password
+
+    def change_pass(self,newpass):
+        self.user_pass=newpass
+        db.session.add(self)
+        db.session.commit()
+
+    def prt(self):
+        print(self.user_id,self.user_name,self.user_pass)
 
 class Material(db.Model):
     __tablename__ = 'materials'
@@ -8,28 +30,15 @@ class Material(db.Model):
     material_name=db.Column(db.String(64),nullable=False, unique=True, index=True)
     countnum=db.Column(db.Integer,nullable=False)
 
-    def __init__(self,material_name,countnum):
-        m=super(Material,material_name,countnum)
-        db.session.add(m)
-        db.commit()
-
     def change_countnum(self,diff):
         self.countnum+=diff
         if(self.countnum<0):
-            self.countnum=0
-
-class User(db.Model):
-    __tablename__ = 'users'
-    user_id=db.Column(db.Integer,nullable=False,primary_key=True)
-    user_name=db.Column(db.String(64),nullable=False, unique=True, index=True)
-    user_pass = db.Column(db.String(64),nullable=False)
-    def __init__(self,user_name,user_pass):
-        u=super(User,user_name,user_pass)
-        db.session.add(u)
-        db.commit()
-
-    def verify_pass(self,userpass):
-        return self.user_pass==userpass
+            return False
+        db.session.add(self)
+        db.session.commit()
+        return True
+    def prt(self):
+        print(self.material_id, self.material_name, self.countnum)
 
 class Opr(db.Model):
     __tablename__ = 'oprs'
@@ -37,8 +46,9 @@ class Opr(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     diff=db.Column(db.Integer,nullable=False)
     material_id = db.Column(db.Integer, db.ForeignKey('materials.material_id'))
-    # timestamp =db.Column(db.DateTime, default=datetime.utcno,nullable=False)
-    def __init__(self,user_id,diff,material_id):
-        o=super(Opr,user_id,diff,material_id)
-        db.session.add(o)
-        db.commit()
+    # timestamp =db.Column(db.DateTime,index=True,nullable=False)
+
+    def prt(self):
+        print(self.opr_id,self.user_id, self.diff, self.material_id)
+
+

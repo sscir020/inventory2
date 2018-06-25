@@ -1,12 +1,9 @@
-from flask import render_template
-from .__init__ import ctr
-
+from . import ctr
 
 @ctr.app_errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
-
+    return "not found 404"
 
 @ctr.app_errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
+def internal_error(e):
+    return "internal 500"

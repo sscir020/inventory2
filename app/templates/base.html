@@ -1,0 +1,51 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Inveory{% endblock %}
+{% block head %}
+	<meta charset="utf-8">
+	<title>Inventory System</title>
+	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Inventory</a>
+		</div>
+		<div>
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="{{url_for('ctr.welcome_user')}}">Welcome
+				{% if session['userid']!= None %}
+				{{session['username']}}</a></li>
+				{% else %}
+				User</a></li>
+				{% endif %}
+				<li><a href="{{url_for('ctr.log_user_in')}}">Login</a></li>
+				<li><a href="{{url_for('ctr.register')}}">Register</a></li>
+				<li><a href="{{url_for('ctr.log_user_out')}}">Logout</a></li>
+				<li><a href="{{url_for('ctr.show_materials')}}">|    Materials</a></li>
+				<li><a href="{{url_for('ctr.show_join_oprs')}}">JoinOperations</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+{% endblock %}
+
+
+
+{% block content %}
+<div class="container">
+    {% block page_content %}
+    {% endblock %}
+
+	{% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

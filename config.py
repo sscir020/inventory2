@@ -1,15 +1,35 @@
-from flask_sqlalchemy import SQLAlchemy
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
 
-from app import app
-from app.ctr import ctr
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
+    FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-    'mysql://root:1234@localhost:3306/testdb1?charset=utf8'
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-app.config['SECRET_KEY'] = 'hard to guess string'
+    @staticmethod
+    def init_app(app):
+        pass
 
-db=SQLAlchemy()
-db.init_app(app)
 
-app.register_blueprint(ctr)
-app.register_blueprint(ctr,url_prefix='/ctr')
+class DevelopmentConfig(Config):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hard_guess@localhost:3306/testdb1?charset=utf8'
+
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:testdb1@localhost:3306/testdb1?charset=utf8'
+
+
+class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+
+
+config = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig,
+
+    'default': DevelopmentConfig
+}

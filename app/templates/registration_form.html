@@ -1,4 +1,9 @@
+{% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{{ wtf.quick_form(form) }}
 
-<div><a href={{url_for('login'}}></a>existed user - login account</div>
+
+{% block page_content %}
+{{ wtf.quick_form(form) }}
+<div><a href={{url_for('ctr.log_user_in')}}>existed user - login account</a></div>
+{% endblock %}
+

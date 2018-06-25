@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+
+{% block page_content %}
 <div>
  <table>
      {% for entry in materials %}
@@ -5,12 +8,14 @@
          <td>{{entry.material_id}}</td>
          <td>{{entry.material_name}}</td>
          <td>{{entry.countnum}}</td>
-         <td><a href={{url.for('_edit_opr',material_id=entry.material_id}}>edit</a></td>
+         <td> <a href="{{ url_for('ctr.change_countnum',materialid=entry.material_id) }}">edit</a></td>
      </tr>
      {% endfor %}
     </table>
-    <a href="{{url_for('_add_opr'}}">add new material</a>
+    <div><a href="{{url_for('ctr.add_material')}}">add new material</a></div>
 </div>
+{% endblock %}
+
 
 
 
