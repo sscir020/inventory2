@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block page_content %}
+
+
+<form action="{{url_for('ctr.get_opr')}}" method="POST">
+<!--{{form.aopr()}}-->
+<!--{{form.listopr()}}-->
+<!--{% for oneopr in form.listopr %}-->
+<!--<tr>-->
+    <!--<td>{{ oneopr.diff }}</td>-->
+    <!--<td>{{ oneopr.operation }}</td>-->
+    <!--<td>{{ oneopr.submit }}</td>-->
+<!--</tr>-->
+<!--{% endfor %}-->
+{% for i in range(form.listopr|length) %}
+<tr>
+    <td>{{ form.listopr[i].diff }}{{ form.listopr[i].operation }}{{ form.listopr[i].submit }}</td>
+    {% set form.listopr[i].hide=-1 %}
+</tr>
+{% endfor %}
+</form>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block page_content %}
+<div>
+    <!--<h1>返修库存列表</h1>-->
+    <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
+         <thead>
+             <th>参数模板ID</th>
+             <th>参数数量</th>
+             <th>配件ID:配件数量-集合</th>
+         </thead>
+         {% for entry in accessories %}
+         <tr>
+             <td>{{entry.acces_id}}</td>
+             <td>{{entry.param_num}}</td>
+             <td>
+                  {% set acces= json.loads(entry.param_acces)  %}
+                 <!--{{acces}}-->
+                  {% for key in acces %}
+                 <!--{{key}}-->
+                      {{Sensorname(key|int).name}}:{{acces[key]}}&nbsp;&nbsp;&nbsp;
+                  {% endfor %}
+             </td>
+         </tr>
+         {% endfor %}
+    </table>
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_param_accessory') }}
+</div>
+{% endif %}
+{% endblock %}
+
+
+
+

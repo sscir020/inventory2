@@ -4,30 +4,45 @@
 {% block head %}
 	<meta charset="utf-8">
 	<title>Inventory System</title>
-	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
-	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	{{ super() }}
+	<link rel="stylesheet" type="text/css" href="static/css/tablelook.css"  >
+	<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
 {% endblock %}
 
 {% block navbar %}
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="#">Inventory</a>
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="sr-only">Toggle</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="{{url_for('ctr.welcome_user')}}">首页</a>
 		</div>
-		<div>
+		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="{{url_for('ctr.welcome_user')}}">Welcome
-				{% if session['userid']!= None %}
-				{{session['username']}}</a></li>
-				{% else %}
-				User</a></li>
-				{% endif %}
-				<li><a href="{{url_for('ctr.log_user_in')}}">Login</a></li>
-				<li><a href="{{url_for('ctr.register')}}">Register</a></li>
-				<li><a href="{{url_for('ctr.log_user_out')}}">Logout</a></li>
-				<li><a href="{{url_for('ctr.show_materials')}}">|    Materials</a></li>
-				<li><a href="{{url_for('ctr.show_join_oprs')}}">JoinOperations</a></li>
+				<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">欢迎
+					{% if session['userid']!= None %}
+					{{session['username']}}<b class="caret"></b></a>
+					{% else %}
+					User<b class="caret"></b></a>
+					{% endif %}
+					<ul class="dropdown-menu">
+						<li><a href="{{url_for('ctr.log_user_in')}}">登录</a></li>
+						<li><a href="{{url_for('ctr.log_user_out')}}">退出</a></li>
+					</ul>
+				</li>
+                <li><a href="#" class="divider">|</a></li>
+				<li><a href="{{url_for('ctr.show_materials',page=1,alarm_level=0)}}"> 库存列表</a></li>
+				<li><a href="{{url_for('ctr.show_add_material')}}">添加新库存</a></li>
+				<li><a href="{{url_for('ctr.show_rework_materials')}}"> 返修中列表</a></li>
+				<li><a href="{{url_for('ctr.show_buy_materials')}}"> 购买中列表</a></li>
+				<li><a href="{{url_for('ctr.show_join_oprs_main')}}">主要操作记录</a></li>
+				<li><a href="{{url_for('ctr.show_join_oprs')}}">全部操作记录</a></li>
+				<li><a href="{{url_for('ctr.show_param_accessory')}}">参数模板列表</a></li>
 			</ul>
 		</div>
 	</div>
@@ -38,14 +53,13 @@
 
 {% block content %}
 <div class="container">
-    {% block page_content %}
-    {% endblock %}
-
 	{% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         {{ message }}
     </div>
     {% endfor %}
+
+    {% block page_content %}{% endblock %}
 </div>
 {% endblock %}

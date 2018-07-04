@@ -1,0 +1,51 @@
+<!--{% extends "base.html" %}-->
+<!--{% import "_macros.html" as macros %}-->
+
+<!--{% block page_content %}-->
+<!--<div>-->
+    <!--&lt;!&ndash;<h1>库存列表</h1>&ndash;&gt;-->
+    <!--<table class="table table-hover" id="tableattr">-->
+         <!--<thead>-->
+             <!--<th>库存ID</th>-->
+             <!--<th>库存名</th>-->
+             <!--<th>库存数量</th>-->
+             <!--<th>返修中数量</th>-->
+         <!--</thead>-->
+         <!--{% for entry in materials %}-->
+         <!--<tr id="tr_entry">-->
+             <!--<td>{{entry.material_id}}</td>-->
+             <!--<td>{{entry.material_name}}</td>-->
+             <!--<td>{{entry.countnum}}</td>-->
+             <!--<td>{{entry.reworknum}}</td>-->
+         <!--</tr>-->
+         <!--<tr id="tr_input">-->
+             <!--<td></td>-->
+             <!--<td></td>-->
+             <!--<td><form name="form_inoutbound_{{entry.material_id}}" action="{{ url_for('ctr.form_change_countnum',materialid=entry.material_id) }}" method="post" class="numcls1">-->
+                        <!--入库<input type="text" name="input_inbound" id="numcls1" >-->
+                        <!--出库<input type="text" name="input_outbound" id="numcls2" >-->
+                        <!--<input type="submit" name="submit" value="操作">-->
+                    <!--</form>-->
+             <!--</td>-->
+             <!--<td><form name="form_reworkstore_{{entry.material_id}}" action="{{ url_for('ctr.form_change_reworknum',materialid=entry.material_id) }}" method="post" class="numcls1">-->
+                        <!--修好<input type="text" name="input_rework" id="numcls3">-->
+                        <!--返修<input type="text" name="input_restore"id="numcls4">-->
+                        <!--<input type="submit" name="submit" value="操作">-->
+                    <!--</form>-->
+              <!--</td>-->
+         <!--</tr>-->
+         <!--{% endfor %}-->
+    <!--</table>-->
+<!--</div>-->
+
+
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_materials') }}-->
+<!--</div>-->
+<!--{% endif %}-->
+<!--{% endblock %}-->
+
+
+
+

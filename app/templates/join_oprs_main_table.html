@@ -28,11 +28,12 @@
          </tr>
          {% endfor %}
     </table>
+    <a href="{{ url_for('ctr.rollback_opr') }}">[回滚一条操作]</a>
 </div>
 
 {% if pagination %}
 <div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs') }}
+    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs_main') }}
 </div>
 {% endif %}
 {% endblock %}

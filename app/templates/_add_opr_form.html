@@ -3,6 +3,17 @@
 
 
 {% block page_content %}
-{{ wtf.quick_form(form) }}
+<form action="{{ url_for('ctr.add_material') }}" method="post">
+    <p>材料/物品名<input type="text" name="input_material_name"></p>
+    <p>数量<input type="number" name="input_material_num"></p>
+    <p>需要的配件数量：</p>
+    <ul>
+    {% for item in materials %}
+         <li><input type="checkbox" name="input_accessory_check_{{loop.index}}" value="{{item.material_id}}">
+         {{loop.index}}.{{item.material_name}}<input type="number" name="input_accessory_num_{{loop.index}}" class="text_acce"></li>
+    {% endfor %}
+    </ul>
+    <input type="submit">
+</form>
 {% endblock %}
 

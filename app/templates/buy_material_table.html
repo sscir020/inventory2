@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block page_content %}
+<div>
+    <!--<h1>购买库存列表</h1>-->
+    <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
+         <thead>
+             <th>库存ID</th>
+             <th>库存名</th>
+             <th>购买中数量</th>
+             <th>库存数量</th>
+         </thead>
+         {% for entry in materials %}
+         <tr>
+             <td>{{entry.material_id}}</td>
+             <td>{{entry.material_name}}</td>
+             <td>{{entry.buynum}}</td>
+             <td>{{entry.countnum}}</td>
+         </tr>
+         {% endfor %}
+    </table>
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_buy_materials') }}
+</div>
+{% endif %}
+{% endblock %}
+
+
+
+
