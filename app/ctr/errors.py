@@ -1,3 +1,4 @@
+#coding:utf-8
 from . import ctr
 
 @ctr.app_errorhandler(404)
