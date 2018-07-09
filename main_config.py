@@ -50,6 +50,7 @@ class Oprenum(Enum):
     RESTORE = 4
     REWORK = 5
     BUYING = 6
+    CANCELBUY=7
 
 oprenumCH ={
     Oprenum.INITADD.name: '新入库',
@@ -57,14 +58,16 @@ oprenumCH ={
     Oprenum.OUTBOUND.name: '出库',
     Oprenum.RESTORE.name: '修好入库',
     Oprenum.REWORK.name: '返修中出库',
-    Oprenum.BUYING.name:"购买中"
+    Oprenum.BUYING.name:"购买中",
+    Oprenum.CANCELBUY.name:'取消购买'
 }
 oprenumNum = {
     '入库':Oprenum.INBOUND,
     '出库':Oprenum.OUTBOUND,
     '修好':Oprenum.RESTORE,
     '返修':Oprenum.REWORK,
-    '购买':Oprenum.BUYING
+    '购买':Oprenum.BUYING,
+    '不买':Oprenum.CANCELBUY
 }
 class Sensorname(Enum):
     P25 = 1

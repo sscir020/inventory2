@@ -4,7 +4,7 @@
 {% block page_content %}
 <div>
     <!--<h1>库存列表</h1>-->
-    <form action="{{ url_for('ctr.form_change_num',page=page,alarm_level=alarm_level) }}" method="post">
+    <form action="{{ url_for('ctr.form_change_num',page=page) }}" method="post">
 
         <table class="table table-hover" id="tableattr">
              <thead>
@@ -14,6 +14,7 @@
                  <th>库存数量</th>
                  <th>返修中数量</th>
                  <th>购买中数量</th>
+                 <th>警戒值</th>
                  <th>操作</th>
              </thead>
 
@@ -22,22 +23,21 @@
                  <td>{{entry.material_id}}</td>
                  <td>{{entry.material_name}}</td>
                  <td>{{entry.acces_id}}</td>
-                 {% if entry.countnum < alarm_level|int  %}
+                 {% if entry.countnum < entry.alarm_level  %}
                  <td  style="color:red">{{entry.countnum}}</td>
                  {% else %}
                  <td>{{entry.countnum}}</td>
                  {% endif %}
                  <td>{{entry.reworknum}}</td>
                  <td>{{entry.buynum}}</td>
+                 <td>{{entry.alarm_level}}</td>
                  <td><div>
                      <input id="numcls1"  name="input_text_{{loop.index}}" type="text">
                      <input id="numcls2"  name="input_list_{{loop.index}}"  list="operations" >
                          <datalist id="operations">
-                             <option value="入库">
-                             <option value="出库">
-                             <option value="修好">
-                             <option value="返修">
                              <option value="购买">
+                             <option value="返修">
+                             <option value="出库">
                         </datalist>
                      <input type="hidden" name="input_hidden_{{loop.index}}" value="{{entry.material_id}}">
                      <input name="input_button_{{loop.index}}" type="submit" value="操作">
@@ -52,13 +52,10 @@
 
 {% if pagination %}
 <div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_materials',alarm_level=alarm_level) }}
+    {{ macros.pagination_widget(pagination, 'ctr.show_materials') }}
 </div>
 {% endif %}
 
-<form action="{{ url_for('ctr.change_text_color') }}" method="post">
-    <input type="number" name="input_change_color" value="{{alarm_level}}">
-    <input type="submit" value="警戒值">
-</form>
+
 {% endblock %}
 

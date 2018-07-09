@@ -11,7 +11,8 @@
              <th>库存名</th>
              <th>操作数量</th>
              <th>操作类型</th>
-             <th>主件操作</th>
+             <th>操作批次</th>
+             <th>组件操作</th>
              <th>操作用户</th>
              <th>操作时间</th>
          </thead>
@@ -22,7 +23,8 @@
              <td>{{entry.material_name}}</td>
              <td>{{entry.diff}}</td>
              <td>{{oprenumCH[entry.oprtype]}}</td>
-             <td>{{entry.ismain}}</td>
+             <td>{{entry.oprbatch}}</td>
+             <td>{{entry.isgroup}}</td>
              <td>{{entry.user_name}}</td>
              <td>{{entry.momentary}}</td>
          </tr>

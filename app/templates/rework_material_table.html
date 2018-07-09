@@ -3,25 +3,35 @@
 
 {% block page_content %}
 <div>
-    <!--<h1>返修库存列表</h1>-->
-    <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
-         <thead>
-             <th>库存ID</th>
-             <th>库存名</th>
-             <th>返修中数量</th>
-             <th>库存数量</th>
-             <th>总数</th>
-         </thead>
-         {% for entry in materials %}
-         <tr>
-             <td>{{entry.material_id}}</td>
-             <td>{{entry.material_name}}</td>
-             <td>{{entry.reworknum}}</td>
-             <td>{{entry.countnum}}</td>
-             <td>{{entry.reworknum+entry.countnum}}</td>
-         </tr>
-         {% endfor %}
-    </table>
+    <form action="{{ url_for('ctr.form_change_restore_num') }}" method="post">
+         <!--<h1>返修库存列表</h1>-->
+         <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
+             <thead>
+                 <th>库存ID</th>
+                 <th>库存名</th>
+                 <th>库存数量</th>
+                 <th>返修批次</th>
+                 <th>返修数量</th>
+                 <th>修好数量</th>
+             </thead>
+             {% for entry in materials %}
+                 {% set index=loop.index %}
+                 {% set reworkdict=json.loads(entry.reworknum) %}
+                 {% for batch in reworkdict %}
+                     <tr>
+                         <td>{{entry.material_id}}</td>
+                         <td>{{entry.material_name}}</td>
+                         <td>{{entry.countnum}}</td>
+                         <td>{{batch}}</td>
+                         <td>{{reworkdict[batch]}}</td>
+                         <td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">
+                             <input type="number" name="input_restore_num_{{index}}_{{loop.index}}"></td>
+                     </tr>
+                 {% endfor %}
+             {% endfor %}
+         </table>
+        <input type="submit" name="input_restore_btn" value="修好提交">
+    </form>
 </div>
 
 

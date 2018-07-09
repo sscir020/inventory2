@@ -13,29 +13,33 @@ drop table if exists accessories;
 create table accessories(
         acces_id int not null auto_increment,
         param_num int not null,
-        param_acces varchar(256) not null,
+        param_acces varchar(2048) not null,
         primary key (acces_id)
 );
 
-drop table if EXISTS oprs;
+
 drop table if exists materials;
 create table materials(
 		material_id int not null auto_increment,
 		material_name varchar(64) not null,
 		countnum int not null,
-		reworknum int not null default 0,
-		buynum int not null default 0,
+		reworknum varchar(256) not null default '{}',
+		buynum varchar(256) not null default '{}',
+		alarmlevel int not null default 0,
 		acces_id int not null default 0,
 		primary key (material_id),
 		unique(material_name)
 		);
+
+drop table if EXISTS oprs;
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,
 		material_id int not null,
 		diff int not null,
 		oprtype varchar(16) not null,
-		ismain tinyint(1) not null,
+		oprbatch int not null default 0,
+		isgroup tinyint(1) not null default 0,
 		momentary datetime not null default current_timestamp,
 		primary key (opr_id),
 		foreign key (user_id) references users(user_id),
