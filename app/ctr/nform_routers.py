@@ -14,6 +14,9 @@ def welcome_user():
     # return "welcome_user"
     return render_template('welcome.html')
 
+@ctr.route('/about')
+def about_app():
+    return render_template('about.html')
 
 @ctr.route('/logout')
 @loggedin_required
