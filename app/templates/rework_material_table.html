@@ -9,9 +9,9 @@
              <thead>
                  <th>库存ID</th>
                  <th>库存名</th>
-                 <th>库存数量</th>
-                 <th>返修批次</th>
                  <th>返修数量</th>
+                 <th>返修批次</th>
+                 <th>库存数量</th>
                  <th>修好数量</th>
              </thead>
              {% for entry in materials %}
@@ -21,9 +21,9 @@
                      <tr>
                          <td>{{entry.material_id}}</td>
                          <td>{{entry.material_name}}</td>
-                         <td>{{entry.countnum}}</td>
-                         <td>{{batch}}</td>
                          <td>{{reworkdict[batch]}}</td>
+                         <td>{{batch}}</td>
+                         <td>{{entry.countnum}}</td>
                          <td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">
                              <input type="number" name="input_restore_num_{{index}}_{{loop.index}}"></td>
                      </tr>

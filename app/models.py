@@ -44,13 +44,21 @@ class Material(db.Model):
             if diff<=0:
                 flash("新入库数量小于等于0")
                 return False
+        elif oprtype == Oprenum.OUTBOUND.name:
+            if self.countnum<diff:
+                flash("出库数量大于库存数量")
+                return False
         elif oprtype == Oprenum.BUYING.name:
             if diff<=0:
                 flash("购买数量小于等于0")
                 return False
+        elif oprtype == Oprenum.REWORK.name:
+            if self.countnum<diff:
+                flash("返修数量大于库存数量")
+                return False
         elif oprtype==Oprenum.INBOUND.name:
             buydict = json.loads(self.buynum)
-            print(buydict)
+            # print(buydict)
             if batch not in buydict.keys():
                 flash("批次不存在")
                 return False
@@ -65,54 +73,58 @@ class Material(db.Model):
             if reworkdict[batch]<diff:
                 flash("修好数量大于返修数量")
                 return False
-        elif oprtype == Oprenum.OUTBOUND.name:
-            if self.countnum<diff:
-                flash("出库数量大于库存数量")
-                return False
-        elif oprtype == Oprenum.REWORK.name:
-            if self.countnum<diff:
-                flash("返修数量大于库存数量")
-                return False
-
         return True
 
     def material_change_num(self,diff,oprtype,batch):
-        if oprtype==Oprenum.INITADD.name:
+        if oprtype==Oprenum.INITADD.name:#****
             self.countnum += diff
-        elif oprtype == Oprenum.BUYING.name:
+        elif oprtype == Oprenum.OUTBOUND.name:#****
+            self.countnum-=diff
+        elif oprtype == Oprenum.BUYING.name:#-->
             buydict=json.loads(self.buynum)
             batch=len(buydict.keys())+1
             buydict[batch]=diff
             self.buynum=json.dumps(buydict)
-        elif oprtype==Oprenum.INBOUND.name:
+        elif oprtype == Oprenum.REWORK.name:#-->
+            reworkdict = json.loads(self.reworknum)
+            batch = len(reworkdict.keys()) + 1
+            reworkdict[batch]=diff
+            self.reworknum = json.dumps(reworkdict)
+            self.countnum-=diff
+        elif oprtype==Oprenum.INBOUND.name:####
             buydict = json.loads(self.buynum)
             buydict[batch]-=diff
             if buydict[batch]==0:
                 buydict.pop(batch)
             self.buynum = json.dumps(buydict)
             self.countnum+=diff
-        elif oprtype == Oprenum.RESTORE.name:
+        elif oprtype == Oprenum.RESTORE.name:####
             reworkdict=json.loads(self.reworknum)
             reworkdict[batch]-=diff
             if reworkdict[batch]==0:
                 reworkdict.pop(batch)
             self.reworknum=json.dumps(reworkdict)
             self.countnum+=diff
-        elif oprtype == Oprenum.OUTBOUND.name:
-            self.countnum-=diff
-        elif oprtype == Oprenum.REWORK.name:
-            reworkdict = json.loads(self.reworknum)
-            batch = len(reworkdict.keys()) + 1
-            reworkdict[batch]=diff
-            self.reworknum = json.dumps(reworkdict)
-            self.countnum-=diff
+        elif oprtype == Oprenum.CANCELBUY.name:
+            buydict = json.loads(self.buynum)
+            value=buydict.pop(batch)
+            batch=value
+            self.buynum = json.dumps(buydict)
+        else:
+            flash("操作类型错误")
+            batch=-1
         db.session.add(self)
         # db.session.commit()
+        return batch
 
     def material_isvalid_num_rev (self,diff,oprtype,batch):
         if oprtype==Oprenum.INITADD.name:
             if diff> self.countnum:
                 flash("取消新入库数量大于库存数量")##
+                return False
+        elif oprtype == Oprenum.OUTBOUND.name:
+            if diff<=0:
+                flash("取消出库数量小于等于0")##
                 return False
         elif oprtype == Oprenum.BUYING.name:
             buydict = json.loads(self.buynum)
@@ -122,18 +134,6 @@ class Material(db.Model):
             if diff> buydict[batch]:
                 flash("取消购买数量大于购买批次数量")##
                 return False
-        elif oprtype==Oprenum.INBOUND.name:
-            if diff>self.countnum:# 5 2  -> 7 0
-                flash("取消入库数量大于库存数量")
-                return False
-        elif oprtype == Oprenum.RESTORE.name:
-            if diff>self.countnum:
-                flash("取消修好数量大于库存数量")
-                return False
-        elif oprtype == Oprenum.OUTBOUND.name:
-            if diff<=0:
-                flash("取消出库数量小于等于0")##
-                return False
         elif oprtype == Oprenum.REWORK.name:
             reworkdict = json.loads(self.reworknum)
             if batch not in reworkdict.keys():
@@ -142,19 +142,37 @@ class Material(db.Model):
             if diff>reworkdict[batch]:
                 flash("取消返修数量大于返修批次数量")##
                 return False
+        elif oprtype==Oprenum.INBOUND.name:
+            if diff>self.countnum:# 5 2  -> 7 0
+                flash("取消入库数量大于库存数量")
+                return False
+        elif oprtype == Oprenum.RESTORE.name:
+            if diff>self.countnum:
+                flash("取消修好数量大于库存数量")
+                return False
         return True
 
 
     def material_change_num_rev(self,diff,oprtype,batch):
         if oprtype==Oprenum.INITADD.name:
             self.countnum -= diff
+        elif oprtype == Oprenum.OUTBOUND.name:
+            self.countnum+=diff
         elif oprtype == Oprenum.BUYING.name:
             # batch=len(self.buynum.keys())+1
             buydict = json.loads(self.buynum)
+            # print(buydict)
             buydict[batch]-=diff
             if buydict[batch]==0:
                 buydict.pop(batch)
             self.buynum = json.dumps(buydict)
+        elif oprtype == Oprenum.REWORK.name:
+            reworkdict = json.loads(self.reworknum)
+            reworkdict[batch]-=diff
+            if reworkdict[batch] == 0:
+                reworkdict.pop(batch)
+            self.reworknum = json.dumps(reworkdict)
+            self.countnum+=diff
         elif oprtype==Oprenum.INBOUND.name:
             buydict = json.loads(self.buynum)
             if batch not in buydict.keys():
@@ -171,18 +189,16 @@ class Material(db.Model):
                 reworkdict[batch] += diff
             self.reworknum = json.dumps(reworkdict)
             self.countnum-=diff
-        elif oprtype == Oprenum.OUTBOUND.name:
-            self.countnum+=diff
-        elif oprtype == Oprenum.REWORK.name:
-            reworkdict = json.loads(self.reworknum)
-            reworkdict[batch]-=diff
-            if reworkdict[batch] == 0:
-                reworkdict.pop(batch)
-            self.reworknum = json.dumps(reworkdict)
-            self.countnum+=diff
+        elif oprtype == Oprenum.CANCELBUY.name:
+            buydict = json.loads(self.buynum)
+            buydict[batch]=diff
+            self.buynum = json.dumps(buydict)
+        else:
+            flash("操作类型错误")
+            batch=-1
         db.session.add(self)
         # db.session.commit()
-
+        return batch
 
     def prt(self):
         print(self.material_id, self.material_name, self.countnum,self.reworknum,self.buynum)

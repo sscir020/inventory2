@@ -61,22 +61,22 @@ def add_material():
                         else:
                             dict[request.form[keyid]]=request.form[keynum]
                 acces=json.dumps(dict)
-                print (acces)
+                # print (acces)
                 if(len(dict)>0 ):
                     if Accessory.query.filter_by(param_acces=acces).first()==None:
                         a = Accessory(param_num=len(dict),param_acces=acces)
                         db.session.add(a)
                         db.session.commit()
                     a = Accessory.query.filter_by(param_acces=acces).first()
-                    m=Material(material_name=materialname, countnum=0,acces_id=a.acces_id,alarm_level=alarm_level)
+                    m = Material(material_name=materialname, countnum=0,acces_id=a.acces_id,alarm_level=alarm_level)
                 else:
                     m = Material(material_name=materialname, countnum=0, acces_id=0,alarm_level=alarm_level)
                 db.session.add(m)
                 db.session.commit()
+
                 m=Material.query.filter_by(material_name=materialname).first()
                 o=Opr(material_id=m.material_id,diff=m.countnum,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch=0 )
                 db.session.add(o)
-
                 if m.acces_id != None and m.acces_id != 0:
                     a = Accessory.query.filter_by(acces_id=m.acces_id).first()
                     data = json.loads(a.param_acces)
@@ -106,9 +106,9 @@ def convert_str_num(num):
         return 0
     return int(num)
 
-def change_outbound_num(m,materialid,diff,oprtype,batch):
-    m.material_change_num(diff=diff,oprtype=oprtype,batch=0)
-    o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True)
+def change_outbound_num(m,materialid,diff,oprtype):
+    oprbatch=m.material_change_num(diff=diff,oprtype=oprtype,batch=0)
+    o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True,oprbatch=oprbatch)
     db.session.add(o)
 
     if m.acces_id!= None and m.acces_id!=0:
@@ -119,8 +119,8 @@ def change_outbound_num(m,materialid,diff,oprtype,batch):
             num=num*diff
             m1=Material.query.filter_by(material_id=materialid).first()
             if m1.material_isvalid_num(diff=diff,oprtype=oprtype,batch=0):
-                m1.material_change_num(diff=num,oprtype=oprtype,batch=0)
-                o = Opr(material_id=m1.material_id, diff=num, user_id=session['userid'], oprtype=oprtype,isgroup=False,oprbatch=batch)
+                oprbatch=m1.material_change_num(diff=num,oprtype=oprtype,batch=0)
+                o = Opr(material_id=m1.material_id, diff=num, user_id=session['userid'], oprtype=oprtype,isgroup=False,oprbatch=oprbatch)
                 db.session.add(o)
             else:
                 flash("配件数量不足")
@@ -128,9 +128,9 @@ def change_outbound_num(m,materialid,diff,oprtype,batch):
     db.session.commit()
 
 
-def change_rework_buying_num(m,materialid,diff,oprtype,batch):#outbound,rework,buying
-        m.material_change_num(diff=diff,oprtype=oprtype,batch=0)
-        o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True,oprbatch=batch)
+def change_rework_buying_num(m,materialid,diff,oprtype):#outbound,rework,buying
+        oprbatch=m.material_change_num(diff=diff,oprtype=oprtype,batch=0)
+        o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True,oprbatch=oprbatch)
         db.session.add(o)
         db.session.commit()
 
@@ -163,10 +163,10 @@ def form_change_num(page):
                     flash("数量超标")
                 else:
                     if oprtype==Oprenum.REWORK.name or oprtype==Oprenum.BUYING.name:
-                        change_rework_buying_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype,batch=0)
+                        change_rework_buying_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype)
                         flash(oprenumCH[oprtype], "数量更新成功")
                     elif oprtype==Oprenum.OUTBOUND.name:
-                        change_outbound_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype,batch=0)
+                        change_outbound_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype)
                         flash(oprenumCH[oprtype], "数量更新成功")
                     else:
                         flash("错误的操作类型")
@@ -199,10 +199,11 @@ def form_change_inbound_num():
             elif m.material_isvalid_num(diff=diff, oprtype=Oprenum.INBOUND.name, batch=batch) == False:
                 flash("数量超标")
             else:
-                m.material_change_num(diff=diff,oprtype=Oprenum.INBOUND.name,batch=batch)
-                o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.INBOUND.name, isgroup=True,oprbatch=batch)
-                db.session.add(o)
-                db.session.commit()
+                batch=m.material_change_num(diff=diff,oprtype=Oprenum.INBOUND.name,batch=batch)
+                if batch!=-1:
+                    o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.INBOUND.name, isgroup=True,oprbatch=batch)
+                    db.session.add(o)
+                    db.session.commit()
     return redirect(url_for('ctr.show_buy_materials'))
 
 

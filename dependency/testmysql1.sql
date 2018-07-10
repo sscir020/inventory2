@@ -17,21 +17,21 @@ create table accessories(
         primary key (acces_id)
 );
 
-
+drop table if EXISTS oprs;
 drop table if exists materials;
+
 create table materials(
 		material_id int not null auto_increment,
 		material_name varchar(64) not null,
-		countnum int not null,
+		countnum int not null default 0,
 		reworknum varchar(256) not null default '{}',
 		buynum varchar(256) not null default '{}',
-		alarmlevel int not null default 0,
+		alarm_level int not null default 0,
 		acces_id int not null default 0,
 		primary key (material_id),
 		unique(material_name)
 		);
 
-drop table if EXISTS oprs;
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,

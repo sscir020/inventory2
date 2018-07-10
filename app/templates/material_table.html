@@ -10,27 +10,28 @@
              <thead>
                  <th>库存ID</th>
                  <th>库存名</th>
-                 <th>参数模板ID</th>
                  <th>库存数量</th>
-                 <th>返修中数量</th>
-                 <th>购买中数量</th>
+                 <th>购买中数量列表</th>
+                 <th>返修中数量列表</th>
                  <th>警戒值</th>
+                 <th>参数模板ID</th>
                  <th>操作</th>
              </thead>
-
              {% for entry in materials %}
              <tr id="tr_entry">
                  <td>{{entry.material_id}}</td>
                  <td>{{entry.material_name}}</td>
-                 <td>{{entry.acces_id}}</td>
                  {% if entry.countnum < entry.alarm_level  %}
                  <td  style="color:red">{{entry.countnum}}</td>
                  {% else %}
                  <td>{{entry.countnum}}</td>
                  {% endif %}
-                 <td>{{entry.reworknum}}</td>
-                 <td>{{entry.buynum}}</td>
+                 {% set buylist=json.loads(entry.buynum) %}
+                 <td>{{buylist.values()|list}}</td>
+                 {% set reworklist=json.loads(entry.reworknum) %}
+                 <td>{{reworklist.values()|list}}</td>
                  <td>{{entry.alarm_level}}</td>
+                 <td>{{entry.acces_id}}</td>
                  <td><div>
                      <input id="numcls1"  name="input_text_{{loop.index}}" type="text">
                      <input id="numcls2"  name="input_list_{{loop.index}}"  list="operations" >

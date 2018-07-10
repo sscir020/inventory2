@@ -9,9 +9,9 @@
              <thead>
                  <th>库存ID</th>
                  <th>库存名</th>
-                 <th>库存数量</th>
-                 <th>购买批次</th>
                  <th>购买中数量</th>
+                 <th>购买批次</th>
+                 <th>库存数量</th>
                  <th>到货数量</th>
                  <th>取消订单</th>
              </thead>
@@ -22,9 +22,9 @@
                      <tr>
                          <td>{{entry.material_id}}</td>
                          <td>{{entry.material_name}}</td>
-                         <td>{{entry.countnum}}</td>
-                         <td>{{batch}}</td>
                          <td>{{buydict[batch]}}</td>
+                         <td>{{batch}}</td>
+                         <td>{{entry.countnum}}</td>
                          <td><input type="number" name="input_inbound_num_{{index}}_{{loop.index}}">
                              <input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>
                          <td><input type="checkbox" name="input_checkbox" value="{{entry.material_id}}_{{batch}}" ></td>
@@ -32,8 +32,8 @@
                  {% endfor%}
              {% endfor %}
          </table>
-         <input type="submit" name="input_inbound_btn" value="到货" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">
-         <input type="submit" name="input_cancel_btn" value="取消订单" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">
+         <input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">
+         <input type="submit" name="input_cancel_btn" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">
     </form>
 </div>
 

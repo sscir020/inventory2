@@ -200,3 +200,10 @@ if __name__ == '__main__':
     #             flash('Invalid password.')
     #     return render_template("auth/change_password.html", form=form)
 
+    # form1 = ColorForm()
+    # if form1.validate_on_submit:
+    #     alarm_level = form1.alarm_level.data
+    #     if alarm_level==None or  alarm_level <0:
+    #         alarm_level = 0
+    #         flash("警戒值错误")
+    # flash("提交错误")

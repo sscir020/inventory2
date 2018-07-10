@@ -40,16 +40,8 @@ def show_materials(page):
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     materials=pagination.items
 
-    # form1 = ColorForm()
-    # if form1.validate_on_submit:
-    #     alarm_level = form1.alarm_level.data
-    #     if alarm_level==None or  alarm_level <0:
-    #         alarm_level = 0
-    #         flash("警戒值错误")
-    # flash("提交错误")
-
     # print(pagination==None)
-    return render_template('material_table.html',materials=materials,pagination=pagination,Param=Param,page=page )
+    return render_template('material_table.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
     # return render_template('material_table.html',materials=Material.query.all())
 
 @ctr.route('/rework_materials_table')
@@ -124,15 +116,17 @@ def rollback_opr():
         db.session.commit()
         opr = Opr.query.order_by(Opr.opr_id.desc()).first()
     m = Material.query.filter_by(material_id=opr.material_id).first()
-    if m != None:
-        m.material_change_num_rev(diff=opr.diff, batch=opr.oprbatch, oprtype=opr.oprtype)
-        db.session.add(m)
-    else:
-        flash("操作记录错误")
-        return redirect(url_for('ctr.show_join_oprs_main'))
     if opr.oprtype == Oprenum.INITADD.name:
+        Opr.query.filter_by(opr_id=opr.opr_id).delete()
         Material.query.filter_by(material_id=opr.material_id).delete()
-    Opr.query.filter_by(opr_id=opr.opr_id).delete()
+    else:
+        if m != None:
+            m.material_change_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype)
+            Opr.query.filter_by(opr_id=opr.opr_id).delete()
+            db.session.add(m)
+        else:
+            flash("操作记录错误")
+            return redirect(url_for('ctr.show_join_oprs_main'))
     db.session.commit()
     flash("回滚成功")
     return redirect(url_for('ctr.show_join_oprs_main'))
