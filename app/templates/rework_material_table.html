@@ -3,34 +3,45 @@
 
 {% block page_content %}
 <div>
-    <form action="{{ url_for('ctr.form_change_restore_num') }}" method="post">
-         <!--<h1>返修库存列表</h1>-->
+    <form name="form_rework" method="post">
+         <h4>返修中列表</h4>
          <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
              <thead>
                  <th>库存ID</th>
                  <th>库存名</th>
                  <th>返修数量</th>
-                 <th>返修批次</th>
                  <th>库存数量</th>
+                 <th>返修日期</th>
                  <th>修好数量</th>
+                 <th>备注</th>
+                 <th>备注勾选</th>
              </thead>
              {% for entry in materials %}
-                 {% set index=loop.index %}
+                 <!--{% set index=loop.index %}-->
                  {% set reworkdict=json.loads(entry.reworknum) %}
+                 {% set commentdict=json.loads(entry.rework_comments) %}
                  {% for batch in reworkdict %}
                      <tr>
                          <td>{{entry.material_id}}</td>
                          <td>{{entry.material_name}}</td>
                          <td>{{reworkdict[batch]}}</td>
-                         <td>{{batch}}</td>
                          <td>{{entry.countnum}}</td>
-                         <td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">
-                             <input type="number" name="input_restore_num_{{index}}_{{loop.index}}"></td>
+                         <td>{{batch}}</td>
+                         <!--<td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">-->
+                         <td><input type="number" name="input_restore_num_{{entry.material_id}}_{{batch}}"></td>
+                         {% set comment='' %}
+                         {% if batch in commentdict.keys() %}
+                         {% set comment=commentdict[batch] %}
+                         {% endif %}
+                         <td><input type="text" name="input_comment_{{entry.material_id}}_{{batch}}" value="{{comment}}"></td>
+                         <td><input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{batch}}" ></td>
                      </tr>
                  {% endfor %}
              {% endfor %}
          </table>
-        <input type="submit" name="input_restore_btn" value="修好提交">
+         <input type="submit" name="input_restore_btn" value="修好提交" onclick="form_rework.action='{{ url_for('ctr.form_change_restore_num') }}';form_buy.submit()">
+         <input type="submit" name="input_cancel_btn" value="报废提交" onclick="form_rework.action='{{ url_for('ctr.form_change_scrap') }}';form_buy.submit()">
+         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_rework.action='{{ url_for('ctr.form_change_rework_comment') }}';form_buy.submit()">
     </form>
 </div>
 

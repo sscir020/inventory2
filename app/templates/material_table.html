@@ -3,7 +3,7 @@
 
 {% block page_content %}
 <div>
-    <!--<h1>库存列表</h1>-->
+    <h4>库存列表</h4>
     <form action="{{ url_for('ctr.form_change_num',page=page) }}" method="post">
 
         <table class="table table-hover" id="tableattr">
@@ -11,11 +11,11 @@
                  <th>库存ID</th>
                  <th>库存名</th>
                  <th>库存数量</th>
-                 <th>购买中数量列表</th>
-                 <th>返修中数量列表</th>
                  <th>警戒值</th>
                  <th>参数模板ID</th>
-                 <th>操作</th>
+                 <th>购买中数量列表</th>
+                 <th>返修中数量列表</th>
+                 <th>操作数量-操作类型</th>
              </thead>
              {% for entry in materials %}
              <tr id="tr_entry">
@@ -26,27 +26,35 @@
                  {% else %}
                  <td>{{entry.countnum}}</td>
                  {% endif %}
-                 {% set buylist=json.loads(entry.buynum) %}
-                 <td>{{buylist.values()|list}}</td>
-                 {% set reworklist=json.loads(entry.reworknum) %}
-                 <td>{{reworklist.values()|list}}</td>
                  <td>{{entry.alarm_level}}</td>
                  <td>{{entry.acces_id}}</td>
+                 {% set buylist=json.loads(entry.buynum) %}
+                 <td>
+                     {% if buylist|length> 0 %}
+                     {{buylist.values()|list}}
+                     {% endif %}
+                 </td>
+                 {% set reworklist=json.loads(entry.reworknum) %}
+                 <td>
+                     {% if reworklist|length> 0 %}
+                     {{reworklist.values()|list}}
+                     {% endif %}
+                 </td>
                  <td><div>
-                     <input id="numcls1"  name="input_text_{{loop.index}}" type="text">
-                     <input id="numcls2"  name="input_list_{{loop.index}}"  list="operations" >
+                     <input id="numcls1"  name="input_number_{{entry.material_id}}" type="text">
+                     <input id="numcls2"  name="input_oprlist_{{entry.material_id}}"  list="operations" >
                          <datalist id="operations">
                              <option value="购买">
                              <option value="返修">
                              <option value="出库">
                         </datalist>
-                     <input type="hidden" name="input_hidden_{{loop.index}}" value="{{entry.material_id}}">
-                     <input name="input_button_{{loop.index}}" type="submit" value="操作">
+                     <!--<input type="hidden" name="input_hidden_{{loop.index}}" value="{{entry.material_id}}">-->
                      </div>
                  </td>
              </tr>
              {% endfor %}
         </table>
+        <input name="input_sbumit" type="submit" value="操作">
     </form>
 </div>
 

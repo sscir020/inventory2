@@ -4,8 +4,8 @@
 
 {% block page_content %}
 <form action="{{ url_for('ctr.add_material') }}" method="post">
-    <p>材料/物品名<input type="text" name="input_material_name"></p>
-    <p>警戒值<input type="number" name="input_alarm_level"></p>
+    <p>材料名<input type="text" name="input_material_name"></p>
+    <p>警戒值<input type="number" name="input_alarm_level" value=20></p>
     <p>每个材料/物品需要的配件个数：</p>
     <ul>
     {% for item in materials %}

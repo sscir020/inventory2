@@ -10,7 +10,7 @@ class Config:
     SQLALCHEMY_POOL_SIZE = 100
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    FLASK_NUM_PER_PAGE = 20
+    FLASK_NUM_PER_PAGE = 15
 #SESSION_TYPE= 'redis'
     SESSION_PERMANENT = True
     SESSION_KEY_PREFIX='session'
@@ -51,15 +51,17 @@ class Oprenum(Enum):
     REWORK = 5
     BUYING = 6
     CANCELBUY=7
+    SCRAP=8
 
 oprenumCH ={
     Oprenum.INITADD.name: '新入库',
     Oprenum.INBOUND.name: '入库',
     Oprenum.OUTBOUND.name: '出库',
-    Oprenum.RESTORE.name: '修好入库',
-    Oprenum.REWORK.name: '返修中出库',
+    Oprenum.RESTORE.name: '修好',
+    Oprenum.REWORK.name: '返修中',
     Oprenum.BUYING.name:"购买中",
-    Oprenum.CANCELBUY.name:'取消购买'
+    Oprenum.CANCELBUY.name:'取消购买',
+    Oprenum.SCRAP.name:'报废'
 }
 oprenumNum = {
     '入库':Oprenum.INBOUND,
@@ -67,7 +69,8 @@ oprenumNum = {
     '修好':Oprenum.RESTORE,
     '返修':Oprenum.REWORK,
     '购买':Oprenum.BUYING,
-    '不买':Oprenum.CANCELBUY
+    '不买':Oprenum.CANCELBUY,
+    '报废':Oprenum.SCRAP
 }
 class Sensorname(Enum):
     P25 = 1

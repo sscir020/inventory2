@@ -52,7 +52,7 @@ def show_materials(page):
 def show_rework_materials():
     # flash('返修列表')
     page = request.args.get('page',1,type=int)
-    pagination = Material.query.filter(Material.reworknum!='{}').order_by(Material.material_id.desc()).\
+    pagination = Material.query.filter(Material.reworknum!='{}').order_by(Material.material_id).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     materials=pagination.items
     return render_template('rework_material_table.html',materials=materials,pagination=pagination,json=json )
@@ -63,7 +63,7 @@ def show_rework_materials():
 def show_buy_materials():
     # flash('购买列表')
     page = request.args.get('page',1,type=int)
-    pagination = Material.query.filter(Material.buynum!='{}').order_by(Material.material_id.desc()).\
+    pagination = Material.query.filter(Material.buynum!='{}').order_by(Material.material_id).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     materials=pagination.items
     return render_template('buy_material_table.html',materials=materials,pagination=pagination,json=json )
@@ -76,7 +76,7 @@ def show_param_accessory():
     pagination = Accessory.query.order_by(Accessory.acces_id).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     accessories=pagination.items
-    return render_template('param_accessory_table.html',accessories=accessories,pagination=pagination,json=json,Sensorname=Sensorname )
+    return render_template('param_accessory_table.html',accessories=accessories,pagination=pagination,json=json,Material=Material )
 
 @ctr.route('/join_oprs_table')
 @loggedin_required

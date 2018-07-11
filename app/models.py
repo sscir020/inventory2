@@ -33,10 +33,12 @@ class Material(db.Model):
     material_id=db.Column(db.Integer,nullable=False,primary_key=True)
     material_name=db.Column(db.String(64),nullable=False, unique=True, index=True)
     countnum=db.Column(db.Integer,nullable=False,default=0)
-    reworknum=db.Column(db.String(256),nullable=False,default='{}')
-    buynum = db.Column(db.String(256), nullable=False, default='{}')
     alarm_level=db.Column(db.Integer,nullable=False,default=0)
     acces_id=db.Column(db.Integer, db.ForeignKey('accessories.acces_id'),default=0)
+    buynum = db.Column(db.String(256), nullable=False, default='{}')
+    reworknum=db.Column(db.String(256),nullable=False,default='{}')
+    buy_comments = db.Column(db.String(2048), nullable=True, default='{}')
+    rework_comments=db.Column(db.String(2048),nullable=True,default='{}')
     oprs = db.relationship('Opr', backref='materials', lazy='dynamic')
 
     def material_isvalid_num(self,diff,oprtype,batch):
@@ -73,6 +75,13 @@ class Material(db.Model):
             if reworkdict[batch]<diff:
                 flash("修好数量大于返修数量")
                 return False
+        elif oprtype == Oprenum.SCRAP.name:
+            reworkdict = json.loads(self.reworknum)
+            if reworkdict[batch]<diff:
+                flash("报废数量大于返修数量")
+                return False
+        else:
+            flash("操作类型错误")
         return True
 
     def material_change_num(self,diff,oprtype,batch):
@@ -82,39 +91,77 @@ class Material(db.Model):
             self.countnum-=diff
         elif oprtype == Oprenum.BUYING.name:#-->
             buydict=json.loads(self.buynum)
-            batch=len(buydict.keys())+1
+            # comments_dict = json.loads(self.buy_comments)
+            batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # batch=len(buydict.keys())+1
             buydict[batch]=diff
+            # comments_dict[batch] = comment
             self.buynum=json.dumps(buydict)
+            # self.buy_comments = json.dumps(comment)
         elif oprtype == Oprenum.REWORK.name:#-->
             reworkdict = json.loads(self.reworknum)
-            batch = len(reworkdict.keys()) + 1
+            # comments_dict = json.loads(self.rework_comments)
+            batch=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # batch = len(reworkdict.keys()) + 1
             reworkdict[batch]=diff
+            self.countnum -= diff
+            # comments_dict[batch] = comment
             self.reworknum = json.dumps(reworkdict)
-            self.countnum-=diff
+            # self.rework_comments = json.dumps(comment)
         elif oprtype==Oprenum.INBOUND.name:####
             buydict = json.loads(self.buynum)
             buydict[batch]-=diff
+            self.countnum += diff
             if buydict[batch]==0:
                 buydict.pop(batch)
+                comments_dict = json.loads(self.buy_comments)
+                if batch in comments_dict:
+                    comments_dict.pop(batch)
+                    self.buy_comments = json.dumps(comments_dict)
+            # else:
+                # comments_dict[batch] = comment
             self.buynum = json.dumps(buydict)
-            self.countnum+=diff
+
         elif oprtype == Oprenum.RESTORE.name:####
             reworkdict=json.loads(self.reworknum)
             reworkdict[batch]-=diff
+            self.countnum += diff
             if reworkdict[batch]==0:
                 reworkdict.pop(batch)
+                comments_dict = json.loads(self.rework_comments)
+                if batch in comments_dict:
+                    comments_dict.pop(batch)
+                    self.rework_comments = json.dumps(comments_dict)
+            # else:
+                # comments_dict[batch] = comment
             self.reworknum=json.dumps(reworkdict)
-            self.countnum+=diff
+
         elif oprtype == Oprenum.CANCELBUY.name:
             buydict = json.loads(self.buynum)
             value=buydict.pop(batch)
+            comments_dict = json.loads(self.buy_comments)
+            if batch in comments_dict:
+                comments_dict.pop(batch)
+                self.buy_comments = json.dumps(comments_dict)
             batch=value
             self.buynum = json.dumps(buydict)
+        elif oprtype == Oprenum.SCRAP.name:
+            reworkdict = json.loads(self.reworknum)
+            reworkdict[batch]-=diff
+            if reworkdict[batch]==0:
+                reworkdict.pop(batch)
+                comments_dict = json.loads(self.rework_comments)
+                if batch in comments_dict:
+                    comments_dict.pop(batch)
+                    self.rework_comments = json.dumps(comments_dict)
+            # else:
+                # comments_dict[batch] = comment
+            self.reworknum = json.dumps(reworkdict)
         else:
             flash("操作类型错误")
             batch=-1
         db.session.add(self)
-        # db.session.commit()
+        db.session.commit()
         return batch
 
     def material_isvalid_num_rev (self,diff,oprtype,batch):
@@ -140,7 +187,7 @@ class Material(db.Model):
                 flash("批次不存在")
                 return False
             if diff>reworkdict[batch]:
-                flash("取消返修数量大于返修批次数量")##
+                flash("取消返修数量大于返修批次数量")
                 return False
         elif oprtype==Oprenum.INBOUND.name:
             if diff>self.countnum:# 5 2  -> 7 0
@@ -150,6 +197,12 @@ class Material(db.Model):
             if diff>self.countnum:
                 flash("取消修好数量大于库存数量")
                 return False
+        elif oprtype == Oprenum.SCRAP.name:
+            if diff<=0:
+                flash("报废数量小于等于0")
+                return False
+        else:
+            flash("操作类型错误")
         return True
 
 
@@ -161,43 +214,69 @@ class Material(db.Model):
         elif oprtype == Oprenum.BUYING.name:
             # batch=len(self.buynum.keys())+1
             buydict = json.loads(self.buynum)
+            comments_dict = json.loads(self.buy_comments)
             # print(buydict)
             buydict[batch]-=diff
             if buydict[batch]==0:
                 buydict.pop(batch)
+                comments_dict.pop(batch)
             self.buynum = json.dumps(buydict)
+
         elif oprtype == Oprenum.REWORK.name:
             reworkdict = json.loads(self.reworknum)
+            comments_dict = json.loads(self.rework_comments)
             reworkdict[batch]-=diff
+            self.countnum += diff
             if reworkdict[batch] == 0:
                 reworkdict.pop(batch)
+                comments_dict.pop(batch)
             self.reworknum = json.dumps(reworkdict)
-            self.countnum+=diff
+            self.rework_comments = json.dumps(comments_dict)
+
         elif oprtype==Oprenum.INBOUND.name:
             buydict = json.loads(self.buynum)
+            comments_dict = json.loads(self.buy_comments)
             if batch not in buydict.keys():
                 buydict[batch] = diff
+                comments_dict[batch] = '{}'
             else:
                 buydict[batch]+=diff
+            self.countnum -= diff
             self.buynum = json.dumps(buydict)
-            self.countnum-=diff
+            self.buy_comments = json.dumps(comments_dict)
         elif oprtype == Oprenum.RESTORE.name:
             reworkdict = json.loads(self.reworknum)
+            comments_dict = json.loads(self.rework_comments)
             if batch not in reworkdict.keys():
                 reworkdict[batch] = diff
+                comments_dict[batch] = '{}'
             else:#  if self.reworknum[batch]==0:
                 reworkdict[batch] += diff
+            self.countnum -= diff
             self.reworknum = json.dumps(reworkdict)
-            self.countnum-=diff
+            self.rework_comments = json.dumps(comments_dict)
         elif oprtype == Oprenum.CANCELBUY.name:
             buydict = json.loads(self.buynum)
+            comments_dict = json.loads(self.buy_comments)
             buydict[batch]=diff
+            comments_dict[batch] = '{}'
             self.buynum = json.dumps(buydict)
+            self.buy_comments = json.dumps(comments_dict)
+        elif oprtype == Oprenum.SCRAP.name:
+            reworkdict = json.loads(self.reworknum)
+            comments_dict = json.loads(self.rework_comments)
+            if batch not in reworkdict.keys():
+                reworkdict[batch] = diff
+                comments_dict[batch] = '{}'
+            else:
+                reworkdict[batch] += diff
+            self.reworknum = json.dumps(reworkdict)
+            self.rework_comments = json.dumps(comments_dict)
         else:
             flash("操作类型错误")
-            batch=-1
+            batch="-1"
         db.session.add(self)
-        # db.session.commit()
+        db.session.commit()
         return batch
 
     def prt(self):
@@ -211,8 +290,9 @@ class Opr(db.Model):
     diff = db.Column(db.Integer, nullable=False)
     material_id = db.Column(db.Integer, db.ForeignKey('materials.material_id'))
     oprtype = db.Column(db.String(32), nullable=False)
-    oprbatch = db.Column(db.Integer, nullable=False,default=0)
+    oprbatch = db.Column(db.String(32), nullable=False,default='')
     isgroup =db.Column(db.Boolean,nullable=False,default=0)
+    comment = db.Column(db.String(40), nullable=True, default='')
     momentary = db.Column(db.DateTime, index=True,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def prt(self):

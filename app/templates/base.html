@@ -3,7 +3,7 @@
 {% block title %}Inveory{% endblock %}
 {% block head %}
 	<meta charset="utf-8">
-	<title>Inventory System</title>
+	<title>奥斯恩-进销存系统</title>
 	{{ super() }}
 	<link rel="stylesheet" type="text/css" href="static/css/tablelook.css"  >
 	<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
@@ -38,12 +38,12 @@
 				</li>
                 <li><a href="#" class="divider">|</a></li>
 				<li><a href="{{url_for('ctr.show_materials',page=1)}}"> 库存列表</a></li>
-				<li><a href="{{url_for('ctr.show_add_material')}}">添加新库存</a></li>
+				<li><a href="{{url_for('ctr.show_add_material')}}">添加新材料</a></li>
 				<li><a href="{{url_for('ctr.show_buy_materials')}}"> 购买中列表</a></li>
 				<li><a href="{{url_for('ctr.show_rework_materials')}}"> 返修中列表</a></li>
 				<li><a href="{{url_for('ctr.show_join_oprs_main')}}">主要操作记录</a></li>
 				<li><a href="{{url_for('ctr.show_join_oprs')}}">全部操作记录</a></li>
-				<li><a href="{{url_for('ctr.show_param_accessory')}}">参数模板列表</a></li>
+				<li><a href="{{url_for('ctr.show_param_accessory')}}">出库参数模板列表</a></li>
 			</ul>
 		</div>
 	</div>

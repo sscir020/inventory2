@@ -7,7 +7,7 @@ import json
 class paramTestCase(unittest.TestCase):
     def test_add(self):
         brands={'brand3':Param.PARAM_3,'brand5':Param.PARAM_5,'brand7':Param.PARAM_7}
-        app = create_app('development')
+        app = create_app('development')#development#testing
         app.app_context().push()
         with  app.app_context():
             # print('***********************')
@@ -23,20 +23,20 @@ class paramTestCase(unittest.TestCase):
             #     print((params[Param.PARAM_THREE.name])[i])
             #     print(paramnums[Param.PARAM_THREE.name][i])
             for i in range(1,28):
-                m=Material(material_name=Sensorname(i).name,countnum=0,acces_id=0,alarm_level=5)
+                m=Material(material_name=Sensorname(i).name,countnum=0,acces_id=0,alarm_level=20)
                 db.session.add(m)
 
-            m=Material(material_name=list(brands)[0],countnum=5,acces_id=1,alarm_level=5)
-            db.session.add(m)
+            # m=Material(material_name=list(brands)[0],countnum=5,acces_id=1,alarm_level=5)
+            # db.session.add(m)
             # m = Material(material_name=list(brands)[1], countnum=5, reworknum=0, paramtype=list(brands.values())[1].name)
             # db.session.add(m)
             # m = Material(material_name=list(brands)[2], countnum=5, reworknum=0, paramtype=list(brands.values())[2].name)
             # db.session.add(m)
             # db.session.commit()
             #
-            for i in range(1,2):
-                o=Opr(user_id=i,diff=5,material_id=i+27,oprtype=Oprenum.INITADD.name,isgroup=1)
-                db.session.add(o)
+            # for i in range(1,2):
+            #     o=Opr(user_id=i,diff=5,material_id=i+27,oprtype=Oprenum.INITADD.name,isgroup=1)
+            #     db.session.add(o)
             db.session.commit()
 
 
