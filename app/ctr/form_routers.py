@@ -44,7 +44,7 @@ def add_material():
     if request.method == "POST":
         materialname=request.form['input_material_name']
         alarm_level=request.form['input_alarm_level']
-        if materialname!=None and materialname!='' :
+        if materialname!=None and materialname!=''and alarm_level>0 :
         # if 'input_accessory_list' in request.form:
         #     list=request.form['input_accessory_list']
         # list1 = request.form
@@ -55,51 +55,40 @@ def add_material():
                     if keyid[0:21]=='input_accessory_check':
                         # print(key1)
                         keynum='input_accessory_num_'+keyid[22:]
-                        if( request.form[keynum]=='' or int(request.form[keynum])<=0 ):
-                            flash("数值应是一个正数")
+                        if( int(request.form[keynum])<=0 ):
+                            flash("数量应是一个正数")
                             return redirect(url_for('ctr.show_add_material'))
                         else:
                             dict[request.form[keyid]]=request.form[keynum]
                 acces=json.dumps(dict)
-                # print (acces)
                 if(len(dict)>0 ):
-                    if Accessory.query.filter_by(param_acces=acces).first()==None:
+                    if Accessory.query.filter(Accessory.param_acces==acces).first()==None:
                         a = Accessory(param_num=len(dict),param_acces=acces)
                         db.session.add(a)
                         db.session.commit()
-                    a = Accessory.query.filter_by(param_acces=acces).first()
                     m = Material(material_name=materialname, countnum=0,acces_id=a.acces_id,alarm_level=alarm_level)
+
+                    for materialid in dict:
+                        o = Opr(material_id=materialid, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
+                                momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                        db.session.add(o)
+                        db.session.commit()
                 else:
                     m = Material(material_name=materialname, countnum=0, acces_id=0,alarm_level=alarm_level)
                 db.session.add(m)
                 db.session.commit()
-
                 m=Material.query.filter_by(material_name=materialname).first()
-                o=Opr(material_id=m.material_id,diff=m.countnum,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
+                o=Opr(material_id=m.material_id,diff=0,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
                       momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 db.session.add(o)
-                if m.acces_id != None and m.acces_id != 0:
-                    a = Accessory.query.filter_by(acces_id=m.acces_id).first()
-                    data = json.loads(a.param_acces)
-                    for materialid in data:
-                        num = int(data[materialid])
-                        num = num * m.countnum
-                        # print('*************************')
-                        # print(num)
-                        m1 = Material.query.filter_by(material_id=materialid).first()
-                        m1.material_change_num(diff=num,oprtype=Oprenum.INITADD.name,batch='')
-                        o = Opr(material_id=m1.material_id, diff=num, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
-                                momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                        db.session.add(o)
-                        db.session.commit()
+                db.session.commit()
+
                 flash('新材料添加成功')
-                return redirect(url_for('ctr.show_materials',page=1))
+                return redirect(url_for('ctr.show_material_table',page=1))
             else:
                 flash('材料名已存在')
         else:
-            flash('需要填写材料名称和数量')
-    else:
-        flash('需要添加新材料')
+            flash('请正确填写材料名称和数量')
     return redirect(url_for('ctr.show_add_material'))
 
 
@@ -108,38 +97,21 @@ def convert_str_num(num):
         return 0
     return int(num)
 
-def change_outbound_num(m,materialid,diff,oprtype):
-    oprbatch=m.material_change_num(diff=diff,oprtype=oprtype,batch='')
-    o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True,oprbatch=oprbatch, \
-            momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    db.session.add(o)
-    db.session.commit()
-
-    if m.acces_id!= None and m.acces_id!=0:
-        a=Accessory.query.filter_by(acces_id=m.acces_id).first()
-        data=json.loads(a.param_acces)
-        for materialid in data:
-            num=int(data[materialid])
-            num=num*diff
-            m1=Material.query.filter_by(material_id=materialid).first()
-            if m1.material_isvalid_num(diff=diff,oprtype=oprtype,batch=''):
-                m1.material_change_num(diff=num,oprtype=oprtype,batch='')
-                o = Opr(material_id=m1.material_id, diff=num, user_id=session['userid'], oprtype=oprtype,isgroup=False, \
-                        momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                db.session.add(o)
-                db.session.commit()
-            else:
-                flash("配件数量不足")
-                return False
-
-
-
-def change_rework_buying_num(m,materialid,diff,oprtype):#outbound,rework,buying
-        m.material_change_num(diff=diff,oprtype=oprtype,batch='')
-        o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True, \
-                momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUYING,REWORK,OUTBOUND,INBOUND,RESTORE,SCRAP #INITADD,CANCELBUY
+    m = Material.query.filter_by(material_id=materialid).first()
+    if m == None:
+        flash("材料名不存在")
+        return False
+    elif m.material_isvalid_num(diff=diff, oprtype=oprtype, batch=batch) == False:
+        flash("数量超标")
+        return False
+    else:
+        value=m.material_change_num(diff=diff, oprtype=oprtype, batch=batch)
+        o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=isgroup,
+                oprbatch=value, comment=comment, momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         db.session.add(o)
         db.session.commit()
+    return True
 
 
 
@@ -166,62 +138,38 @@ def form_change_num(page):
                 # print(index)
                 oprtype=Oprenum(index).name
                 # print(oprtype)
-                m = Material.query.filter_by(material_id=materialid).first()
-                if m == None:
-                    flash("材料名不存在")
-                elif m.material_isvalid_num(diff=diff, oprtype=oprtype, batch='') == False:
-                    flash("数量超标")
-                else:
-                    if oprtype==Oprenum.BUYING.name:
-                        change_rework_buying_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype)
+                if oprtype==Oprenum.BUYING.name:
+                    if change_materials_oprs_db(oprtype=Oprenum.BUYING.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='')==True:
                         flash("购买列表数量更新成功")
-                    elif oprtype == Oprenum.REWORK.name:
-                        change_rework_buying_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype)
+                    else:
+                        flash("购买列表数量更新失败")
+                elif oprtype == Oprenum.REWORK.name:
+                    if change_materials_oprs_db(oprtype=Oprenum.REWORK.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='')==True:
                         flash("返修列表数量更新成功")
-                    elif oprtype==Oprenum.OUTBOUND.name:
-                        change_outbound_num(m=m,materialid=materialid,diff=diff,oprtype=oprtype)
+                    else:
+                        flash("返修列表数量更新失败")
+                elif oprtype==Oprenum.OUTBOUND.name:
+                    m = Material.query.filter_by(material_id=materialid).first()
+                    if m.acces_id != None and m.acces_id != 0:
+                        a = Accessory.query.filter_by(acces_id=m.acces_id).first()
+                        data = json.loads(a.param_acces)
+                        for acces_materialid in data:
+                            num = int(data[acces_materialid])
+                            num = num * diff
+                            if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=acces_materialid, diff=num, isgroup=False,batch='', comment='') == False:
+                                flash("配件数量不足")
+                                return redirect(url_for('ctr.show_material_table',page=page))
+                    if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='') == True:
                         flash("出库数量更新成功")
                     else:
-                        flash("错误的操作类型")
+                        flash("出库数量更新失败")
+                else:
+                    flash("错误的操作类型")
             else:
                 flash("请选择操作类型")
         else:
             flash('请填写数量')
-    return redirect(url_for('ctr.show_materials',page=page))
-
-@ctr.route('/form_change_inbound_num_act', methods=['GET', 'POST'])
-@loggedin_required
-def form_change_inbound_num():
-    if request.method=="POST":
-        print(request.form)
-        diff=0
-        for key in request.form:
-            if "input_inbound_num_" in key and request.form[key]!='':
-                diff = convert_str_num(request.form[key])
-                if diff > 0:
-                    string=key[18:]
-                    # string = request.form["input_hidden_" + str(index)]
-                    break
-        if diff > 0:
-            comment = request.form['input_comment_' + string]
-            list=string.split('_')
-            materialid=list[0]
-            batch=list[1]
-            m = Material.query.filter_by(material_id=materialid).first()
-            if m == None:
-                flash("材料名不存在")
-            elif m.material_isvalid_num(diff=diff, oprtype=Oprenum.INBOUND.name, batch=batch) == False:
-                flash("数量超标")
-            else:
-                batch=m.material_change_num(diff=diff,oprtype=Oprenum.INBOUND.name,batch=batch)
-                if batch!='-1':
-                    o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.INBOUND.name, isgroup=True,oprbatch=batch,comment=comment, \
-                            momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                    db.session.add(o)
-                    db.session.commit()
-        else:
-            flash("请选择填写到货数量并提交")
-    return redirect(url_for('ctr.show_buy_materials'))
+    return redirect(url_for('ctr.show_material_table', page=page))
 
 
 @ctr.route('/form_cancel_buy_act', methods=['GET', 'POST'])
@@ -229,8 +177,8 @@ def form_change_inbound_num():
 def form_cancel_buy():
     if request.method=="POST":
         # print(request.form)
-        if "input_checkbox" in request.form:
-            list=request.form["input_checkbox"].split('_')
+        if "input_checkbox_cancel" in request.form:
+            list=request.form["input_checkbox_cancel"].split('_')
             materialid=list[0]
             batch=list[1]
             m = Material.query.filter_by(material_id=materialid).first()
@@ -253,6 +201,30 @@ def form_cancel_buy():
             flash("请勾选订单并提交")
     return redirect(url_for('ctr.show_buy_materials'))
 
+
+@ctr.route('/form_change_inbound_num_act', methods=['GET', 'POST'])
+@loggedin_required
+def form_change_inbound_num():
+    if request.method=="POST":
+        print(request.form)
+        diff=0
+        for key in request.form:
+            if "input_inbound_num_" in key and request.form[key]!='':
+                diff = convert_str_num(request.form[key])
+                if diff > 0:
+                    string=key[18:]
+                    # string = request.form["input_hidden_" + str(index)]
+                    break
+        if diff > 0:
+            comment = request.form['input_comment_' + string]
+            list=string.split('_')
+            materialid=list[0]
+            batch=list[1]
+            change_materials_oprs_db(oprtype=Oprenum.INBOUND.name, materialid=materialid, diff=diff, isgroup=True,batch=batch, comment=comment)
+        else:
+            flash("请正确填写到货数量并提交")
+    return redirect(url_for('ctr.show_buy_materials'))
+
 @ctr.route('/form_change_restore_num_act', methods=['GET', 'POST'])
 @loggedin_required
 def form_change_restore_num():
@@ -270,21 +242,12 @@ def form_change_restore_num():
             list = string.split('_')
             materialid = list[0]
             batch = list[1]
-            m = Material.query.filter_by(material_id=materialid).first()
-            if m == None:
-                flash("材料名不存在")
-            elif m.material_isvalid_num(diff=diff, oprtype=Oprenum.RESTORE.name, batch=batch) == False:
-                flash("数量超标")
-            else:
-                m.material_change_num(diff=diff, oprtype=Oprenum.RESTORE.name, batch=batch)
-                o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.RESTORE.name, isgroup=True,oprbatch=batch, comment=comment,\
-                        momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                db.session.add(o)
-                db.session.commit()
+            change_materials_oprs_db(oprtype=Oprenum.RESTORE.name, materialid=materialid, diff=diff, isgroup=True,batch=batch, comment=comment)
         else:
-            flash("请填写修好数量")
-
+            flash("请正确填写修好数量")
     return redirect(url_for('ctr.show_rework_materials'))
+
+
 
 
 @ctr.route('/form_chang_scrap_act', methods=['GET', 'POST'])
@@ -304,32 +267,111 @@ def form_change_scrap():
             list = string.split('_')
             materialid = list[0]
             batch = list[1]
-            m = Material.query.filter_by(material_id=materialid).first()
-            if m == None:
-                flash("材料名不存在")
-            elif m.material_isvalid_num(diff=diff, oprtype=Oprenum.SCRAP.name, batch=batch) == False:
-                flash("数量超标")
-            else:
-                m.material_change_num(diff=diff, oprtype=Oprenum.SCRAP.name, batch=batch,comment=comment)
-                o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.SCRAP.name, isgroup=True,oprbatch=batch, comment=comment,\
-                        momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                db.session.add(o)
-                db.session.commit()
+            change_materials_oprs_db(oprtype=Oprenum.SCRAP.name, materialid=materialid, diff=diff, isgroup=True, batch=batch, comment=comment)
         else:
-            flash("请填写修好数量")
+            flash("请正确填写修好数量")
+    return redirect(url_for('ctr.show_rework_materials'))
 
-@ctr.route('/form_cahnge_rework_comment_act',methods=['GET','POST'])
+
+
+@ctr.route('/form_change_comment_act/<oprtype>',methods=['GET','POST'])
 @loggedin_required
-def form_change_rework_comment():
+def form_change_comment(oprtype):
     if request.method == 'POST':
         if 'input_checkbox_comment' in request.form:
             string=request.form['input_checkbox_comment']
             list = string.split('_')
             materialid = list[0]
             batch = list[1]
-            comment=request.form['input_comment_'+string]
-            m=Material.query.filter_by(materialid=materialid).first()
-            comments_dict=json.loads(m.buy_comments)
-            comments_dict[batch]=comment
+            comment=str(request.form['input_comment_'+string])
+            if len(comment)<=Config.MAX_CHAR_PER_COMMENT:
+                m=Material.query.filter_by(material_id=materialid).first()
+                if oprtype==Oprenum.REWORK.name:
+                    comments_dict=json.loads(m.rework_comments)
+                    comments_dict[batch]=comment
+                    m.rework_comments = json.dumps(comments_dict)
+                    db.session.add(m)
+                    db.session.commit()
+                    flash("返修备注修改成功")
+                elif oprtype==Oprenum.BUYING.name:
+                    comments_dict = json.loads(m.buy_comments)
+                    comments_dict[batch] = comment
+                    m.buy_comments = json.dumps(comments_dict)
+                    db.session.add(m)
+                    db.session.commit()
+                    flash("购买备注修改成功")
+                else:
+                    flash("备注类型错误")
+            else:
+                flash("每条备注不超过20个中文字")
         else:
-            flash("请勾选备注")
+            flash("请勾选返修备注")
+    if oprtype == Oprenum.REWORK.name:
+        return redirect(url_for('ctr.show_rework_materials'))
+    elif oprtype == Oprenum.BUYING.name:
+        return redirect(url_for('ctr.show_buy_materials'))
+    else:
+        flash("备注类型错误")
+
+# @ctr.route('/form_change_buy_comment_act',methods=['GET','POST'])
+# @loggedin_required
+# def form_change_buy_comment():
+#     if request.method == 'POST':
+#         if 'input_checkbox_comment' in request.form:
+#             string=request.form['input_checkbox_comment']
+#             list = string.split('_')
+#             materialid = list[0]
+#             batch = list[1]
+#             comment=str(request.form['input_comment_'+string])
+#             if len(comment)<=40:
+#                 m=Material.query.filter_by(materialid=materialid).first()
+#                 comments_dict=json.loads(m.buy_comments)
+#                 comments_dict[batch]=comment
+#                 m.buy_comments = json.dump(comments_dict)
+#                 db.session.add(m)
+#                 db.session.commit()
+#             else:
+#                 flash("每条备注不超过20个中文字")
+#         else:
+#             flash("请勾选购买备注")
+#     return redirect(url_for('ctr.show_buy_materials'))
+
+# def change_outbound_num(m,materialid,diff,oprtype):
+#     oprbatch=m.material_change_num(diff=diff,oprtype=oprtype,batch='')
+#     o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True,oprbatch=oprbatch, \
+#             momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+#     db.session.add(o)
+#     db.session.commit()
+#
+#     if m.acces_id!= None and m.acces_id!=0:
+#         a=Accessory.query.filter_by(acces_id=m.acces_id).first()
+#         data=json.loads(a.param_acces)
+#         for acces_materialid in data:
+#             num=int(data[acces_materialid])
+#             num=num*diff
+#             if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=acces_materialid, diff=num, isgroup=False,
+#                                      batch='', comment='')==False:
+#                 flash("配件数量不足")
+#                 return False
+#
+#
+#
+# def change_rework_buying_num(m,materialid,diff,oprtype):#outbound,rework,buying
+#         m.material_change_num(diff=diff,oprtype=oprtype,batch='')
+#         o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True, \
+#                 momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+#         db.session.add(o)
+#         db.session.commit()
+
+        # if m.acces_id != None and m.acces_id != 0:
+        #     a = Accessory.query.filter_by(acces_id=m.acces_id).first()
+        #     data = json.loads(a.param_acces)
+        #     for materialid in data:
+        #         # num = int(data[materialid])
+        #         # num = num * m.countnum
+        #         m1 = Material.query.filter_by(material_id=materialid).first()
+        #         # m1.material_change_num(diff=num,oprtype=Oprenum.INITADD.name,batch='')
+        #         o = Opr(material_id=m1.material_id, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
+        #                 momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        #         db.session.add(o)
+        #         db.session.commit()

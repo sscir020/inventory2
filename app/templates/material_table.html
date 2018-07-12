@@ -6,7 +6,7 @@
     <h4>库存列表</h4>
     <form action="{{ url_for('ctr.form_change_num',page=page) }}" method="post">
 
-        <table class="table table-hover" id="tableattr">
+        <table class="table table-hover" id="table_material">
              <thead>
                  <th>库存ID</th>
                  <th>库存名</th>
@@ -40,21 +40,19 @@
                      {{reworklist.values()|list}}
                      {% endif %}
                  </td>
-                 <td><div>
+                 <td>
                      <input id="numcls1"  name="input_number_{{entry.material_id}}" type="text">
                      <input id="numcls2"  name="input_oprlist_{{entry.material_id}}"  list="operations" >
-                         <datalist id="operations">
-                             <option value="购买">
-                             <option value="返修">
-                             <option value="出库">
-                        </datalist>
-                     <!--<input type="hidden" name="input_hidden_{{loop.index}}" value="{{entry.material_id}}">-->
-                     </div>
+                     <datalist id="operations">
+                         <option value="购买">
+                         <option value="返修">
+                         <option value="出库">
+                    </datalist>
                  </td>
              </tr>
              {% endfor %}
         </table>
-        <input name="input_sbumit" type="submit" value="操作">
+        <input name="input_sbumit" type="submit" value="提交操作">
     </form>
 </div>
 

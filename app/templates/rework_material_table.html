@@ -12,9 +12,9 @@
                  <th>返修数量</th>
                  <th>库存数量</th>
                  <th>返修日期</th>
-                 <th>修好数量</th>
+                 <th>修好/报废数量</th>
                  <th>备注</th>
-                 <th>备注勾选</th>
+                 <th>备注选择</th>
              </thead>
              {% for entry in materials %}
                  <!--{% set index=loop.index %}-->
@@ -41,7 +41,7 @@
          </table>
          <input type="submit" name="input_restore_btn" value="修好提交" onclick="form_rework.action='{{ url_for('ctr.form_change_restore_num') }}';form_buy.submit()">
          <input type="submit" name="input_cancel_btn" value="报废提交" onclick="form_rework.action='{{ url_for('ctr.form_change_scrap') }}';form_buy.submit()">
-         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_rework.action='{{ url_for('ctr.form_change_rework_comment') }}';form_buy.submit()">
+         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_rework.action='{{ url_for('ctr.form_change_comment',oprtype=Oprenum.REWORK.name) }}';form_buy.submit()">
     </form>
 </div>
 

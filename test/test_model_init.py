@@ -23,7 +23,7 @@ class paramTestCase(unittest.TestCase):
             #     print((params[Param.PARAM_THREE.name])[i])
             #     print(paramnums[Param.PARAM_THREE.name][i])
             for i in range(1,28):
-                m=Material(material_name=Sensorname(i).name,countnum=0,acces_id=0,alarm_level=20)
+                m=Material(material_name=Sensorname(i).name,countnum=20,acces_id=0,alarm_level=20)
                 db.session.add(m)
 
             # m=Material(material_name=list(brands)[0],countnum=5,acces_id=1,alarm_level=5)

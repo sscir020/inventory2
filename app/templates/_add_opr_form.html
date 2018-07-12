@@ -7,10 +7,11 @@
     <p>材料名<input type="text" name="input_material_name"></p>
     <p>警戒值<input type="number" name="input_alarm_level" value=20></p>
     <p>每个材料/物品需要的配件个数：</p>
-    <ul>
+    <ul id="accessory_list">
     {% for item in materials %}
-         <li><input type="checkbox" name="input_accessory_check_{{loop.index}}" value="{{item.material_id}}">
-         {{loop.index}}.{{item.material_name}}<input type="number" name="input_accessory_num_{{loop.index}}" class="text_acce"></li>
+         <li><input type="checkbox" name="input_accessory_check_{{item.material_id}}" value="{{item.material_id}}">
+         {{item.material_name}}<input type="number" name="input_accessory_num_{{item.material_id}}" class="text_acce"></li>
+        <!--{{loop.index}}.-->
     {% endfor %}
     </ul>
     <input type="submit">

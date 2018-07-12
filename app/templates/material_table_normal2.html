@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block page_content %}
+<div>
+    <form name="form_material"  method="post"> <!--action="url_for('ctr.form_change_num',page=page)"-->
+        <h4>库存列表</h4>
+         <table class="table table-condensed" id="table_material"><!--table-condensed-->
+             <thead>
+                 <th>库存ID</th>
+                 <th>库存名</th>
+                 <th>库存数量</th>
+                 <th>警戒值</th>
+                 <th>参数模板ID</th>
+             </thead>
+             {% for entry in materials %}
+                 {% set buydict=json.loads(entry.buynum) %}
+                 {% set reworkdict=json.loads(entry.reworknum) %}
+                 <tr>
+                     <td>{{entry.material_id}}</td>
+                     <td>{{entry.material_name}}</td>
+                     <td>{{entry.countnum}}</td>
+                     <td>{{entry.alarm_level}}</td>
+                     <td>{{entry.acces_id}}</td>
+                 </tr>
+             {% endfor %}
+         </table>
+         <input type="submit" name="input_submit" value="操作提交" onclick="form_material.action='{{ url_for('ctr.form_change_num',page=page) }}';form_material.submit()">
+    </form>
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_material_table_normal2') }}
+</div>
+{% endif %}
+{% endblock %}
+
+
+
+

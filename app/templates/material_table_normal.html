@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block page_content %}
+<div>
+    <form name="form_material"  method="post"> <!--action="url_for('ctr.form_change_num',page=page)"-->
+        <h4>库存列表</h4>
+         <table class="table table-condensed" id="table_material"><!--table-condensed-->
+             <thead>
+                 <th>库存ID</th>
+                 <th>库存名</th>
+                 <th>库存数量</th>
+                 <th>警戒值</th>
+                 <th>参数模板ID</th>
+                 <th>购买中数量列表</th>
+                 <th>返修中数量列表</th>
+                 <th>操作数量-操作类型</th>
+                 <th>操作数量-操作类型</th>
+             </thead>
+             {% for entry in materials %}
+                 {% set buydict=json.loads(entry.buynum) %}
+                 {% set reworkdict=json.loads(entry.reworknum) %}
+                 <tr>
+                     <td>{{entry.material_id}}</td>
+                     <td>{{entry.material_name}}</td>
+                     {% if entry.countnum < entry.alarm_level %}
+                     <td style="color:red">{{entry.countnum}}</td>
+                     {% else %}
+                     <td>{{entry.countnum}}</td>
+                     {% endif %}
+                     <td>{{entry.alarm_level}}</td>
+                     <td>{{entry.acces_id}}</td>
+                     <td>
+                     {% if buydict|length > 0 %}
+                     {{ buydict.values()|list }}
+                     {% endif %}
+                     </td>
+                     <td>
+                     {% if reworkdict|length > 0 %}
+                     {{ reworkdict.values()|list }}
+                     {% endif %}
+                     </td>
+                     <td><input type="number" name="input_number_{{entry.material_id}}"></td>
+                     <td>
+                         <input name="input_oprlist_{{entry.material_id}}" list="operations" >
+                            <datalist id="operations">
+                                <option value="购买"></option>
+                                <option value="返修"></option>
+                                <option value="出库"></option>
+                            </datalist>
+                     </td>
+                 </tr>
+             {% endfor %}
+         </table>
+         <input type="submit" name="input_submit" value="操作提交" onclick="form_material.action='{{ url_for('ctr.form_change_num',page=page) }}';form_material.submit()">
+    </form>
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_material_table') }}
+</div>
+{% endif %}
+{% endblock %}
+
+
+
+

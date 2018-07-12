@@ -30,9 +30,19 @@ def log_user_out():
     return redirect(url_for('ctr.welcome_user'))
 
 
+@ctr.route('/materials_table_normal2')
+@loggedin_required
+def show_material_table_normal2():
+    # flash('库存列表')
+    page = request.args.get('page',1,type=int)
+    pagination = Material.query.order_by(Material.material_id).paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
+    materials=pagination.items
+    return render_template('material_table_normal2.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
+
+
 @ctr.route('/materials_table/<page>')
 @loggedin_required
-def show_materials(page):
+def show_material_table(page):
     # print(session)
     # flash('库存列表')
     page=int(page)
@@ -44,7 +54,7 @@ def show_materials(page):
     materials=pagination.items
 
     # print(pagination==None)
-    return render_template('material_table.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
+    return render_template('material_table_normal.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
     # return render_template('material_table.html',materials=Material.query.all())
 
 @ctr.route('/rework_materials_table')
@@ -55,7 +65,7 @@ def show_rework_materials():
     pagination = Material.query.filter(Material.reworknum!='{}').order_by(Material.material_id).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     materials=pagination.items
-    return render_template('rework_material_table.html',materials=materials,pagination=pagination,json=json )
+    return render_template('rework_material_table.html',materials=materials,pagination=pagination,json=json,Oprenum=Oprenum )
 
 
 @ctr.route('/buy_materials_table')
@@ -66,7 +76,7 @@ def show_buy_materials():
     pagination = Material.query.filter(Material.buynum!='{}').order_by(Material.material_id).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     materials=pagination.items
-    return render_template('buy_material_table.html',materials=materials,pagination=pagination,json=json )
+    return render_template('buy_material_table.html',materials=materials,pagination=pagination,json=json,Oprenum=Oprenum )
 
 @ctr.route('/param_accessory_table')
 @loggedin_required
@@ -83,7 +93,8 @@ def show_param_accessory():
 def show_join_oprs():
     # flash('操作记录')
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
-    sql = db.session.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,Opr.isgroup,Opr.oprbatch,Opr.momentary).join(User, User.user_id == Opr.user_id)\
+    sql = db.session.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,\
+                           Opr.isgroup,Opr.oprbatch,Opr.comment,Opr.momentary).join(User, User.user_id == Opr.user_id)\
         .join(Material,Material.material_id==Opr.material_id).order_by(Opr.opr_id.desc())
     page = request.args.get('page', 1, type=int)
     pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
@@ -96,7 +107,8 @@ def show_join_oprs():
 def show_join_oprs_main():
     # flash('操作记录')
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
-    sql = db.session.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,Opr.isgroup,Opr.oprbatch,Opr.momentary).join(User, User.user_id == Opr.user_id)\
+    sql = db.session.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,\
+                           Opr.isgroup,Opr.oprbatch,Opr.comment, Opr.momentary).join(User, User.user_id == Opr.user_id)\
         .join(Material,Material.material_id==Opr.material_id).filter(Opr.isgroup==True).order_by(Opr.opr_id.desc())
     page = request.args.get('page', 1, type=int)
     pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)

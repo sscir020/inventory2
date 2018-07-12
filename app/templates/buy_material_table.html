@@ -14,10 +14,12 @@
                  <th>购买日期</th>
                  <th>到货数量</th>
                  <th>取消订单</th>
+                 <th>备注</th>
+                 <th>备注选择</th>
              </thead>
              {% for entry in materials %}
                  {% set buydict=json.loads(entry.buynum) %}
-                 {% set index=loop.index %}
+                 <!--{% set index=loop.index %}-->
                  {% set commentdict=json.loads(entry.buy_comments) %}
                  {% for batch in buydict %}
                      <tr>
@@ -29,7 +31,6 @@
                          <td><input type="number" name="input_inbound_num_{{entry.material_id}}_{{batch}}"></td>
                              <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
                          <td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{batch}}" ></td>
-
                          {% set comment='' %}
                          {% if batch in commentdict.keys() %}
                          {% set comment=commentdict[batch] %}
@@ -42,7 +43,7 @@
          </table>
          <input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">
          <input type="submit" name="input_cancel_btn" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">
-         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_buy_comment') }}';form_buy.submit()">
+         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_comment',oprtype=Oprenum.BUYING.name) }}';form_buy.submit()">
     </form>
 </div>
 
