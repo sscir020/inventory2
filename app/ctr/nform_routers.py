@@ -128,10 +128,14 @@ def rollback_opr():
             if opr.oprtype == Oprenum.INITADD.name:
                 Opr.query.filter_by(opr_id=opr.opr_id).delete()
                 Material.query.filter_by(material_id=opr.material_id).delete()
+                db.session.commit()
+                flash("回滚成功_主件")
             else:
                 if m.material_isvalid_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype):
                     m.material_change_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype)
                     Opr.query.filter_by(opr_id=opr.opr_id).delete()
+                    db.session.commit()
+                    flash("回滚成功_主件")
                 else:
                     flash("回滚操作记录错误-数量超标_main")
                     return redirect(url_for('ctr.show_join_oprs_main'))
@@ -140,22 +144,22 @@ def rollback_opr():
             return redirect(url_for('ctr.show_join_oprs_main'))
         opr = Opr.query.order_by(Opr.opr_id.desc()).first()
 
-    opr.prt()
-    m.prt()
     while opr.isgroup == False:
         m = Material.query.filter_by(material_id=opr.material_id).first()
         if m!=None:
             if m.material_isvalid_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype):
                 m.material_change_num_rev(diff=opr.diff,batch=opr.oprbatch,oprtype=opr.oprtype)
                 Opr.query.filter_by(opr_id=opr.opr_id).delete()
+                db.session.commit()
+                flash("回滚成功_配件")
             else:
-                flash("回滚操作记录错误-数量超标_acces")
+                flash("回滚操作记录错误-数量超标_配件")
                 return redirect(url_for('ctr.show_join_oprs_main'))
         else:
-            flash("回滚操作记录错误-材料不存在_acces")
+            flash("回滚操作记录错误-材料不存在_配件")
             return redirect(url_for('ctr.show_join_oprs_main'))
         opr = Opr.query.order_by(Opr.opr_id.desc()).first()
-    flash("回滚成功")
+
     return redirect(url_for('ctr.show_join_oprs_main'))
 
 
