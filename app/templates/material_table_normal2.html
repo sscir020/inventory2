@@ -12,6 +12,10 @@
                  <th>库存数量</th>
                  <th>警戒值</th>
                  <th>参数模板ID</th>
+                 <th>购买中数量列表</th>
+                 <th>返修中数量列表</th>
+                 <th>操作数量-操作类型</th>
+                 <th>操作数量-操作类型</th>
              </thead>
              {% for entry in materials %}
                  {% set buydict=json.loads(entry.buynum) %}
@@ -19,9 +23,32 @@
                  <tr>
                      <td>{{entry.material_id}}</td>
                      <td>{{entry.material_name}}</td>
+                     {% if entry.countnum < entry.alarm_level %}
+                     <td style="color:red">{{entry.countnum}}</td>
+                     {% else %}
                      <td>{{entry.countnum}}</td>
+                     {% endif %}
                      <td>{{entry.alarm_level}}</td>
                      <td>{{entry.acces_id}}</td>
+                     <td>
+                     {% if buydict|length > 0 %}
+                     {{ buydict.values()|list }}
+                     {% endif %}
+                     </td>
+                     <td>
+                     {% if reworkdict|length > 0 %}
+                     {{ reworkdict.values()|list }}
+                     {% endif %}
+                     </td>
+                     <td><input type="number" name="input_number_{{entry.material_id}}"></td>
+                     <td>
+                         <input name="input_oprlist_{{entry.material_id}}" list="operations" >
+                            <datalist id="operations">
+                                <option value="购买"></option>
+                                <option value="返修"></option>
+                                <option value="出库"></option>
+                            </datalist>
+                     </td>
                  </tr>
              {% endfor %}
          </table>

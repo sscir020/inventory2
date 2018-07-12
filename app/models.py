@@ -177,13 +177,14 @@ class Material(db.Model):
         return value
 
     def material_isvalid_num_rev (self,diff,oprtype,batch):
-        if diff<=0:
+        if diff<0:
             flash("数量小于等于0")##
             return False
         if oprtype==Oprenum.INITADD.name:
-            if diff> self.countnum:
-                flash("取消新添加数量大于库存数量")##
-                return False
+            pass
+            # if diff> self.countnum:
+            #     flash("取消新添加数量大于库存数量")##
+            #     return False
         # elif oprtype == Oprenum.OUTBOUND.name:
         #     if diff<=0:
         #         flash("取消出库数量小于等于0")##
@@ -237,9 +238,11 @@ class Material(db.Model):
             # buydict[batch]-=diff
             # if buydict[batch]==0:
             buydict.pop(batch)
+
             comments_dict = json.loads(self.buy_comments)
-            comments_dict.pop(batch)
-            self.buy_comments = json.dumps(comments_dict)
+            if batch in comments_dict:
+                comments_dict.pop(batch)
+                self.buy_comments = json.dumps(comments_dict)
             self.buynum = json.dumps(buydict)
         elif oprtype == Oprenum.REWORK.name:#++++
             self.countnum += diff
@@ -248,17 +251,18 @@ class Material(db.Model):
             # if reworkdict[batch] == 0:
             reworkdict.pop(batch)
             comments_dict = json.loads(self.rework_comments)
-            comments_dict.pop(batch)
-            self.rework_comments = json.dumps(comments_dict)
+            if batch in comments_dict:
+                comments_dict.pop(batch)
+                self.rework_comments = json.dumps(comments_dict)
             self.reworknum = json.dumps(reworkdict)
         elif oprtype==Oprenum.INBOUND.name:#----
             self.countnum -= diff
             buydict = json.loads(self.buynum)
             if batch not in buydict.keys():
                 buydict[batch] = diff
-                comments_dict = json.loads(self.buy_comments)
-                comments_dict[batch] = '{}'
-                self.buy_comments = json.dumps(comments_dict)
+                # comments_dict = json.loads(self.buy_comments)
+                # comments_dict[batch] = ''
+                # self.buy_comments = json.dumps(comments_dict)
             else:
                 buydict[batch]+=diff
             self.buynum = json.dumps(buydict)
@@ -267,26 +271,26 @@ class Material(db.Model):
             reworkdict = json.loads(self.reworknum)
             if batch not in reworkdict.keys():
                 reworkdict[batch] = diff
-                comments_dict = json.loads(self.rework_comments)
-                comments_dict[batch] = '{}'
-                self.rework_comments = json.dumps(comments_dict)
+                # comments_dict = json.loads(self.rework_comments)
+                # comments_dict[batch] = ''
+                # self.rework_comments = json.dumps(comments_dict)
             else:#  if self.reworknum[batch]==0:
                 reworkdict[batch] += diff
             self.reworknum = json.dumps(reworkdict)
         elif oprtype == Oprenum.CANCELBUY.name:#>>>>
             buydict = json.loads(self.buynum)
-            comments_dict = json.loads(self.buy_comments)
+            # comments_dict = json.loads(self.buy_comments)
             buydict[batch]=diff
-            comments_dict[batch] = '{}'
+            # comments_dict[batch] = ''
             self.buynum = json.dumps(buydict)
-            self.buy_comments = json.dumps(comments_dict)
+            # self.buy_comments = json.dumps(comments_dict)
         elif oprtype == Oprenum.SCRAP.name:#>>>>
             reworkdict = json.loads(self.reworknum)
             if batch not in reworkdict.keys():
                 reworkdict[batch] = diff
-                comments_dict = json.loads(self.rework_comments)
-                comments_dict[batch] = '{}'
-                self.rework_comments = json.dumps(comments_dict)
+                # comments_dict = json.loads(self.rework_comments)
+                # comments_dict[batch] = ''
+                # self.rework_comments = json.dumps(comments_dict)
             else:
                 reworkdict[batch] += diff
             self.reworknum = json.dumps(reworkdict)

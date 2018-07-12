@@ -43,7 +43,7 @@ def log_user_in():
 def add_material():
     if request.method == "POST":
         materialname=request.form['input_material_name']
-        alarm_level=request.form['input_alarm_level']
+        alarm_level=convert_str_num(request.form['input_alarm_level'])
         if materialname!=None and materialname!=''and alarm_level>0 :
         # if 'input_accessory_list' in request.form:
         #     list=request.form['input_accessory_list']
@@ -66,6 +66,8 @@ def add_material():
                         a = Accessory(param_num=len(dict),param_acces=acces)
                         db.session.add(a)
                         db.session.commit()
+                    else:
+                        a=Accessory.query.filter(Accessory.param_acces==acces).first()
                     m = Material(material_name=materialname, countnum=0,acces_id=a.acces_id,alarm_level=alarm_level)
 
                     for materialid in dict:
@@ -158,7 +160,7 @@ def form_change_num(page):
                             num = num * diff
                             if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=acces_materialid, diff=num, isgroup=False,batch='', comment='') == False:
                                 flash("配件数量不足")
-                                return redirect(url_for('ctr.show_material_table',page=page))
+                                return redirect(url_for('ctr.show_material_table', page=page))
                     if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='') == True:
                         flash("出库数量更新成功")
                     else:
