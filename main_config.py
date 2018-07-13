@@ -6,14 +6,14 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # sys.setdefaultencoding('utf8')
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or '1AR4bnTnLHZyHaKt'
-    SQLALCHEMY_POOL_SIZE = 100
+    SECRET_KEY =  '1AR4bnTnLHZyHaKt' #os.environ.get('SECRET_KEY') or
+    SQLALCHEMY_POOL_SIZE = 5
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     FLASK_NUM_PER_PAGE = 20
     FLASK_NUM_PER_PAGE_LIST = 6
 #SESSION_TYPE= 'redis'
-    SESSION_PERMANENT = True
+    SESSION_PERMANENT = False
     SESSION_KEY_PREFIX='session'
     ALARM_LEVEL=0
     MAX_CHAR_PER_COMMENT = 20

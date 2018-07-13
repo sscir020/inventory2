@@ -44,6 +44,7 @@
          <input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">
          <input type="submit" name="input_cancel_btn" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">
          <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_comment',oprtype=Oprenum.BUYING.name) }}';form_buy.submit()">
+         <input type="submit" name="input_comment_btn" value="回退提交" onclick="form_buy.action='{{ url_for('ctr.form_rollback') }}';form_buy.submit()">
     </form>
 </div>
 

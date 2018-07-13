@@ -1,7 +1,7 @@
 from .__init__ import db
 from flask import flash
 from main_config import Oprenum
-import json,datetime
+import json,datetime,time
 # from datetime import datetime
 # from flask_login import UserMixin, AnonymousUserMixin
 
@@ -99,12 +99,15 @@ class Material(db.Model):
         if oprtype==Oprenum.INITADD.name:#****
             self.countnum += diff
         elif oprtype == Oprenum.OUTBOUND.name:#****
-            self.countnum-=diff
+            self.countnum -= diff
         elif oprtype == Oprenum.BUYING.name:#-->
             buydict=json.loads(self.buynum)
             # comments_dict = json.loads(self.buy_comments)
             batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             # batch=len(buydict.keys())+1
+            while batch in buydict.keys():
+                time.sleep(1)
+                batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             buydict[batch]=diff
             # comments_dict[batch] = comment
             self.buynum=json.dumps(buydict)
@@ -114,6 +117,9 @@ class Material(db.Model):
             reworkdict = json.loads(self.reworknum)
             # comments_dict = json.loads(self.rework_comments)
             batch=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            while batch in reworkdict.keys():
+                time.sleep(1)
+                batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             # batch = len(reworkdict.keys()) + 1
             reworkdict[batch]=diff
             self.countnum -= diff
@@ -171,9 +177,9 @@ class Material(db.Model):
         else:
             flash("操作类型错误")
             value='-1'
-        if value!='-1':
-            db.session.add(self)
-            db.session.commit()
+        # if value!='-1':
+        #     db.session.add(self)
+        #     db.session.commit()
         return value
 
     def material_isvalid_num_rev (self,diff,oprtype,batch):
@@ -297,9 +303,9 @@ class Material(db.Model):
         else:
             flash("操作类型错误")
             value='-1'
-        if value!='-1':
-            db.session.add(self)
-            db.session.commit()
+        # if value!='-1':
+        #     db.session.add(self)
+        #     db.session.commit()
         return value
 
     def prt(self):

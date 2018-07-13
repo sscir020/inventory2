@@ -100,6 +100,7 @@ def convert_str_num(num):
     return int(num)
 
 def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUYING,REWORK,OUTBOUND,INBOUND,RESTORE,SCRAP #INITADD,CANCELBUY
+    print('materialid:' + str(materialid) + ",diff:" + str(diff) + ",oprtype:" + str(oprtype) + ",batch:" + str(batch))
     m = Material.query.filter_by(material_id=materialid).first()
     if m == None:
         flash("材料名不存在")
@@ -109,12 +110,23 @@ def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUY
         return False
     else:
         value=m.material_change_num(diff=diff, oprtype=oprtype, batch=batch)
+        # print(db.session)
+        # db.session.add(m)
         o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=isgroup,
                 oprbatch=value, comment=comment, momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        db.session.add(o)
+        # db.session.add(o)
+        db.session.add_all([m,o])
         db.session.commit()
+        db.session.flush()
+        db.session.close()
+        # db.session.clear()
     return True
 
+
+@ctr.route('/form_rollback_act',methods=['GET','POST'])
+@loggedin_required
+def form_rollback():
+    db.session.rollback()
 
 
 @ctr.route('/change_buy_rework_outbound_act/<page>', methods=['GET', 'POST'])
