@@ -7,7 +7,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY =  '1AR4bnTnLHZyHaKt' #os.environ.get('SECRET_KEY') or
-    SQLALCHEMY_POOL_SIZE = 5
+    SQLALCHEMY_POOL_SIZE = 100
+    SQLALCHEMY_MAX_OVERFLOW = 0
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     FLASK_NUM_PER_PAGE = 20
@@ -25,7 +26,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hard_guess@localhost:3306/testdb1?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:easy-guess-word@localhost:3306/testdb1?charset=utf8'
 
 
 class TestingConfig(Config):

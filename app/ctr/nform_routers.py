@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import render_template,url_for,redirect,flash,session,request,current_app
 # from flask_login import login_user,logout_user,login_required,current_user
-from ..models import Opr,Material,User,Accessory
+from ..models import Opr,Material,User,Accessory,Buy,Rework
 from . import ctr
 from ..__init__ import db
 from ..decorators import loggedin_required
@@ -64,10 +64,10 @@ def show_material_table():
 def show_rework_materials():
     # flash('返修列表')
     page = request.args.get('page',1,type=int)
-    pagination = Material.query.filter(Material.reworknum!='{}').order_by(Material.material_id.desc()).\
+    pagination = Rework.query.order_by(Rework.batch.desc()).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
-    materials=pagination.items
-    return render_template('rework_material_table.html',materials=materials,pagination=pagination,json=json,Oprenum=Oprenum )
+    reworkbatches=pagination.items
+    return render_template('rework_material_table.html',reworkbatches=reworkbatches,pagination=pagination,json=json,Oprenum=Oprenum )
 
 
 @ctr.route('/buy_materials_table')
@@ -75,10 +75,10 @@ def show_rework_materials():
 def show_buy_materials():
     # flash('购买列表')
     page = request.args.get('page',1,type=int)
-    pagination = Material.query.filter(Material.buynum!='{}').order_by(Material.material_id.desc()).\
+    pagination = Buy.query.order_by(Buy.batch.desc()).\
         paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
-    materials=pagination.items
-    return render_template('buy_material_table.html',materials=materials,pagination=pagination,json=json,Oprenum=Oprenum )
+    buybatches=pagination.items
+    return render_template('buy_material_table.html',buybatches=buybatches,pagination=pagination,json=json,Oprenum=Oprenum )
 
 @ctr.route('/param_accessory_table')
 @loggedin_required
@@ -118,6 +118,101 @@ def show_join_oprs_main():
     # print(sql[0])
     return render_template('join_oprs_main_table.html',join_oprs=join_oprs,pagination=pagination,oprenumCH=oprenumCH)
 
+def material_isvalid_num_rev (m,diff,oprtype,batch):
+    if diff<0:
+        flash("数量小于等于0")##
+        return False
+    if oprtype==Oprenum.INITADD.name:
+        pass
+        # if diff> self.countnum:
+        #     flash("取消新添加数量大于库存数量")##
+        #     return False
+    # elif oprtype == Oprenum.OUTBOUND.name:
+    #     if diff<=0:
+    #         flash("取消出库数量小于等于0")##
+    #         return False
+    elif oprtype == Oprenum.BUYING.name:
+        b = Buy.query.filter(Buy.batch == batch).first()
+        if b==None:
+            flash("批次不存在")
+            return False
+        if diff!= b.num:
+            flash("取消购买数量不等于购买批次数量")##
+            return False
+    elif oprtype == Oprenum.REWORK.name:
+        b=Rework.query.filter(Rework.batch == batch).fist()
+        if b==None:
+            flash("批次不存在")
+            return False
+        if diff!=b.num:
+            flash("取消返修数量不等于返修批次数量")
+            return False
+    elif oprtype==Oprenum.INBOUND.name:
+        if diff>m.countnum:# 5 2  -> 7 0
+            flash("取消入库数量大于库存数量")
+            return False
+    elif oprtype == Oprenum.RESTORE.name:#返修
+        if diff>m.countnum:
+            flash("取消修好数量大于库存数量")
+            return False
+    # elif oprtype == Oprenum.SCRAP.name:
+    #     if diff<=0:
+    #         flash("报废数量小于等于0")
+    #         return False
+    else:
+        if oprtype != Oprenum.OUTBOUND.name and oprtype != Oprenum.CANCELBUY.name and oprtype != Oprenum.SCRAP.name:
+            flash("操作类型错误")
+            return False
+    return True
+
+
+def material_change_num_rev(m,diff,oprtype,batch):
+    value=0
+    if oprtype==Oprenum.OUTBOUND.name:####
+        m.countnum += diff
+        db.session.add_all([m])
+    elif oprtype == Oprenum.INITADD.name:####
+        pass
+    #     self.countnum -= diff
+    elif oprtype == Oprenum.BUYING.name:#++++
+        Buy.query.filter(Buy.batch == batch).delete()
+    elif oprtype == Oprenum.REWORK.name:#++++
+        m.countnum += diff
+        Rework.query.filter(Rework.batch == batch).delete()
+        db.session.add_all([m])
+    elif oprtype==Oprenum.INBOUND.name:#----
+        m.countnum -= diff
+        b = Buy.query.filter(Buy.batch == batch).first()
+        if b==None:
+            b=Buy(batch=batch,material_id=m.material_id,num=diff)
+        else:
+            b.num+=diff
+        db.session.add_all([m,b])
+    elif oprtype == Oprenum.RESTORE.name:#----
+        m.countnum -= diff
+        b = Rework.query.filter(Rework.batch == batch).first()
+        if b==None:
+            b = Buy(batch=batch, material_id=m.material_id, num=diff)
+        else:
+            b.num += diff
+        db.session.add_all([m,b])
+    elif oprtype == Oprenum.CANCELBUY.name:#>>>>
+        b = Buy(batch=batch, material_id=m.material_id, num=diff)
+        db.session.add_all([b])
+    elif oprtype == Oprenum.SCRAP.name:#>>>>
+        b = Rework.query.filter(Rework.batch == batch).first()
+        if b==None:
+            b = Rework(batch=batch, material_id=m.material_id, num=diff)
+        else:
+            b.num += diff
+        db.session.add_all([b])
+    else:
+        flash("操作类型错误")
+        value='-1'
+    # if value!='-1':
+    #     db.session.add(self)
+    #     db.session.commit()
+    return value
 @ctr.route('/rollback')
 def rollback_opr():
     opr = Opr.query.order_by(Opr.opr_id.desc()).first()
@@ -147,8 +242,8 @@ def rollback_opr():
     while opr.isgroup == False:
         m = Material.query.filter_by(material_id=opr.material_id).first()
         if m!=None:
-            if m.material_isvalid_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype):
-                m.material_change_num_rev(diff=opr.diff,batch=opr.oprbatch,oprtype=opr.oprtype)
+            if material_isvalid_num_rev(m=m,diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype):
+                material_change_num_rev(m=m,diff=opr.diff,batch=opr.oprbatch,oprtype=opr.oprtype)
                 Opr.query.filter_by(opr_id=opr.opr_id).delete()
                 db.session.commit()
                 flash("回滚成功_配件")
