@@ -13,8 +13,6 @@
                  <th>库存数量</th>
                  <th>警戒值</th>
                  <th>参数模板ID</th>
-                 <th>购买中数量列表</th>
-                 <th>返修中数量列表</th>
                  <th>操作数量-操作类型</th>
              </thead>
              {% for entry in materials %}
@@ -28,18 +26,7 @@
                  {% endif %}
                  <td>{{entry.alarm_level}}</td>
                  <td>{{entry.acces_id}}</td>
-                 {% set buylist=json.loads(entry.buynum) %}
-                 <td>
-                     {% if buylist|length> 0 %}
-                     {{buylist.values()|list}}
-                     {% endif %}
-                 </td>
-                 {% set reworklist=json.loads(entry.reworknum) %}
-                 <td>
-                     {% if reworklist|length> 0 %}
-                     {{reworklist.values()|list}}
-                     {% endif %}
-                 </td>
+
                  <td>
                      <input id="numcls1"  name="input_number_{{entry.material_id}}" type="text">
                      <input id="numcls2"  name="input_oprlist_{{entry.material_id}}"  list="operations" >

@@ -7,38 +7,28 @@
         <h4>购买中列表</h4>
          <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
              <thead>
+                 <th>购买ID</th>
                  <th>库存ID</th>
-                 <th>库存名</th>
                  <th>购买中数量</th>
-                 <th>库存数量</th>
                  <th>购买日期</th>
                  <th>到货数量</th>
                  <th>取消订单</th>
                  <th>备注</th>
                  <th>备注选择</th>
              </thead>
-             {% for entry in materials %}
-                 {% set buydict=json.loads(entry.buynum) %}
+             {% for entry in buybatches %}
                  <!--{% set index=loop.index %}-->
-                 {% set commentdict=json.loads(entry.buy_comments) %}
-                 {% for batch in buydict %}
-                     <tr>
-                         <td>{{entry.material_id}}</td>
-                         <td>{{entry.material_name}}</td>
-                         <td>{{buydict[batch]}}</td>
-                         <td>{{entry.countnum}}</td>
-                         <td>{{batch}}</td>
-                         <td><input type="number" name="input_inbound_num_{{entry.material_id}}_{{batch}}"></td>
-                             <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
-                         <td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{batch}}" ></td>
-                         {% set comment='' %}
-                         {% if batch in commentdict.keys() %}
-                         {% set comment=commentdict[batch] %}
-                         {% endif %}
-                         <td><input type="text" name="input_comment_{{entry.material_id}}_{{batch}}" value="{{comment}}"></td>
-                         <td><input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{batch}}" ></td>
-                     </tr>
-                 {% endfor%}
+                 <tr>
+                     <td>{{entry.buy_id}}</td>
+                     <td>{{entry.material_id}}</td>
+                     <td>{{entry.num}}</td>
+                     <td>{{entry.batch}}</td>
+                     <td><input type="number" name="input_inbound_num_{{entry.material_id}}_{{entry.batch}}"></td>
+                         <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
+                     <td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{entry.batch}}" ></td>
+                     <td><input type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}"></td>
+                     <td><input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
+                 </tr>
              {% endfor %}
          </table>
          <input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">

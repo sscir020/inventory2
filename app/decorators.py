@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import abort,session,redirect,url_for,flash
+from flask import abort,session,redirect,url_for,flash,request
 # from app import login_manager
 # from .models import User
 
@@ -17,3 +17,12 @@ def loggedin_required(f):
 
     return decorated_function
 
+def filter_get(f):
+    @wraps(f)
+    def decorated_function(*args,**kwargs):
+        # print(session)
+        # print('userid' in session)
+        if request.method=='POST':
+            return f(*args, **kwargs)
+        flash("GET is not allowed")
+    return decorated_function

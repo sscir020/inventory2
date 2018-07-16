@@ -26,14 +26,31 @@ create table materials(
 		countnum int not null default 0,
 		alarm_level int not null default 0,
 		acces_id int not null default 0,
-		buynum varchar(512) not null default '{}',
-		reworknum varchar(512) not null default '{}',
-		buy_comments varchar(2048) default '{}',
-		rework_comments varchar(2048) default '{}',
 		primary key (material_id),
 		unique(material_name)
 		);
-
+drop table if exists buys;
+drop table if exists reworks;
+create table buys(
+        buy_id int not null auto_increment,
+        batch varchar(32) not null,
+        material_id int not null,
+        num int not null default 0,
+        comment varchar(20) default '',
+        primary key(buy_id),
+        unique(batch),
+        foreign key (material_id) references materials(material_id)
+);
+create table reworks(
+        rework_id int not null auto_increment,
+        batch varchar(32) not null,
+        material_id int not null,
+        num int not null default 0,
+        comment varchar(20) default '',
+        primary key(rework_id),
+        unique(batch),
+        foreign key (material_id) references materials(material_id)
+);
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,
