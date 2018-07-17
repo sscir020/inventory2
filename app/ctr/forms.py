@@ -13,7 +13,12 @@ class LoginForm(FlaskForm):
     userpass = PasswordField('密码', validators=[DataRequired()])
     submit = SubmitField('登录')
 
-
+class RegistrationForm(FlaskForm):
+    username=StringField("用户名-英文",validators=[DataRequired()])
+    userpass=PasswordField("密码",validators=[DataRequired(),EqualTo('userpass2',message='密码不一致')])
+    userpass2 = PasswordField("确认密码", validators=[DataRequired()])
+    role=IntegerField("用户角色", validators=[DataRequired()])
+    submit = SubmitField('注册')
 # class ColorForm(FlaskForm):
 #     alarm_level=IntegerField("警戒值",validators=[DataRequired()])
 #     submit=SubmitField("修改")
@@ -38,8 +43,3 @@ class LoginForm(FlaskForm):
 #     diff = IntegerField("填写修好的数量例如 10 或者 返修中的数量例如 -10 ", validators=[DataRequired()])
 #     submit = SubmitField('返修出入库')
 #
-# class RegistrationForm(FlaskForm):
-#     username=StringField("用户名-英文",validators=[DataRequired()])
-#     userpass=PasswordField("密码",validators=[DataRequired(),EqualTo('userpass2',message='密码不一致')])
-#     userpass2 = PasswordField("确认密码", validators=[DataRequired()])
-#     submit = SubmitField('注册')

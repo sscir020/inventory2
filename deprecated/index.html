@@ -7,3 +7,42 @@
 
 <!--{{ super() }}-->
 	<!--<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">-->
+
+
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_buy_materials') }}-->
+<!--</div>-->
+<!--{% endif %}-->
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs_main') }}
+</div>
+{% endif %}
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs') }}
+</div>
+{% endif %}
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_material_table') }}
+</div>
+{% endif %}
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_param_accessory') }}
+</div>
+{% endif %}
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'ctr.show_rework_materials') }}
+</div>
+{% endif %}

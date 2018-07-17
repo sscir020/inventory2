@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import render_template,url_for,redirect,flash,session,request
 # from flask_login import login_user,logout_user,current_user,login_required
-from .forms import LoginForm,AddOprForm#ColorForm#ListForm,OprForm #EditOprForm,EditReworkOprForm #RegistrationForm
+from .forms import LoginForm,RegistrationForm #AddOprForm#ColorForm#ListForm,OprForm #EditOprForm,EditReworkOprForm
 from ..models import Opr,Material,User,Accessory,Buy,Rework
 from . import ctr
 from ..__init__ import db
@@ -32,11 +32,28 @@ def log_user_in():
             session['userid'] = user.user_id
             session['username'] = user.user_name
             session['userpass'] = user.user_pass
+            session['role'] = user.role
             flash("登录成功")
             return redirect(url_for('ctr.welcome_user'))
     else:
         flash("需要登录")
     return render_template('login_form.html',form=form)
+
+@ctr.route('/registration', methods=['GET', 'POST'])
+def register():
+    form=RegistrationForm()
+    if form.validate_on_submit():
+        if User.query.filter_by(user_name=form.username.data).first() == None:
+            u=User(user_name=form.username.data,user_pass=form.userpass.data,role=form.role.data)
+            db.session.add(u)
+            db.session.commit()
+            flash('账户创建成功')
+            return redirect(url_for('ctr.log_user_in'))
+        else:
+            flash('账户已存在')
+    else:
+        flash('需要注册')
+    return render_template('registration_form.html',form=form)
 
 @ctr.route('/add_material_act', methods=['', 'POST'])
 @loggedin_required
@@ -65,26 +82,27 @@ def add_material():
                     if Accessory.query.filter(Accessory.param_acces==acces).first()==None:
                         a = Accessory(param_num=len(dict),param_acces=acces)
                         db.session.add(a)
-                        # db.session.commit()
+                        db.session.commit()
                     else:
                         a=Accessory.query.filter(Accessory.param_acces==acces).first()
                     m = Material(material_name=materialname, countnum=0,acces_id=a.acces_id,alarm_level=alarm_level)
 
                     for materialid in dict:
                         o = Opr(material_id=materialid, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
-                                momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                                momentary=datetime.datetime.now())
                         db.session.add(o)
-                        # db.session.commit()
+                    db.session.commit()
                 else:
                     m = Material(material_name=materialname, countnum=0, acces_id=0,alarm_level=alarm_level)
                 db.session.add(m)
+                db.session.commit()
                 db.session.flush()
                 m=Material.query.filter_by(material_name=materialname).first()
                 o=Opr(material_id=m.material_id,diff=0,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
-                      momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                      momentary=datetime.datetime.now())
                 db.session.add(o)
                 db.session.commit()
-
+                db.session.flush()
                 flash('新材料添加成功')
                 return redirect(url_for('ctr.show_material_table',page=1))
             else:
@@ -160,21 +178,21 @@ def material_change_num(m,diff,oprtype,batch):
         elif oprtype == Oprenum.OUTBOUND.name:#****
             m.countnum -= diff
         elif oprtype == Oprenum.BUYING.name:#-->
-            batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            batch = datetime.datetime.now()
             b = Buy.query.filter(Buy.batch == batch).first()
             while b!=None:
                 time.sleep(1)
-                batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                batch = datetime.datetime.now()
                 b = Buy.query.filter(Buy.batch == batch).first()
             b=Buy(batch=batch,material_id=m.material_id,num=diff)
             db.session.add(b)
             value = batch
         elif oprtype == Oprenum.REWORK.name:#-->
-            batch=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            batch=datetime.datetime.now()
             b = Rework.query.filter(Rework.batch == batch).first()
             while b!=None:
                 m.sleep(1)
-                batch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                batch = datetime.datetime.now()
                 b = Rework.query.filter(Rework.batch == batch).first()
             b=Rework(batch=batch,material_id=m.material_id,num=diff)
             m.countnum -= diff
@@ -233,10 +251,10 @@ def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUY
     else:
         value=material_change_num(m=m,diff=diff, oprtype=oprtype, batch=batch)
         o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=isgroup,
-                oprbatch=value, comment=comment, momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                oprbatch=value, comment=comment, momentary=datetime.datetime.now())
         db.session.add_all([m,o])
-        db.session.flush()
         db.session.commit()
+        db.session.flush()
         db.session.close()
     return True
 

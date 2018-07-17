@@ -29,18 +29,27 @@ def log_user_out():
     flash("登出成功")
     return redirect(url_for('ctr.welcome_user'))
 
-
-@ctr.route('/materials_table_normal2')
+@ctr.route('/user_table',methods=['GET',''])
 @loggedin_required
-def show_material_table_normal2():
-    # flash('库存列表')
-    # page=int(page)
-    # if page==None:
-    #     page=1
-    page = request.args.get('page',1,type=int)
-    pagination = Material.query.order_by(Material.material_id.desc()).paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
-    materials=pagination.items
-    return render_template('material_table_normal2.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
+def show_users():
+    # flash('购买列表')
+    db.session.flush()
+    # page = request.args.get('page',1,type=int)
+    # pagination = Accessory.query.order_by(Accessory.acces_id).\
+    #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
+    # accessories=pagination.items
+    return render_template('user_table.html',users=User.query.all() )
+# @ctr.route('/materials_table_normal2')
+# @loggedin_required
+# def show_material_table_normal2():
+#     # flash('库存列表')
+#     # page=int(page)
+#     # if page==None:
+#     #     page=1
+#     page = request.args.get('page',1,type=int)
+#     pagination = Material.query.order_by(Material.material_id.desc()).paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
+#     materials=pagination.items
+#     return render_template('material_table_normal2.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
 
 
 @ctr.route('/materials_table',methods=['GET',''])
@@ -53,12 +62,12 @@ def show_material_table():
     # if page==None:
     #     page=1
     db.session.flush()
-    page = request.args.get('page',1,type=int)
-    pagination = Material.query.order_by(Material.material_id.desc()).\
-        paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
-    materials=pagination.items
+    # page = request.args.get('page',1,type=int)
+    # pagination = Material.query.order_by(Material.material_id.desc()).\
+    #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
+    # materials=pagination.items
     # print(pagination==None)
-    return render_template('material_table.html',materials=materials,pagination=pagination,Param=Param,page=page,json=json )
+    return render_template('material_table.html',materials= Material.query.order_by(Material.material_id.desc()).all(),Param=Param,json=json )
     # return render_template('material_table.html',materials=Material.query.all())
 
 @ctr.route('/rework_materials_table',methods=['GET',''])
@@ -67,11 +76,11 @@ def show_rework_materials():
     print(request)
     # flash('返修列表')
     db.session.flush()
-    page = request.args.get('page',1,type=int)
-    pagination = Rework.query.order_by(Rework.batch.desc()).\
-        paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
-    reworkbatches=pagination.items
-    return render_template('rework_material_table.html',reworkbatches=reworkbatches,pagination=pagination,json=json,Oprenum=Oprenum )
+    # page = request.args.get('page',1,type=int)
+    # pagination = Rework.query.order_by(Rework.batch.desc()).\
+    #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
+    # reworkbatches=pagination.items
+    return render_template('rework_material_table.html',reworkbatches=Rework.query.order_by(Rework.batch.desc()).all(),json=json,Oprenum=Oprenum )
 
 
 @ctr.route('/buy_materials_table',methods=['GET',''])
@@ -80,22 +89,22 @@ def show_buy_materials():
     print(request)
     # flash('购买列表')
     db.session.flush()
-    page = request.args.get('page',1,type=int)
-    pagination = Buy.query.order_by(Buy.batch.desc()).\
-        paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
-    buybatches=pagination.items
-    return render_template('buy_material_table.html',buybatches=buybatches,pagination=pagination,json=json,Oprenum=Oprenum )
+    # page = request.args.get('page',1,type=int)
+    # pagination = Buy.query.order_by(Buy.batch.desc()).\
+    #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
+    # buybatches=pagination.items
+    return render_template('buy_material_table.html',buybatches=Buy.query.order_by(Buy.batch.desc()).all(),json=json,Oprenum=Oprenum )
 
 @ctr.route('/param_accessory_table',methods=['GET',''])
 @loggedin_required
 def show_param_accessory():
     # flash('购买列表')
     db.session.flush()
-    page = request.args.get('page',1,type=int)
-    pagination = Accessory.query.order_by(Accessory.acces_id).\
-        paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
-    accessories=pagination.items
-    return render_template('param_accessory_table.html',accessories=accessories,pagination=pagination,json=json,Material=Material )
+    # page = request.args.get('page',1,type=int)
+    # pagination = Accessory.query.order_by(Accessory.acces_id).\
+    #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
+    # accessories=pagination.items
+    return render_template('param_accessory_table.html',accessories=Accessory.query.order_by(Accessory.acces_id).all(),json=json,Material=Material )
 
 @ctr.route('/join_oprs_table',methods=['GET',''])
 @loggedin_required
@@ -105,12 +114,13 @@ def show_join_oprs():
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
     sql = db.session.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,\
                            Opr.isgroup,Opr.oprbatch,Opr.comment,Opr.momentary).join(User, User.user_id == Opr.user_id)\
-        .join(Material,Material.material_id==Opr.material_id).order_by(Opr.opr_id.desc())
-    page = request.args.get('page', 1, type=int)
-    pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
-    join_oprs=pagination.items
+        .join(Material,Material.material_id==Opr.material_id).order_by(Opr.opr_id.desc()).all()
+    print(sql)
+    # page = request.args.get('page', 1, type=int)
+    # pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
+    # join_oprs=pagination.items
     # print(sql[0])
-    return render_template('join_oprs_table.html',join_oprs=join_oprs,pagination=pagination,oprenumCH=oprenumCH)
+    return render_template('join_oprs_table.html',join_oprs=sql,oprenumCH=oprenumCH)
 
 @ctr.route('/join_oprs_main_table',methods=['GET',''])
 @loggedin_required
@@ -120,12 +130,13 @@ def show_join_oprs_main():
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
     sql = db.session.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,\
                            Opr.isgroup,Opr.oprbatch,Opr.comment, Opr.momentary).join(User, User.user_id == Opr.user_id)\
-        .join(Material,Material.material_id==Opr.material_id).filter(Opr.isgroup==True).order_by(Opr.opr_id.desc())
-    page = request.args.get('page', 1, type=int)
-    pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
-    join_oprs=pagination.items
+        .join(Material,Material.material_id==Opr.material_id).filter(Opr.isgroup==True).order_by(Opr.opr_id.desc()).all()
+    print(sql)
+    # page = request.args.get('page', 1, type=int)
+    # pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
+    # join_oprs=pagination.items
     # print(sql[0])
-    return render_template('join_oprs_main_table.html',join_oprs=join_oprs,pagination=pagination,oprenumCH=oprenumCH)
+    return render_template('join_oprs_main_table.html',join_oprs=sql,oprenumCH=oprenumCH)
 
 def material_isvalid_num_rev (m,diff,oprtype,batch):
     if diff<0:

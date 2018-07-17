@@ -15,7 +15,7 @@
              <th>主件操作</th>
              <th>备注</th>
              <th>操作用户</th>
-             <th>操作时间</th>
+             <!--<th>操作时间</th>-->
          </thead>
          {% for entry in join_oprs %}
          <tr>
@@ -28,15 +28,11 @@
              <td>{{entry.isgroup}}</td>
              <td>{{entry.comment}}</td>
              <td>{{entry.user_name}}</td>
-             <td>{{entry.momentary}}</td>
+             <!--<td>{{entry.momentary}}</td>-->
          </tr>
          {% endfor %}
     </table>
 </div>
 
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs') }}
-</div>
-{% endif %}
+
 {% endblock %}

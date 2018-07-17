@@ -7,16 +7,16 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY =  '1AR4bnTnLHZyHaKt' #os.environ.get('SECRET_KEY') or
-    SQLALCHEMY_POOL_SIZE = 100
-    SQLALCHEMY_MAX_OVERFLOW = 0
+    # SQLALCHEMY_POOL_SIZE = 100
+    # SQLALCHEMY_MAX_OVERFLOW = 0
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     FLASK_NUM_PER_PAGE = 5
     FLASK_NUM_PER_PAGE_LIST = 6
 #SESSION_TYPE= 'redis'
-    SESSION_PERMANENT = False
-    SESSION_KEY_PREFIX='session'
-    ALARM_LEVEL=0
+    SESSION_PERMANENT = True
+    # SESSION_KEY_PREFIX='sessionp'
+    # ALARM_LEVEL=0
     MAX_CHAR_PER_COMMENT = 20
 
     @staticmethod
@@ -28,6 +28,13 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hard_guess@localhost:3306/testdb1?charset=utf8'
 
+class Development2Config(Config):
+    # basedir = os.path.abspath(os.path.dirname(__file__))
+    # string= os.path.join(basedir,'projects\inventory2\database\data.sqlite')
+    # print("path:"+string)
+    # DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///D:\\projects\\inventory2\\database\\data.sqlite'
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///'+string
 
 class TestingConfig(Config):
     TESTING = True
@@ -40,6 +47,7 @@ class ProductionConfig(Config):
 
 config = {
     'development': DevelopmentConfig,
+    'development2': Development2Config,
     'testing': TestingConfig,
     'production': ProductionConfig,
 

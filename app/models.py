@@ -10,6 +10,7 @@ class User(db.Model):
     user_id=db.Column(db.Integer,nullable=False,primary_key=True)
     user_name=db.Column(db.String(64),nullable=False, unique=True, index=True)
     user_pass = db.Column(db.String(64),nullable=False)
+    role = db.Column(db.Integer,nullable=False,default=1)
     oprs = db.relationship('Opr', backref='users', lazy='dynamic')
     # def __init__(self,**kwargs):
     #     # self.user_name=username
