@@ -120,7 +120,7 @@ def show_join_oprs():
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
     sql = dbsession.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,\
                            Opr.isgroup,Opr.oprbatch,Opr.comment,Opr.momentary).join(User, User.user_id == Opr.user_id)\
-        .join(Material,Material.material_id==Opr.material_id).order_by(Opr.opr_id.desc()).all()
+        .join(Material,Material.material_id==Opr.material_id).order_by(Opr.opr_id.desc()).limit(50)
     # print(sql)
     # page = request.args.get('page', 1, type=int)
     # pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
@@ -136,7 +136,7 @@ def show_join_oprs_main():
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
     sql = dbsession.query(Opr.opr_id, Opr.diff, User.user_name,Material.material_name,Material.material_id,Opr.oprtype,\
                            Opr.isgroup,Opr.oprbatch,Opr.comment, Opr.momentary).join(User, User.user_id == Opr.user_id)\
-        .join(Material,Material.material_id==Opr.material_id).filter(Opr.isgroup==True).order_by(Opr.opr_id.desc()).all()
+        .join(Material,Material.material_id==Opr.material_id).filter(Opr.isgroup==True).order_by(Opr.opr_id.desc()).limit(50)
     # print(sql)
     # page = request.args.get('page', 1, type=int)
     # pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
@@ -252,8 +252,8 @@ def rollback_opr():
                 dbsession.commit()
                 flash("回滚成功_主件")
             else:
-                if m.material_isvalid_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype):
-                    m.material_change_num_rev(diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype)
+                if material_isvalid_num_rev(m=m,diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype):
+                    material_change_num_rev(m=m,diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype)
                     dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                     dbsession.commit()
                     flash("回滚成功_主件")

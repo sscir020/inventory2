@@ -12,7 +12,7 @@
                  <th>返修数量</th>
                  <th>返修日期</th>
                  <th>修好/报废数量</th>
-                 <th>备注</th>
+                 <th>备注(不超过20个字,请勾选右侧)</th>
                  <th>备注选择</th>
              </thead>
              {% for entry in reworkbatches %}
@@ -24,7 +24,7 @@
                      <td>{{entry.batch}}</td>
                      <!--<td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">-->
                      <td><input type="number" name="input_restore_num_{{entry.material_id}}_{{entry.batch}}"></td>
-                     <td><input type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}"></td>
+                     <td><input id="comment_txt" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}"></td>
                      <td><input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
                  </tr>
              {% endfor %}

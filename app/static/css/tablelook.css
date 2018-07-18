@@ -84,7 +84,9 @@ a
     margin:0 0 0 40px;
     list-style-type: decimal;
 }
-
 .text_acce{
     width:50px;
+}
+#comment_txt{
+    width:220px;
 }
