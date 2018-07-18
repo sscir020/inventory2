@@ -4,19 +4,21 @@ from flask import render_template,url_for,redirect,flash,session,request
 from .forms import LoginForm,RegistrationForm #AddOprForm#ColorForm#ListForm,OprForm #EditOprForm,EditReworkOprForm
 from ..models import Opr,Material,User,Accessory,Buy,Rework
 from . import ctr
-from ..__init__ import db
+# from ..__init__ import db
 from ..decorators import loggedin_required,filter_get
 from main_config import Oprenum,Config,Param,params,paramnums,oprenumNum,oprenumCH,Oprenum
 
 import datetime,time
 import json
 
+from ..__init__ import dbsession
+
 @ctr.route('/', methods=['GET', 'POST'])
 @ctr.route('/login', methods=['GET', 'POST'])
 def log_user_in():
     form=LoginForm()
     if form.validate_on_submit():
-        user=User.query.filter_by(user_name=form.username.data).first()
+        user=dbsession.query(User).filter_by(user_name=form.username.data).first()
         if user == None:
             flash("用户不存在")
             return redirect(url_for('ctr.log_user_in'))
@@ -43,10 +45,10 @@ def log_user_in():
 def register():
     form=RegistrationForm()
     if form.validate_on_submit():
-        if User.query.filter_by(user_name=form.username.data).first() == None:
+        if dbsession.query(User).filter_by(user_name=form.username.data).first() == None:
             u=User(user_name=form.username.data,user_pass=form.userpass.data,role=form.role.data)
-            db.session.add(u)
-            db.session.commit()
+            dbsession.add(u)
+            dbsession.commit()
             flash('账户创建成功')
             return redirect(url_for('ctr.log_user_in'))
         else:
@@ -66,7 +68,7 @@ def add_material():
         #     list=request.form['input_accessory_list']
         # list1 = request.form
         # print(list1)
-            if Material.query.filter_by(material_name=materialname).first() == None:
+            if dbsession.query(Material).filter_by(material_name=materialname).first() == None:
                 dict={}
                 for keyid in request.form.keys():
                     if keyid[0:21]=='input_accessory_check':
@@ -79,30 +81,32 @@ def add_material():
                             dict[request.form[keyid]]=request.form[keynum]
                 acces=json.dumps(dict)
                 if(len(dict)>0 ):
-                    if Accessory.query.filter(Accessory.param_acces==acces).first()==None:
+                    if dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()==None:
                         a = Accessory(param_num=len(dict),param_acces=acces)
-                        db.session.add(a)
-                        db.session.commit()
+                        dbsession.add(a)
+                        dbsession.commit()
+                        dbsession.flush()
                     else:
-                        a=Accessory.query.filter(Accessory.param_acces==acces).first()
+                        a=dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()
                     m = Material(material_name=materialname, countnum=0,acces_id=a.acces_id,alarm_level=alarm_level)
 
                     for materialid in dict:
                         o = Opr(material_id=materialid, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
                                 momentary=datetime.datetime.now())
-                        db.session.add(o)
-                    db.session.commit()
+                        dbsession.add(o)
+                        dbsession.commit()
+                    dbsession.flush()
                 else:
                     m = Material(material_name=materialname, countnum=0, acces_id=0,alarm_level=alarm_level)
-                db.session.add(m)
-                db.session.commit()
-                db.session.flush()
-                m=Material.query.filter_by(material_name=materialname).first()
+                dbsession.add(m)
+                dbsession.commit()
+                dbsession.flush()
+                m=dbsession.query(Material).filter_by(material_name=materialname).first()
                 o=Opr(material_id=m.material_id,diff=0,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
                       momentary=datetime.datetime.now())
-                db.session.add(o)
-                db.session.commit()
-                db.session.flush()
+                dbsession.add(o)
+                dbsession.commit()
+                dbsession.flush()
                 flash('新材料添加成功')
                 return redirect(url_for('ctr.show_material_table',page=1))
             else:
@@ -137,7 +141,7 @@ def material_isvalid_num(m,diff,oprtype,batch):
             flash("返修数量大于库存数量"+str(diff)+">"+str(m.countnum))
             return False
     elif oprtype==Oprenum.INBOUND.name:
-        b=Buy.query.filter(Buy.batch==batch).first()
+        b=dbsession.query(Buy).filter(Buy.batch==batch).first()
         if b == None:
             flash("购买批次不存在"+str(batch))
             return False
@@ -145,7 +149,7 @@ def material_isvalid_num(m,diff,oprtype,batch):
             flash("入库数量大于购买批次数量"+str(diff)+">"+str(b.num))
             return False
     elif oprtype == Oprenum.RESTORE.name:
-        b = Rework.query.filter(Rework.batch == batch).first()
+        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
         if b == None:
             flash("返修批次不存在"+str(batch))
             return False
@@ -153,12 +157,12 @@ def material_isvalid_num(m,diff,oprtype,batch):
             flash("修好数量大于返修批次数量"+str(diff)+">"+str(b.num))
             return False
     elif oprtype == Oprenum.CANCELBUY.name:
-        b=Buy.query.filter(Buy.batch==batch).first()
+        b=dbsession.query(Buy).filter(Buy.batch==batch).first()
         if b == None:
             flash("购买批次不存在"+str(batch))
             return False
     elif oprtype == Oprenum.SCRAP.name:
-        b = Rework.query.filter(Rework.batch == batch).first()
+        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
         if b == None:
             flash("返修批次不存在"+str(batch))
             return False
@@ -179,69 +183,69 @@ def material_change_num(m,diff,oprtype,batch):
             m.countnum -= diff
         elif oprtype == Oprenum.BUYING.name:#-->
             batch = datetime.datetime.now()
-            b = Buy.query.filter(Buy.batch == batch).first()
+            b = dbsession.query(Buy).filter(Buy.batch == batch).first()
             while b!=None:
                 time.sleep(1)
                 batch = datetime.datetime.now()
-                b = Buy.query.filter(Buy.batch == batch).first()
+                b = dbsession.query(Buy).filter(Buy.batch == batch).first()
             b=Buy(batch=batch,material_id=m.material_id,num=diff)
-            db.session.add(b)
+            dbsession.add(b)
             value = batch
         elif oprtype == Oprenum.REWORK.name:#-->
             batch=datetime.datetime.now()
-            b = Rework.query.filter(Rework.batch == batch).first()
+            b = dbsession.query(Rework).filter(Rework.batch == batch).first()
             while b!=None:
                 m.sleep(1)
                 batch = datetime.datetime.now()
-                b = Rework.query.filter(Rework.batch == batch).first()
+                b = dbsession.query(Rework).filter(Rework.batch == batch).first()
             b=Rework(batch=batch,material_id=m.material_id,num=diff)
             m.countnum -= diff
-            db.session.add(b)
+            dbsession.add(b)
             value = batch
         elif oprtype==Oprenum.INBOUND.name:####
-            b = Buy.query.filter(Buy.batch == batch).first()
+            b = dbsession.query(Buy).filter(Buy.batch == batch).first()
             b.num-=diff
             m.countnum += diff
-            db.session.add(b)
+            dbsession.add(b)
             if b.num==0:
-                Buy.query.filter(Buy.batch == batch).delete()
-                # db.session.commit()
+                dbsession.query(Buy).filter(Buy.batch == batch).delete()
+                # dbsession.commit()
             else:
-                db.session.add(b)
+                dbsession.add(b)
         elif oprtype == Oprenum.RESTORE.name:####
-            b = Rework.query.filter(Rework.batch == batch).first()
+            b = dbsession.query(Rework).filter(Rework.batch == batch).first()
             b.num -= diff
             m.countnum += diff
             if b.num == 0:
-                Rework.query.filter(Rework.batch == batch).delete()
-                # db.session.commit()
+                dbsession.query(Rework).filter(Rework.batch == batch).delete()
+                # dbsession.commit()
             else:
-                db.session.add(b)
+                dbsession.add(b)
         elif oprtype == Oprenum.CANCELBUY.name:
-            b = Buy.query.filter(Buy.batch == batch).first()
+            b = dbsession.query(Buy).filter(Buy.batch == batch).first()
             value=b.num
             Buy.query.filter(Buy.batch == batch).delete()
-            # db.session.commit()
+            # dbsession.commit()
         elif oprtype == Oprenum.SCRAP.name:
-            b = Rework.query.filter(Rework.batch == batch).first()
+            b = dbsession.query(Rework).filter(Rework.batch == batch).first()
             b.num -= diff
             if b.num == 0:
-                Rework.query.filter(Rework.batch == batch).delete()
-                # db.session.commit()
+                dbsession.query(Rework).filter(Rework.batch == batch).delete()
+                # dbsession.commit()
             else:
-                db.session.add(b)
+                dbsession.add(b)
         else:
             flash("操作类型错误")
             value='-1'
         # if value!='-1':
-        #     db.session.add(self)
-        #     db.session.commit()
+        #     dbsession.add(self)
+        #     dbsession.commit()
         return value
 
 
 def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUYING,REWORK,OUTBOUND,INBOUND,RESTORE,SCRAP #INITADD,CANCELBUY
     print('materialid:' + str(materialid) + ",diff:" + str(diff) + ",oprtype:" + str(oprtype) + ",batch:" + str(batch))
-    m = Material.query.filter(Material.material_id==materialid).first()
+    m = dbsession.query(Material).filter(Material.material_id==materialid).first()
     if m == None:
         flash("材料名不存在")
         return False
@@ -252,17 +256,17 @@ def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUY
         value=material_change_num(m=m,diff=diff, oprtype=oprtype, batch=batch)
         o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=isgroup,
                 oprbatch=value, comment=comment, momentary=datetime.datetime.now())
-        db.session.add_all([m,o])
-        db.session.commit()
-        db.session.flush()
-        db.session.close()
+        dbsession.add_all([m,o])
+        dbsession.commit()
+        dbsession.flush()
+        # dbsession.close()
     return True
 
 
 @ctr.route('/form_rollback_act',methods=['','POST'])
 @loggedin_required
 def form_rollback():
-    db.session.rollback()
+    dbsession.rollback()
     return redirect(url_for('ctr.show_buy_materials'))
 
 
@@ -301,9 +305,9 @@ def form_change_num():
                     else:
                         flash("返修列表数量更新失败")
                 elif oprtype==Oprenum.OUTBOUND.name:
-                    m = Material.query.filter_by(material_id=materialid).first()
+                    m = dbsession.query(Material).filter_by(material_id=materialid).first()
                     if m.acces_id != None and m.acces_id != 0:
-                        a = Accessory.query.filter_by(acces_id=m.acces_id).first()
+                        a = dbsession.query(Accessory).filter_by(acces_id=m.acces_id).first()
                         data = json.loads(a.param_acces)
                         for acces_materialid in data:
                             num = int(data[acces_materialid])
@@ -333,7 +337,7 @@ def form_cancel_buy():
             list=request.form["input_checkbox_cancel"].split('_')
             materialid=list[0]
             batch=list[1]
-            m = Material.query.filter_by(material_id=materialid).first()
+            m = dbsession.query(Material).filter_by(material_id=materialid).first()
             buydict=json.loads(m.buynum)
             comments_dict=json.loads(m.buy_comments)
             diff=buydict.pop(batch)
@@ -342,12 +346,12 @@ def form_cancel_buy():
                 comment=comments_dict.pop(batch)
                 m.buy_comments=json.dumps(comments_dict)
             m.buynum = json.dumps(buydict)
-            db.session.add(m)
-            db.session.commit()
+            dbsession.add(m)
+            dbsession.commit()
             o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.CANCELBUY.name, isgroup=True,oprbatch=batch,comment=comment, \
-                    momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-            db.session.add(o)
-            db.session.commit()
+                    momentary=datetime.datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
+            dbsession.add(o)
+            dbsession.commit()
             flash("订单取消成功")
         else:
             flash("请勾选订单并提交")
@@ -438,16 +442,16 @@ def form_change_comment(oprtype):
             comment=str(request.form['input_comment_'+string])
             if len(comment)<=Config.MAX_CHAR_PER_COMMENT:
                 if oprtype==Oprenum.REWORK.name:
-                    b=Rework.query.filter_by(batch=batch).first()
+                    b=dbsession.query(Rework).filter_by(batch=batch).first()
                     b.comment=comment
-                    db.session.add(b)
-                    db.session.commit()
+                    dbsession.add(b)
+                    dbsession.commit()
                     flash("返修备注修改成功")
                 elif oprtype==Oprenum.BUYING.name:
-                    b = Buy.query.filter_by(batch=batch).first()
+                    b = dbsession.query(Buy).filter_by(batch=batch).first()
                     b.comment = comment
-                    db.session.add(b)
-                    db.session.commit()
+                    dbsession.add(b)
+                    dbsession.commit()
                     flash("购买备注修改成功")
                 else:
                     flash("备注类型错误")
@@ -473,12 +477,12 @@ def form_change_comment(oprtype):
 #             batch = list[1]
 #             comment=str(request.form['input_comment_'+string])
 #             if len(comment)<=40:
-#                 m=Material.query.filter_by(materialid=materialid).first()
+#                 m=dbsession.query(Material).filter_by(materialid=materialid).first()
 #                 comments_dict=json.loads(m.buy_comments)
 #                 comments_dict[batch]=comment
 #                 m.buy_comments = json.dump(comments_dict)
-#                 db.session.add(m)
-#                 db.session.commit()
+#                 dbsession.add(m)
+#                 dbsession.commit()
 #             else:
 #                 flash("每条备注不超过20个中文字")
 #         else:
@@ -489,11 +493,11 @@ def form_change_comment(oprtype):
 #     oprbatch=m.material_change_num(diff=diff,oprtype=oprtype,batch='')
 #     o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True,oprbatch=oprbatch, \
 #             momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-#     db.session.add(o)
-#     db.session.commit()
+#     dbsession.add(o)
+#     dbsession.commit()
 #
 #     if m.acces_id!= None and m.acces_id!=0:
-#         a=Accessory.query.filter_by(acces_id=m.acces_id).first()
+#         a=dbsession.query(Accessory).filter_by(acces_id=m.acces_id).first()
 #         data=json.loads(a.param_acces)
 #         for acces_materialid in data:
 #             num=int(data[acces_materialid])
@@ -509,18 +513,18 @@ def form_change_comment(oprtype):
 #         m.material_change_num(diff=diff,oprtype=oprtype,batch='')
 #         o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=True, \
 #                 momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-#         db.session.add(o)
-#         db.session.commit()
+#         dbsession.add(o)
+#         dbsession.commit()
 
         # if m.acces_id != None and m.acces_id != 0:
-        #     a = Accessory.query.filter_by(acces_id=m.acces_id).first()
+        #     a = dbsession.query(Accessory).filter_by(acces_id=m.acces_id).first()
         #     data = json.loads(a.param_acces)
         #     for materialid in data:
         #         # num = int(data[materialid])
         #         # num = num * m.countnum
-        #         m1 = Material.query.filter_by(material_id=materialid).first()
+        #         m1 = dbsession.query(Material).filter_by(material_id=materialid).first()
         #         # m1.material_change_num(diff=num,oprtype=Oprenum.INITADD.name,batch='')
         #         o = Opr(material_id=m1.material_id, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
         #                 momentary=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        #         db.session.add(o)
-        #         db.session.commit()
+        #         dbsession.add(o)
+        #         dbsession.commit()

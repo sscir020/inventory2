@@ -19,7 +19,7 @@
                  <!--{{acces}}-->
                   {% for key in acces %}
                  <!--{{key}}-->
-                      {% set m=Material.query.filter_by(material_id=(key|int)).first() %}
+                      {% set m=dbsession.query(Material).filter_by(material_id=(key|int)).first() %}
                       {{m.material_name}}:{{acces[key]}}&nbsp;&nbsp;&nbsp;
 
                   {% endfor %}

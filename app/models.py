@@ -1,17 +1,23 @@
-from .__init__ import db
+# from .__init__ import db
 from flask import flash
 from main_config import Oprenum
 import json,datetime,time
 # from datetime import datetime
 # from flask_login import UserMixin, AnonymousUserMixin
 
-class User(db.Model):
+from sqlalchemy import Column,String,Integer,ForeignKey,Boolean,DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+
+Base=declarative_base()
+
+class User(Base):
     __tablename__ = 'users'
-    user_id=db.Column(db.Integer,nullable=False,primary_key=True)
-    user_name=db.Column(db.String(64),nullable=False, unique=True, index=True)
-    user_pass = db.Column(db.String(64),nullable=False)
-    role = db.Column(db.Integer,nullable=False,default=1)
-    oprs = db.relationship('Opr', backref='users', lazy='dynamic')
+    user_id=Column(Integer,nullable=False,primary_key=True)
+    user_name=Column(String(64),nullable=False, unique=True, index=True)
+    user_pass = Column(String(64),nullable=False)
+    role = Column(Integer,nullable=False,default=1)
+    oprs = relationship('Opr', backref='users', lazy='dynamic')
     # def __init__(self,**kwargs):
     #     # self.user_name=username
     #     # self.user_pass=userpass
@@ -23,62 +29,62 @@ class User(db.Model):
 
     # def change_pass(self,newpass):
     #     self.user_pass=newpass
-    #     db.session.add(self)
-    #     db.session.commitAA()
+    #     session.add(self)
+    #     session.commitAA()
 
     def prt(self):
         print(self.user_id,self.user_name,self.user_pass)
 
-class Material(db.Model):
+class Material(Base):
     __tablename__ = 'materials'
-    material_id=db.Column(db.Integer,nullable=False,primary_key=True)
-    material_name=db.Column(db.String(64),nullable=False, unique=True, index=True)##### no defalut
-    countnum=db.Column(db.Integer,nullable=False,default=0)
-    alarm_level=db.Column(db.Integer,nullable=False,default=0)
-    acces_id=db.Column(db.Integer, db.ForeignKey('accessories.acces_id'),default=0)
-    oprs = db.relationship('Opr', backref='materials', lazy='dynamic')
-    # buybatches = db.relationship('Buy', backref='materials', lazy='dynamic')
-    # reworkbatches = db.relationship('Rework', backref='materials', lazy='dynamic')
+    material_id=Column(Integer,nullable=False,primary_key=True)
+    material_name=Column(String(64),nullable=False, unique=True, index=True)##### no defalut
+    countnum=Column(Integer,nullable=False,default=0)
+    alarm_level=Column(Integer,nullable=False,default=0)
+    acces_id=Column(Integer, ForeignKey('accessories.acces_id'),default=0)
+    oprs = relationship('Opr', backref='materials', lazy='dynamic')
+    # buybatches = relationship('Buy', backref='materials', lazy='dynamic')
+    # reworkbatches = relationship('Rework', backref='materials', lazy='dynamic')
 
     def prt(self):
         print(self.material_id, self.material_name, self.countnum,self.reworknum,self.buynum)
 
-class Buy(db.Model):
+class Buy(Base):
     __tablename__='buys'
-    buy_id=db.Column(db.Integer,nullable=False,primary_key=True)
-    material_id = db.Column(db.Integer, db.ForeignKey('materials.material_id'))
-    batch=db.Column(db.String(32),nullable=False,unique=True,index=True)
-    num=db.Column(db.Integer,nullable=False,default=0)
-    comment=db.Column(db.String(20),nullable=True,default='')
+    buy_id=Column(Integer,nullable=False,primary_key=True)
+    material_id = Column(Integer, ForeignKey('materials.material_id'))
+    batch=Column(String(32),nullable=False,unique=True,index=True)
+    num=Column(Integer,nullable=False,default=0)
+    comment=Column(String(20),nullable=True,default='')
 
-class Rework(db.Model):
+class Rework(Base):
     __tablename__='reworks'
-    rework_id=db.Column(db.Integer,nullable=False,primary_key=True)
-    material_id = db.Column(db.Integer, db.ForeignKey('materials.material_id'))
-    batch=db.Column(db.String(32),nullable=False,unique=True,index=True)
-    num=db.Column(db.Integer,nullable=False,default=0)
-    comment=db.Column(db.String(20),nullable=True,default='')
+    rework_id=Column(Integer,nullable=False,primary_key=True)
+    material_id = Column(Integer, ForeignKey('materials.material_id'))
+    batch=Column(String(32),nullable=False,unique=True,index=True)
+    num=Column(Integer,nullable=False,default=0)
+    comment=Column(String(20),nullable=True,default='')
 
-class Opr(db.Model):
+class Opr(Base):
     __tablename__ = 'oprs'
-    opr_id = db.Column(db.Integer, nullable=False, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    diff = db.Column(db.Integer, nullable=False)
-    material_id = db.Column(db.Integer, db.ForeignKey('materials.material_id'))
-    oprtype = db.Column(db.String(32), nullable=False)
-    oprbatch = db.Column(db.String(32), nullable=False,default='')
-    isgroup =db.Column(db.Boolean,nullable=False,default=0)
-    comment = db.Column(db.String(40), nullable=True, default='')
-    momentary = db.Column(db.DateTime, index=True,default=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    opr_id = Column(Integer, nullable=False, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'))
+    diff = Column(Integer, nullable=False)
+    material_id = Column(Integer, ForeignKey('materials.material_id'))
+    oprtype = Column(String(32), nullable=False)
+    oprbatch = Column(String(32), nullable=False,default='')
+    isgroup =Column(Boolean,nullable=False,default=0)
+    comment = Column(String(40), nullable=True, default='')
+    momentary = Column(DateTime, index=True,default=datetime.datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
 
     def prt(self):
         print(self.opr_id, self.user_id, self.diff, self.material_id)
 
-class Accessory(db.Model):
+class Accessory(Base):
     __tablename__='accessories'
-    acces_id = db.Column(db.Integer, nullable=False, primary_key=True)
-    param_num = db.Column(db.Integer, nullable=False)
-    param_acces = db.Column(db.String(2048), nullable=False)
+    acces_id = Column(Integer, nullable=False, primary_key=True)
+    param_num = Column(Integer, nullable=False)
+    param_acces = Column(String(2048), nullable=False)
 
 
 # class AnonymousUser(AnonymousUserMixin):
@@ -96,8 +102,8 @@ class Accessory(db.Model):
 
 # def material_change_countnum(self, diff):
 #     self.countnum += diff
-#     db.session.add(self)
-#     # db.session.commit()
+#     session.add(self)
+#     # session.commit()
 #     return True
 #
 #
@@ -105,8 +111,8 @@ class Accessory(db.Model):
 #     if diff < 0:
 #         self.buynum[batch] -= diff
 #     self.countnum += diff
-#     db.session.add(self)
-#     # db.session.commit()
+#     session.add(self)
+#     # session.commit()
 #     return True
 #
 #
@@ -114,16 +120,16 @@ class Accessory(db.Model):
 #     if diff > 0:
 #         self.buynum -= diff
 #     self.countnum += diff
-#     db.session.add(self)
-#     # db.session.commit()
+#     session.add(self)
+#     # session.commit()
 #     return True
 #
 #
 # def material_change_reworknum(self, diff):
 #     self.countnum += diff
 #     self.reworknum -= diff
-#     db.session.add(self)
-#     # db.session.commit()
+#     session.add(self)
+#     # session.commit()
 #     return True
 
 
