@@ -166,7 +166,7 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
             flash("取消购买数量不等于购买批次数量")##
             return False
     elif oprtype == Oprenum.REWORK.name:
-        b=dbsession.query(Rework).filter(Rework.batch == batch).fist()
+        b=dbsession.query(Rework).filter(Rework.batch == batch).first()
         if b==None:
             flash("批次不存在")
             return False
@@ -218,7 +218,7 @@ def material_change_num_rev(m,diff,oprtype,batch):
         m.countnum -= diff
         b = dbsession.query(Rework).filter(Rework.batch == batch).first()
         if b==None:
-            b = Buy(batch=batch, material_id=m.material_id, num=diff)
+            b = Rework(batch=batch, material_id=m.material_id, num=diff)
         else:
             b.num += diff
         dbsession.add_all([m,b])

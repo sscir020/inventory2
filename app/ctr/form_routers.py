@@ -337,19 +337,12 @@ def form_cancel_buy():
             list=request.form["input_checkbox_cancel"].split('_')
             materialid=list[0]
             batch=list[1]
-            m = dbsession.query(Material).filter_by(material_id=materialid).first()
-            buydict=json.loads(m.buynum)
-            comments_dict=json.loads(m.buy_comments)
-            diff=buydict.pop(batch)
-            comment =''
-            if batch in comments_dict:
-                comment=comments_dict.pop(batch)
-                m.buy_comments=json.dumps(comments_dict)
-            m.buynum = json.dumps(buydict)
-            dbsession.add(m)
-            dbsession.commit()
-            o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.CANCELBUY.name, isgroup=True,oprbatch=batch,comment=comment, \
+            b = dbsession.query(Buy).filter(Buy.batch==batch).first()
+            diff=b.num
+            o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.CANCELBUY.name, isgroup=True,oprbatch=batch,comment=b.comment, \
                     momentary=datetime.datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
+            dbsession.query(Buy).filter(Buy.batch==batch).delete()
+            # dbsession.commit()
             dbsession.add(o)
             dbsession.commit()
             flash("订单取消成功")

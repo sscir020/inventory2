@@ -65,7 +65,7 @@ class Oprenum(Enum):
     SCRAP=8
 
 oprenumCH ={
-    Oprenum.INITADD.name: '新入库',
+    Oprenum.INITADD.name: '新添加',
     Oprenum.INBOUND.name: '入库',
     Oprenum.OUTBOUND.name: '出库',
     Oprenum.RESTORE.name: '修好',
