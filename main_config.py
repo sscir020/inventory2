@@ -63,6 +63,8 @@ class Oprenum(Enum):
     BUYING = 6
     CANCELBUY=7
     SCRAP=8
+    RECYCLE=9
+    RESALE=10
 
 oprenumCH ={
     Oprenum.INITADD.name: '新添加',
@@ -72,7 +74,9 @@ oprenumCH ={
     Oprenum.REWORK.name: '返修中',
     Oprenum.BUYING.name:"购买中",
     Oprenum.CANCELBUY.name:'取消购买',
-    Oprenum.SCRAP.name:'报废'
+    Oprenum.SCRAP.name:'报废',
+    Oprenum.RECYCLE.name:'售后带回',
+    Oprenum.RESALE.name:'售后带出'
 }
 oprenumNum = {
     '入库':Oprenum.INBOUND,
@@ -81,7 +85,9 @@ oprenumNum = {
     '返修':Oprenum.REWORK,
     '购买':Oprenum.BUYING,
     '不买':Oprenum.CANCELBUY,
-    '报废':Oprenum.SCRAP
+    '报废':Oprenum.SCRAP,
+    '售后带回':Oprenum.RECYCLE,
+    '售后带出':Oprenum.RESALE
 }
 class Sensorname(Enum):
     P25 = 1
@@ -120,29 +126,6 @@ class Param(Enum):
     PARAM_3 = 3
     PARAM_0 = 0
 
-params = {
-    Param.PARAM_8.name: [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name, Sensorname.NOISE.name, Sensorname.WINDSPEED.name,
-                             Sensorname.WINDDIRECTION.name, Sensorname.TEMP.name, Sensorname.PRESSURE.name],
-    Param.PARAM_7.name: [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name, Sensorname.NOISE.name, Sensorname.WINDSPEED.name,
-                             Sensorname.WINDDIRECTION.name, Sensorname.TEMP.name],
-    Param.PARAM_5.name:  [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name, Sensorname.NOISE.name, Sensorname.WINDSPEED.name],
-    Param.PARAM_3.name: [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name]
-}
-paramnums = {
-    Param.PARAM_8.name: [1, 1, 1, 1, 1, 1, 1, 1],
-    Param.PARAM_7.name: [1, 1, 1, 1, 1, 1, 1],
-    Param.PARAM_5.name:  [1, 1, 1, 1, 1],
-    Param.PARAM_3.name: [1, 1, 1]
-}
-
-paramdict={
-    Param.PARAM_8.name: [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name, Sensorname.NOISE.name, Sensorname.WINDSPEED.name,
-                             Sensorname.WINDDIRECTION.name, Sensorname.TEMP.name, Sensorname.PRESSURE.name],
-    Param.PARAM_7.name: [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name, Sensorname.NOISE.name, Sensorname.WINDSPEED.name,
-                             Sensorname.WINDDIRECTION.name, Sensorname.TEMP.name],
-    Param.PARAM_5.name:  [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name, Sensorname.NOISE.name, Sensorname.WINDSPEED.name],
-    Param.PARAM_3.name: [Sensorname.P25.name, Sensorname.P10.name, Sensorname.TSP.name]
-}
 
 
 

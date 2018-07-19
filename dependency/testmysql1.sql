@@ -65,6 +65,24 @@ create table oprs(
 		foreign key (user_id) references users(user_id),
 		foreign key (material_id) references materials(material_id)
 		);
+		
+alter table materials convert to character set utf8 collate utf8_unicode_ci;
+alter table users convert to character set utf8 collate utf8_unicode_ci;
+alter table buys convert to character set utf8 collate utf8_unicode_ci;
+alter table reworks convert to character set utf8 collate utf8_unicode_ci;
+alter table accessories convert to character set utf8 collate utf8_unicode_ci;
+alter table oprs convert to character set utf8 collate utf8_unicode_ci;
+
+#default-character-set=utf8
+#character-set-server=utf8
+SET character_set_database =utf8;
+SET character_set_results =utf8;
+SET character_set_server =utf8;
+SET character_set_system =utf8; 
+#/*此处utf-8也可以*/
+SET collation_server = utf8_general_ci;
+SET collation_database = utf8_general_ci;
+
 
 insert into users(user_name,user_pass) values('zhang','1234');
 insert into users(user_name,user_pass) values('wang','1234');

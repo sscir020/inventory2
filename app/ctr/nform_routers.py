@@ -160,7 +160,7 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     elif oprtype == Oprenum.BUYING.name:
         b = dbsession.query(Buy).filter(Buy.batch == batch).first()
         if b==None:
-            flash("批次不存在")
+            flash("购买批次不存在"+str(batch))
             return False
         if diff!= b.num:
             flash("取消购买数量不等于购买批次数量")##
@@ -168,7 +168,7 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     elif oprtype == Oprenum.REWORK.name:
         b=dbsession.query(Rework).filter(Rework.batch == batch).first()
         if b==None:
-            flash("批次不存在")
+            flash("返修批次不存在"+str(batch))
             return False
         if diff!=b.num:
             flash("取消返修数量不等于返修批次数量")
@@ -185,6 +185,16 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     #     if diff<=0:
     #         flash("报废数量小于等于0")
     #         return False
+    elif oprtype == Oprenum.RECYCLE.name:
+        b=dbsession.query(Rework).filter(Rework.batch == batch).first()
+        if b==None:
+            flash("售后带回批次不存在")
+            return False
+        if diff!=b.num:
+            flash("售后带回数量不等于返修批次数量")
+            return False
+    elif oprtype == Oprenum.RESALE.name:
+        pass
     else:
         if oprtype != Oprenum.OUTBOUND.name and oprtype != Oprenum.CANCELBUY.name and oprtype != Oprenum.SCRAP.name:
             flash("操作类型错误")
@@ -232,6 +242,11 @@ def material_change_num_rev(m,diff,oprtype,batch):
         else:
             b.num += diff
         dbsession.add_all([b])
+    elif oprtype == Oprenum.RECYCLE.name:
+        dbsession.query(Rework).filter(Rework.batch == batch).delete()
+    elif oprtype == Oprenum.RESALE.name:
+        m.countnum += diff
+        dbsession.add_all([m])
     else:
         flash("操作类型错误")
         value='-1'
