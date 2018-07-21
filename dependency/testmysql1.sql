@@ -51,6 +51,31 @@ create table reworks(
         unique(batch),
         foreign key (material_id) references materials(material_id)
 );
+drop table if EXISTS clients;
+drop table if exists devices;
+create table devices(
+        device_id int not null auto_increment,
+        MN_id int not null,
+        device_type varchar(20) not null,
+        device_name varchar(32) not null default '',
+        countnum int not null default 0,
+        preparenum int not null default 0,
+        acces_id int null default 0,
+        comment varchar(20) default '',
+        primary key(device_id),
+        unique(device_id),
+        foreign key (acces_id) references accessories(acces_id)
+);
+create table clients(
+        client_id int not null auto_increment,
+        client_name varchar(32) not null,
+        device_id int not null default 0,
+        credit int not null default 0,
+        comment varchar(20) default '',
+        primary key(client_id),
+        unique(client_name),
+        foreign key (device_id) references devices(device_id)
+);
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,
@@ -79,7 +104,7 @@ SET character_set_database =utf8;
 SET character_set_results =utf8;
 SET character_set_server =utf8;
 SET character_set_system =utf8; 
-#/*此处utf-8也可以*/
+#/*锟剿达拷utf-8也锟斤拷锟斤拷*/
 SET collation_server = utf8_general_ci;
 SET collation_database = utf8_general_ci;
 

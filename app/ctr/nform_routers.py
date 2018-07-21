@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import render_template,url_for,redirect,flash,session,request,current_app
 # from flask_login import login_user,logout_user,login_required,current_user
-from ..models import Opr,Material,User,Accessory,Buy,Rework
+from ..models import Opr,Material,User,Accessory,Buy,Rework,Device,Client
 from . import ctr
 # from ..__init__ import db
 from ..decorators import loggedin_required
@@ -148,8 +148,6 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     if diff<0:
         flash("数量小于等于0")##
         return False
-    if oprtype==Oprenum.INITADD.name:
-        pass
         # if diff> self.countnum:
         #     flash("取消新添加数量大于库存数量")##
         #     return False
@@ -157,7 +155,7 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     #     if diff<=0:
     #         flash("取消出库数量小于等于0")##
     #         return False
-    elif oprtype == Oprenum.BUYING.name:
+    if oprtype == Oprenum.BUYING.name:
         b = dbsession.query(Buy).filter(Buy.batch == batch).first()
         if b==None:
             flash("购买批次不存在"+str(batch))
@@ -193,12 +191,21 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
         if diff!=b.num:
             flash("售后带回数量不等于返修批次数量")
             return False
+    elif oprtype==Oprenum.INITADD.name:
+        pass
     elif oprtype == Oprenum.RESALE.name:
         pass
+    elif oprtype == Oprenum.OUTBOUND.name:
+        pass
+    elif oprtype == Oprenum.CANCELBUY.name:
+        pass
+    elif oprtype == Oprenum.SCRAP.name:
+        pass
+    elif oprtype == Oprenum.PREPARE.name:
+        pass
     else:
-        if oprtype != Oprenum.OUTBOUND.name and oprtype != Oprenum.CANCELBUY.name and oprtype != Oprenum.SCRAP.name:
-            flash("操作类型错误")
-            return False
+        flash("操作类型错误")
+        return False
     return True
 
 
@@ -207,8 +214,6 @@ def material_change_num_rev(m,diff,oprtype,batch):
     if oprtype==Oprenum.OUTBOUND.name:####
         m.countnum += diff
         dbsession.add_all([m])
-    elif oprtype == Oprenum.INITADD.name:####
-        pass
     #     self.countnum -= diff
     elif oprtype == Oprenum.BUYING.name:#++++
         dbsession.query(Buy).filter(Buy.batch == batch).delete()
@@ -247,6 +252,10 @@ def material_change_num_rev(m,diff,oprtype,batch):
     elif oprtype == Oprenum.RESALE.name:
         m.countnum += diff
         dbsession.add_all([m])
+    elif oprtype == Oprenum.INITADD.name:####
+        pass
+    elif oprtype == Oprenum.PREPARE.name:
+        pass
     else:
         flash("操作类型错误")
         value='-1'
@@ -300,14 +309,32 @@ def rollback_opr():
 
 
 
-@ctr.route('/_add_opr_get',methods=['GET',''])
+@ctr.route('/_add_material_get',methods=['GET',''])
 @loggedin_required
 def show_add_material():
-    print(request)
-    # db.session.flush()
-    m=dbsession.query(Material).filter_by(acces_id=0).order_by(Material.material_id).all()
-    return render_template("_add_opr_form.html",materials=m)
+    return render_template("_add_material_form.html")
 
+@ctr.route('/_add_device_get',methods=['GET',''])
+@loggedin_required
+def show_add_device():
+    # db.session.flush()
+    m=dbsession.query(Material).filter_by(acces_id=0).all()
+    return render_template("_add_device_form.html",materials=m)
+
+
+@ctr.route('/show_device_table_get', methods=['GET', ''])
+@loggedin_required
+def show_device_table():
+    # db.session.flush()
+    devices= dbsession.query(Device).all()
+    return render_template("device_table.html", devices=devices)
+
+@ctr.route('/show_client_table_get', methods=['GET', ''])
+@loggedin_required
+def show_client_table():
+    # db.session.flush()
+    clients = dbsession.query(Client).all()
+    return render_template("client_table.html", clients=clients)
 #
 # @ctr.route('/rollback')
 # def rollback_opr():

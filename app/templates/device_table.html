@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block page_content %}
+<div>
+    <form name="form_device" method="post">
+         <table  class="table table-hover" id="table_device">
+             <thead>
+                 <th>设备ID</th>
+                 <th>设备MN号</th>
+                 <th>设备类型</th>
+                 <th>设备名称</th>
+                 <th>库存数量</th>
+                 <th>备货数量</th>
+                 <th>出库配件组ID</th>
+                 <th>备注</th>
+             </thead>
+             {% for entry in devices %}
+             <tr>
+                 <td>{{entry.device_id}}</td>
+                 <td>{{entry.MN_id}}</td>
+                 <td>{{entry.device_type}}</td>
+                 <td>{{entry.device_name}}</td>
+                 <td>
+                     {% set a=dbsession.query(Accessory).filter_by(acces_id=(entry.acces_id|int)).first() %}
+                     {% set acces= json.loads(a.param_acces)  %}
+                     <!--{{acces}}-->
+                     {% for key in acces %}
+                     <!--{{key}}-->
+                          {% set m=dbsession.query(Material).filter_by(material_id=(key|int)).first() %}
+                          {{m.material_name}}:{{acces[key]}}&nbsp;&nbsp;
+                     {% endfor %}
+                 </td>
+                 <td><input type="number" name="input_number_{{entry.device_id}}"></td>
+                 <td><input type="text" name="input_text_comment" value="{{entry.comment}}"></td>
+             </tr>
+             {% endfor %}
+        </table>
+        <input type="submit" name="input_submit_prepare" value="备货提交" onclick="form_device.action='{{ url_for('ctr.form_device_prepare') }}';form_device.submit()">
+        <input type="submit" name="input_submit_outbound" value="出库提交" onclick="form_device.action='{{ url_for('ctr.form_device_outbound') }}';form_device.submit()">
+        <input type="submit" name="input_submit_comment" value="备注提交" onclick="form_device.action='{{ url_for('ctr.form_change_comment',oprtype=CommentType.DEVICE.name) }}';form_device.submit()">
+
+    </form>
+</div>
+{% endblock %}

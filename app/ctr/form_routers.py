@@ -2,11 +2,11 @@
 from flask import render_template,url_for,redirect,flash,session,request
 # from flask_login import login_user,logout_user,current_user,login_required
 from .forms import LoginForm,RegistrationForm #AddOprForm#ColorForm#ListForm,OprForm #EditOprForm,EditReworkOprForm
-from ..models import Opr,Material,User,Accessory,Buy,Rework
+from ..models import Opr,Material,User,Accessory,Buy,Rework,Device,Client
 from . import ctr
 # from ..__init__ import db
 from ..decorators import loggedin_required
-from main_config import Oprenum,Config,oprenumNum,oprenumCH,Oprenum #Param,params,paramnums,
+from main_config import Config,oprenumNum,oprenumCH,Oprenum,CommentType #Param,params,paramnums,
 
 import datetime,time
 import json
@@ -70,35 +70,7 @@ def add_material():
         # list1 = request.form
         # print(list1)
             if dbsession.query(Material).filter_by(material_name=materialname).first() == None:
-                dict={}
-                for keyid in request.form.keys():
-                    if keyid[0:21]=='input_accessory_check':
-                        # print(key1)
-                        keynum='input_accessory_num_'+keyid[22:]
-                        if(request.form[keynum]==''or  int(request.form[keynum])<=0 ):
-                            flash("数量应是一个正数")
-                            return redirect(url_for('ctr.show_add_material'))
-                        else:
-                            dict[request.form[keyid]]=request.form[keynum]
-                acces=json.dumps(dict)
-                if(len(dict)>0 ):
-                    if dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()==None:
-                        a = Accessory(param_num=len(dict),param_acces=acces)
-                        dbsession.add(a)
-                        dbsession.commit()
-                        dbsession.flush()
-                    else:
-                        a=dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()
-                    m = Material(material_name=materialname, countnum=countnum,acces_id=a.acces_id,alarm_level=alarm_level)
-
-                    for materialid in dict:
-                        o = Opr(material_id=materialid, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
-                                momentary=datetime.datetime.now())
-                        dbsession.add(o)
-                        dbsession.commit()
-                    dbsession.flush()
-                else:
-                    m = Material(material_name=materialname, countnum=countnum, acces_id=0,alarm_level=alarm_level)
+                m = Material(material_name=materialname, countnum=countnum, acces_id=0,alarm_level=alarm_level)
                 dbsession.add(m)
                 dbsession.commit()
                 dbsession.flush()
@@ -116,6 +88,62 @@ def add_material():
             flash('请正确填写材料名称和数量')
     return redirect(url_for('ctr.show_add_material'))
 
+@ctr.route('/add_device_act', methods=['', 'POST'])
+@loggedin_required
+def add_device():
+    if request.method == "POST":
+        devicename=request.form['input_device_name']
+        countnum=convert_str_num(request.form['input_number_countnum'])
+        alarm_level=convert_str_num(request.form['input_alarm_level'])
+        MN_id=convert_str_num(request.form['input_number_MN'])
+        if devicename!=None and devicename!=''and alarm_level>0 :
+            if dbsession.query(Device).filter_by(device_name=devicename).first() == None:
+                dict={}
+                for keyid in request.form.keys():
+                    if keyid[0:21]=='input_accessory_check':
+                        # print(key1)
+                        keynum='input_accessory_num_'+keyid[22:]
+                        if(request.form[keynum]==''or  int(request.form[keynum])<=0 ):
+                            flash("数量应是一个正数")
+                            return redirect(url_for('ctr.show_add_device'))
+                        else:
+                            dict[request.form[keyid]]=request.form[keynum]
+                acces=json.dumps(dict)
+                if(len(dict)>0 ):
+                    if dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()==None:
+                        a = Accessory(param_num=len(dict),param_acces=acces)
+                        dbsession.add(a)
+                        dbsession.commit()
+                        dbsession.flush()
+                    else:
+                        a=dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()
+                    m = Device(device_name=devicename,MN_id=MN_id, countnum=countnum,acces_id=a.acces_id,alarm_level=alarm_level)
+
+                    for deviceid in dict:
+                        o = Opr(device_id=deviceid, diff=0, user_id=session['userid'], oprtype=Oprenum.INITADD.name,isgroup=False,oprbatch='',\
+                                momentary=datetime.datetime.now())
+                        dbsession.add(o)
+                        dbsession.commit()
+                    dbsession.flush()
+                else:
+                    flash("请勾选参数")
+                    return redirect(url_for('ctr.show_add_device'))
+                dbsession.add(m)
+                dbsession.commit()
+                dbsession.flush()
+                m=dbsession.query(Device).filter_by(device_name=devicename).first()
+                o=Opr(device_id=m.device_id,diff=countnum,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
+                      momentary=datetime.datetime.now())
+                dbsession.add(o)
+                dbsession.commit()
+                dbsession.flush()
+                flash('新设备添加成功')
+                return redirect(url_for('ctr.show_device_table',page=1))
+            else:
+                flash('设备名已存在')
+        else:
+            flash('请正确填写设备名称和数量')
+    return redirect(url_for('ctr.show_add_device'))
 
 def convert_str_num(num):
     if num=='' or num =="":
@@ -170,16 +198,21 @@ def material_isvalid_num(m,diff,oprtype,batch):
         if diff>b.num:
             flash("报废数量大于返修数量"+str(diff)+">"+str(b.num))
             return False
-    elif oprtype == Oprenum.RECYCLE.name:
-        pass
     elif oprtype == Oprenum.RESALE.name:
         if diff>m.countnum:
             flash("售后带出数量大于库存数量"+str(diff)+">"+str(m.countnum))
             return False
+    elif oprtype == Oprenum.RECYCLE.name:
+        pass
+    elif oprtype == Oprenum.INITADD.name:
+        pass
+    elif oprtype == Oprenum.BUYING.name:
+        pass
+    elif oprtype == Oprenum.PREPARE.name:
+        pass
     else:
-        if oprtype!=Oprenum.INITADD.name and oprtype!=Oprenum.BUYING.name:
-            flash("操作类型错误")
-            return False
+        flash("操作类型错误")
+        return False
     return True
 
 def material_change_num(m,diff,oprtype,batch):
@@ -253,6 +286,8 @@ def material_change_num(m,diff,oprtype,batch):
             value = batch
         elif oprtype == Oprenum.RESALE.name:
             m.countnum-=diff
+        elif oprtype == Oprenum.PREPARE.name:
+            pass
         else:
             flash("操作类型错误")
             value='-1'
@@ -281,7 +316,6 @@ def change_materials_oprs_db(oprtype,materialid,diff,isgroup,batch,comment):#BUY
         # dbsession.close()
     return True
 
-
 @ctr.route('/form_rollback_act',methods=['','POST'])
 @loggedin_required
 def form_rollback():
@@ -303,7 +337,7 @@ def form_change_num():
                     # materialid = request.form["input_hidden_" + str(index)]
                     break
         if diff > 0:
-            print(request.form)
+            # print(request.form)
             # input_list={"入库":1,"出库":2,"修好":3,"返修":4,"购买":5},入库,修好
             if(request.form["input_oprlist_" + str(materialid)]!='') and request.form["input_oprlist_" + str(materialid)] in oprenumNum.keys():
                 # print(request.form["input_list_" + str(i)])
@@ -323,16 +357,6 @@ def form_change_num():
                     else:
                         flash("返修列表数量更新失败")
                 elif oprtype==Oprenum.OUTBOUND.name:
-                    m = dbsession.query(Material).filter_by(material_id=materialid).first()
-                    if m.acces_id != None and m.acces_id != 0:
-                        a = dbsession.query(Accessory).filter_by(acces_id=m.acces_id).first()
-                        data = json.loads(a.param_acces)
-                        for acces_materialid in data:
-                            num = int(data[acces_materialid])
-                            num = num * diff
-                            if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=acces_materialid, diff=num, isgroup=False,batch='', comment='') == False:
-                                flash("配件数量不足")
-                                return redirect(url_for('ctr.show_material_table'))
                     if change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='') == True:
                         flash("出库数量更新成功")
                     else:
@@ -378,6 +402,78 @@ def form_cancel_buy():
             flash("请勾选订单并提交")
     return redirect(url_for('ctr.show_buy_materials'))
 
+@ctr.route('/form_device_prepare_act',methods=['','POST'])
+@loggedin_required
+def form_device_prepare():
+    device_id=0
+    if request.method=="POST":
+        diff=0
+        for key in request.form:
+            if "input_number_" in key and request.form[key]!='':
+                diff = convert_str_num(request.form[key])
+                if diff > 0:
+                    device_id=key[20:]#input_number_prepare_
+                    break
+        if diff > 0:
+            d=dbsession.query(Device).filter(Device.device_id==device_id).first()
+            if d!= None:
+                if diff <= d.countnum:
+                    d.countnum -= diff
+                    d.preparenum += diff
+                    dbsession.add(d)
+                    dbsession.commit()
+                else:
+                    flash("要备货数量大于库存数量")
+            else:
+                flash("设备不存在")
+        else:
+            flash("请正确填写修好数量")
+    return redirect(url_for('ctr.show_device_table'))
+
+@ctr.route('/form_device_outbound_act',methods=['','POST'])
+@loggedin_required
+def form_device_outbound():
+    device_id=0
+    if request.method=="POST":
+        diff=0
+        for key in request.form:
+            if "input_number_" in key and request.form[key]!='':
+                diff = convert_str_num(request.form[key])
+                if diff > 0:
+                    device_id=key[20:]#input_number_prepare_
+                    break
+        if diff > 0:
+            d=dbsession.query(Device).filter(Device.device_id==device_id).first()
+            if d!= None:
+                if diff <= d.preparenum:
+                    if d.acces_id != None and d.acces_id != 0:
+                        a = dbsession.query(Accessory).filter_by(acces_id=d.acces_id).first()
+                        data = json.loads(a.param_acces)
+                        for materialid in data:
+                            num = int(data[materialid])
+                            num = num * diff
+                            m=dbsession.query(Material).filter_by(material_id=materialid).first()
+                            if material_isvalid_num(m=m,diff=num, oprtype=Oprenum.OUTBOUND.name, batch='') ==False:
+                                flash("配件数量不足")
+                                return redirect(url_for('ctr.show_device_table'))
+                        for materialid in data:
+                            num = int(data[materialid])
+                            num = num * diff
+                            change_materials_oprs_db(oprtype=Oprenum.OUTBOUND.name, materialid=materialid, diff=num, isgroup=False,batch='', comment='')
+                        d.countnum -= diff
+                        d.preparenum += diff
+                        dbsession.add(d)
+                        dbsession.commit()
+                        flash("设备出库更新成功")
+                    else:
+                        flash("设备参数不存在")
+                else:
+                    flash("要备货数量大于库存数量")
+            else:
+                flash("设备不存在")
+        else:
+            flash("请正确填写修好数量")
+    return redirect(url_for('ctr.show_device_table'))
 
 @ctr.route('/form_change_inbound_num_act', methods=['', 'POST'])
 @loggedin_required

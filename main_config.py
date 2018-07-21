@@ -65,7 +65,12 @@ class Oprenum(Enum):
     SCRAP=8
     RECYCLE=9
     RESALE=10
-
+    PREPARE=11
+class CommentType(Enum):
+    BUY=1
+    REWORK=2
+    DEVICE=4
+    CLIENT = 3
 oprenumCH ={
     Oprenum.INITADD.name: '新添加',
     Oprenum.INBOUND.name: '入库',
@@ -76,7 +81,8 @@ oprenumCH ={
     Oprenum.CANCELBUY.name:'取消购买',
     Oprenum.SCRAP.name:'报废',
     Oprenum.RECYCLE.name:'售后带回',
-    Oprenum.RESALE.name:'售后带出'
+    Oprenum.RESALE.name:'售后带出',
+    Oprenum.PREPARE.name:'备货中'
 }
 oprenumNum = {
     '入库':Oprenum.INBOUND,
@@ -87,7 +93,8 @@ oprenumNum = {
     '不买':Oprenum.CANCELBUY,
     '报废':Oprenum.SCRAP,
     '售后带回':Oprenum.RECYCLE,
-    '售后带出':Oprenum.RESALE
+    '售后带出':Oprenum.RESALE,
+    '备货':Oprenum.PREPARE
 }
 class Sensorname(Enum):
     P25 = 1
