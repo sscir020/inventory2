@@ -24,6 +24,7 @@ create table materials(
 		material_id int not null auto_increment,
 		material_name varchar(64) not null,
 		countnum int not null default 0,
+        preparenum int not null default 0,
 		alarm_level int not null default 0,
 		acces_id int not null default 0,
 		primary key (material_id),
@@ -36,7 +37,7 @@ create table buys(
         batch varchar(32) not null,
         material_id int not null,
         num int not null default 0,
-        comment varchar(20) default '',
+        comment varchar(64) default '',
         primary key(buy_id),
         unique(batch),
         foreign key (material_id) references materials(material_id)
@@ -46,7 +47,7 @@ create table reworks(
         batch varchar(32) not null,
         material_id int not null,
         num int not null default 0,
-        comment varchar(20) default '',
+        comment varchar(64) default '',
         primary key(rework_id),
         unique(batch),
         foreign key (material_id) references materials(material_id)
@@ -58,20 +59,20 @@ create table devices(
         MN_id int not null,
         device_type varchar(20) not null,
         device_name varchar(32) not null default '',
-        countnum int not null default 0,
-        preparenum int not null default 0,
+        countnum int not null,
         acces_id int null default 0,
-        comment varchar(20) default '',
+        comment varchar(64) default '',
         primary key(device_id),
-        unique(device_id),
+        unique(mn_id),
         foreign key (acces_id) references accessories(acces_id)
 );
 create table clients(
         client_id int not null auto_increment,
         client_name varchar(32) not null,
-        device_id int not null default 0,
+        device_id int not null,
+        MN_id int not null default 0,
         credit int not null default 0,
-        comment varchar(20) default '',
+        comment varchar(64) default '',
         primary key(client_id),
         unique(client_name),
         foreign key (device_id) references devices(device_id)
@@ -79,12 +80,13 @@ create table clients(
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,
-		material_id int not null,
+		material_id int,
+		device_id int,
 		diff int not null,
 		oprtype varchar(32) not null,
 		oprbatch varchar(32) not null default '',
 		isgroup tinyint(1) not null default 0,
-		comment varchar(40) default '',
+		comment varchar(64) default '',
 		momentary datetime not null default current_timestamp,
 		primary key (opr_id),
 		foreign key (user_id) references users(user_id),
@@ -108,6 +110,21 @@ SET character_set_system =utf8;
 SET collation_server = utf8_general_ci;
 SET collation_database = utf8_general_ci;
 
+
+alter table materials add COLUMN preparenum int not null default 0;
+alter table devices drop column preparenum;
+
+create table fruit(
+		fruit_id int not null auto_increment PRIMARY key,
+		fruit_name varchar(10) not null
+);
+
+create table total(
+		total_id int not null auto_increment PRIMARY KEY,
+		item_id int,
+		fruit_id int
+
+)
 
 insert into users(user_name,user_pass) values('zhang','1234');
 insert into users(user_name,user_pass) values('wang','1234');

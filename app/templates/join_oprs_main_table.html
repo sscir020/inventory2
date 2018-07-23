@@ -9,6 +9,8 @@
              <th>操作ID</th>
              <th>库存ID</th>
              <th>库存名</th>
+             <th>设备ID</th>
+             <th>设备名</th>
              <th>操作类型</th>
              <th>操作数量</th>
              <th>操作批次</th>
@@ -20,8 +22,22 @@
          {% for entry in join_oprs %}
          <tr>
              <td>{{entry.opr_id}}</td>
-             <td>{{entry.material_id}}</td>
-             <td>{{entry.material_name}}</td>
+             <td>{% if entry.material_id != None %}
+                 {{entry.material_id}}
+                 {% endif %}
+             </td>
+             <td>{% if entry.material_name != None %}
+                 {{entry.material_name}}
+                 {% endif %}
+             </td>
+             <td>{% if entry.device_id != None %}
+                 {{entry.device_id}}
+                 {% endif %}
+             </td>
+             <td>{% if entry.device_name != None %}
+                 {{entry.device_name}}
+                 {% endif %}
+             </td>
              <td>{{oprenumCH[entry.oprtype]}}</td>
              <td>{{entry.diff}}</td>
              <td>{{entry.oprbatch}}</td>
@@ -33,7 +49,11 @@
          {% endfor %}
     </table>
     <a href="{{ url_for('ctr.rollback_opr') }}">[回滚一条操作]</a>
+    <form action="{{ url_for('ctr.form_rollback') }}" method="post">
+        <input type="submit" name="input_comment_btn" value="状态回退提交" >
+    </form>
 </div>
+
 
 
 {% endblock %}

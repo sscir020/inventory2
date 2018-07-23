@@ -11,6 +11,8 @@
                  <th>库存ID</th>
                  <th>库存名</th>
                  <th>库存数量</th>
+                 <th>备货数量</th>
+                 <th>总数量</th>
                  <th>警戒值</th>
                  <th>参数模板ID</th>
                  <th>操作数量-操作类型</th>
@@ -24,6 +26,8 @@
                  {% else %}
                  <td>{{entry.countnum}}</td>
                  {% endif %}
+                 <td>{{entry.preparenum}}</td>
+                 <td>{{entry.countnum+entry.preparenum}}</td>
                  <td>{{entry.alarm_level}}</td>
                  <td>{{entry.acces_id}}</td>
 
@@ -34,6 +38,7 @@
                          <option value="购买">
                          <option value="返修">
                          <option value="出库">
+                         <option value="备货">
                          <option value="售后带回">
                          <option value="售后带出">
                     </datalist>

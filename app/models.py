@@ -40,8 +40,9 @@ class Material(Base):
     material_id=Column(Integer,nullable=False,primary_key=True)
     material_name=Column(String(64),nullable=False, unique=True, index=True)##### no defalut
     countnum=Column(Integer,nullable=False,default=0)
+    preparenum=Column(Integer,nullable=False,default=0)
     alarm_level=Column(Integer,nullable=False,default=0)
-    acces_id=Column(Integer, ForeignKey('accessories.acces_id'),default=0)
+    acces_id=Column(Integer, ForeignKey('accessories.acces_id'))
     oprs = relationship('Opr', backref='materials', lazy='dynamic')
     buybatches = relationship('Buy', backref='materials', lazy='dynamic')
     reworkbatches = relationship('Rework', backref='materials', lazy='dynamic')
@@ -52,7 +53,7 @@ class Material(Base):
 class Buy(Base):
     __tablename__='buys'
     buy_id=Column(Integer,nullable=False,primary_key=True)
-    material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False,default=0)
+    material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False)
     batch=Column(String(32),nullable=False,unique=True,index=True)
     num=Column(Integer,nullable=False,default=0)
     comment=Column(String(20),nullable=True,default='')
@@ -60,7 +61,7 @@ class Buy(Base):
 class Rework(Base):
     __tablename__='reworks'
     rework_id=Column(Integer,nullable=False,primary_key=True)
-    material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False,default=0)
+    material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False)
     batch=Column(String(32),nullable=False,unique=True,index=True)
     num=Column(Integer,nullable=False,default=0)
     comment=Column(String(20),nullable=True,default='')
@@ -71,6 +72,7 @@ class Opr(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'))
     diff = Column(Integer, nullable=False)
     material_id = Column(Integer, ForeignKey('materials.material_id'))
+    device_id = Column(Integer, ForeignKey('devices.device_id'))
     oprtype = Column(String(32), nullable=False)
     oprbatch = Column(String(32), nullable=False,default='')
     isgroup =Column(Boolean,nullable=False,default=0)
@@ -94,18 +96,19 @@ class Device(Base):
     device_type = Column(String(32), nullable=False,default='')
     device_name = Column(String(32), nullable=False, default='')
     countnum = Column(Integer, nullable=False,default=0)
-    preparenum = Column(Integer, nullable=False,default=0)
-    acces_id = Column(Integer, ForeignKey('accessories.acces_id'), nullable=False,default=0)
-    comment = Column(String(20), nullable=True,default='')
+    acces_id = Column(Integer, ForeignKey('accessories.acces_id'), nullable=False)
+    comment = Column(String(64), nullable=True,default='')
     clients = relationship('Client', backref='devices', lazy='dynamic')
+    oprs = relationship('Opr', backref='devices', lazy='dynamic')
 
 class Client(Base):
     __tablename__='clients'
     client_id = Column(Integer, nullable=False, primary_key=True)
     client_name = Column(String(32), nullable=False)
-    device_id = Column(Integer,ForeignKey('devices.device_id'), nullable=False,default=0)
+    device_id = Column(Integer,ForeignKey('devices.device_id'), nullable=False)
+    MN_id = Column(Integer,nullable=False,default=0)
     credit=Column(Integer,nullable=True,default=0)
-    comment = Column(String(20), nullable=True,default='')
+    comment = Column(String(64), nullable=True,default='')
 # class AnonymousUser(AnonymousUserMixin):
 #     def can(self, permissions):
 #         return False

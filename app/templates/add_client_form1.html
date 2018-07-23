@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block page_content %}
+<form action="{{ url_for('ctr.add_client1') }}" method="post">
+    <p>客户名称<input type="text" name="input_text_client_name"></p>
+    <p>设备号<input type="number" name="input_number_device_id"></p>
+    <p>备注<input type="text" name="input_text_comment"></p>
+    <input type="submit" value="新添加客户">
+</form>
+{% endblock %}
+

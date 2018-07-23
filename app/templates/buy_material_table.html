@@ -9,32 +9,34 @@
              <thead>
                  <th>购买ID</th>
                  <th>库存ID</th>
+                 <th>库存名称</th>
                  <th>购买中数量</th>
                  <th>购买日期</th>
                  <th>到货数量</th>
                  <th>取消订单</th>
                  <th>备注(不超过20个字,请勾选右侧)</th>
-                 <th>备注选择</th>
+                 <!--<th>备注选择</th>-->
              </thead>
              {% for entry in buybatches %}
                  <!--{% set index=loop.index %}-->
                  <tr>
                      <td>{{entry.buy_id}}</td>
                      <td>{{entry.material_id}}</td>
+                     <td>{{entry.material_name}}</td>
                      <td>{{entry.num}}</td>
                      <td>{{entry.batch}}</td>
                      <td><input type="number" name="input_inbound_num_{{entry.material_id}}_{{entry.batch}}"></td>
                          <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
                      <td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{entry.batch}}" ></td>
-                     <td><input id="comment_txt" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}"></td>
-                     <td><input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
+                     <td><input id="comment_txt" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}">
+                          <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
                  </tr>
              {% endfor %}
          </table>
          <input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">
          <input type="submit" name="input_cancel_btn" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">
-         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_comment',oprtype=Oprenum.BUYING.name) }}';form_buy.submit()">
-         <!--<input type="submit" name="input_comment_btn" value="回退提交" onclick="form_buy.action='{{ url_for('ctr.form_rollback') }}';form_buy.submit()">-->
+         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.BUY.name) }}';form_buy.submit()">
+
     </form>
 </div>
 

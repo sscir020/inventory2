@@ -7,7 +7,7 @@
 
 <!--{{ super() }}-->
 	<!--<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">-->
-
+        <!--{{loop.index}}.-->
 
 <!--{% if pagination %}-->
 <!--<div class="pagination">-->
@@ -15,34 +15,35 @@
 <!--</div>-->
 <!--{% endif %}-->
 
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs_main') }}
-</div>
-{% endif %}
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_join_oprs_main') }}-->
+<!--</div>-->
+<!--{% endif %}-->
 
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_join_oprs') }}
-</div>
-{% endif %}
-
-
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_material_table') }}
-</div>
-{% endif %}
-
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_param_accessory') }}
-</div>
-{% endif %}
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_join_oprs') }}-->
+<!--</div>-->
+<!--{% endif %}-->
 
 
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, 'ctr.show_rework_materials') }}
-</div>
-{% endif %}
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_material_table') }}-->
+<!--</div>-->
+<!--{% endif %}-->
+
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_param_accessory') }}-->
+<!--</div>-->
+<!--{% endif %}-->
+
+
+<!--{% if pagination %}-->
+<!--<div class="pagination">-->
+    <!--{{ macros.pagination_widget(pagination, 'ctr.show_rework_materials') }}-->
+<!--</div>-->
+<!--{% endif %}-->
+    <!--<input type="submit" name="input_comment_btn" value="回退提交" onclick="form_buy.action='{{ url_for('ctr.form_rollback') }}';form_buy.submit()">-->
