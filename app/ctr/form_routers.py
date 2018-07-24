@@ -62,23 +62,26 @@ def add_client():
     form=AddClientForm()
     if form.validate_on_submit():
         if dbsession.query(Client).filter_by(client_name=form.clientname.data).first() == None:
-            d=dbsession.query(Device).filter(Device.device_id==form.device_id.data).first()
-            if d!=None:
-                if d.MN_id==form.MN_id.data :
-                    c=Client(client_name=form.clientname.data,device_id=form.device_id.data,MN_id=int(form.MN_id.data),comment=form.comment.data)
-                    dbsession.add_all([c])
-                    dbsession.commit()
-                    dbsession.flush()
-                    o=Opr(client_id=c.client_id,diff=0,user_id=session['userid'],oprtype=Oprenum.CINITADD.name, isgroup=True,oprbatch='', \
-                          momentary=datetime.datetime.now())
-                    dbsession.add_all([o])
-                    dbsession.commit()
-                    flash("客户创建成功")
-                    return redirect(url_for('ctr.show_client_table'))
+            if dbsession.query(Client).filter_by(device_id=form.device_id.data).first() == None:
+                d=dbsession.query(Device).filter(Device.device_id==form.device_id.data).first()
+                if d!=None:
+                    if d.MN_id==form.MN_id.data :
+                        c=Client(client_name=form.clientname.data,device_id=form.device_id.data,MN_id=int(form.MN_id.data),comment=form.comment.data)
+                        dbsession.add_all([c])
+                        dbsession.commit()
+                        dbsession.flush()
+                        o=Opr(client_id=c.client_id,diff=0,user_id=session['userid'],oprtype=Oprenum.CINITADD.name, isgroup=True,oprbatch='', \
+                              momentary=datetime.datetime.now())
+                        dbsession.add_all([o])
+                        dbsession.commit()
+                        flash("客户创建成功")
+                        return redirect(url_for('ctr.show_client_table'))
+                    else:
+                        flash("设备编号和MN号不一致")
                 else:
-                    flash("设备编号和MN号不一致")
+                    flash("设备编号不存在")
             else:
-                flash("设备编号不存在")
+                flash("设备编号已被使用")
         else:
             flash("客户已存在")
     else:
@@ -441,9 +444,9 @@ def form_change_num():
                         flash("出库数量更新失败")
                 elif oprtype == Oprenum.RECYCLE.name:
                     if change_materials_oprs_db(oprtype=Oprenum.RECYCLE.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='')==True:
-                        flash("售后带回列表数量更新成功")
+                        flash("售后带回到返修列表数量更新成功")
                     else:
-                        flash("售后带回列表数量更新失败")
+                        flash("售后带回到返修列表数量更新失败")
                 elif oprtype == Oprenum.RESALE.name:
                     if change_materials_oprs_db(oprtype=Oprenum.RESALE.name, materialid=materialid, diff=diff,isgroup=True, batch='', comment='')==True:
                         flash("售后带出列表数量更新成功")

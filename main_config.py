@@ -17,7 +17,7 @@ class Config:
     SESSION_PERMANENT = True
     # SESSION_KEY_PREFIX='sessionp'
     # ALARM_LEVEL=0
-    MAX_CHAR_PER_COMMENT = 20
+    MAX_CHAR_PER_COMMENT = 64
 
     @staticmethod
     def init_app(app):

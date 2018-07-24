@@ -206,7 +206,9 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     elif oprtype == Oprenum.SCRAP.name:
         pass
     elif oprtype == Oprenum.PREPARE.name:
-        pass
+        if diff>m.preparenum:
+            flash("取消备货数量大于备货数量")
+            return False
     elif oprtype == Oprenum.DINITADD.name:
         pass
     elif oprtype == Oprenum.DOUTBOUND.name:
@@ -265,7 +267,8 @@ def material_change_num_rev(m,diff,oprtype,batch):
     elif oprtype == Oprenum.INITADD.name:####
         pass
     elif oprtype == Oprenum.PREPARE.name:
-        pass
+        m.countnum+=diff
+        m.preparenum-=diff
     elif oprtype == Oprenum.DINITADD.name:
         pass
     elif oprtype == Oprenum.DOUTBOUND.name:

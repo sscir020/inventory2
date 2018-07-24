@@ -14,12 +14,12 @@
              <th>客户ID</th>
              <th>客户名</th>
              <th>操作类型</th>
-             <th>操作数量</th>
-             <th>操作批次</th>
-             <th>主件操作</th>
+             <th>数量</th>
+             <th>批次</th>
+             <th>主件</th>
              <th>备注</th>
-             <th>操作用户</th>
-             <th>操作时间</th>
+             <th>用户</th>
+             <th>时间</th>
          </thead>
          {% for entry in join_oprs %}
          <tr>
@@ -58,10 +58,10 @@
          </tr>
          {% endfor %}
     </table>
-    <a href="{{ url_for('ctr.rollback_opr') }}">[回滚一条操作]</a>
-    <form action="{{ url_for('ctr.form_rollback') }}" method="post">
-        <input type="submit" name="input_comment_btn" value="状态回退提交" >
-    </form>
+    点错了，请点击右侧<a href="{{ url_for('ctr.rollback_opr') }}">[回滚一条操作]</a>
+    <!--<form action="{{ url_for('ctr.form_rollback') }}" method="post">-->
+        <!--<input type="submit" name="input_comment_btn" value="状态回退提交" >-->
+    <!--</form>-->
 </div>
 
 

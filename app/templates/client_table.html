@@ -12,7 +12,7 @@
                  <th>设备ID</th>
                  <th>MN号</th>
                  <th>客户信用</th>
-                 <th>备注</th>
+                 <th>备注(请勾选右侧)</th>
              </thead>
              {% for entry in clients %}
              <tr>
@@ -21,7 +21,7 @@
                  <td>{{entry.device_id}}</td>
                  <td>{{entry.MN_id}}</td>
                  <td>{{entry.credit}}</td>
-                 <td><input id="comment_txt" type="text" name="input_comment_{{entry.client_id}}_0" value="{{entry.comment}}">
+                 <td><input class="text_comment" type="text" name="input_comment_{{entry.client_id}}_0" value="{{entry.comment}}">
                      <input type="checkbox" name="input_checkbox_comment" value="{{entry.client_id}}_0"></td>
              </tr>
              {% endfor %}

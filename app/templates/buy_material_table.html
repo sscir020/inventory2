@@ -10,11 +10,11 @@
                  <th>购买ID</th>
                  <th>库存ID</th>
                  <th>库存名称</th>
+                 <th>购买批次</th>
                  <th>购买中数量</th>
-                 <th>购买日期</th>
                  <th>到货数量</th>
                  <th>取消订单</th>
-                 <th>备注(不超过20个字,请勾选右侧)</th>
+                 <th>备注(不超过64个字,请勾选右侧)</th>
                  <!--<th>备注选择</th>-->
              </thead>
              {% for entry in buybatches %}
@@ -23,12 +23,12 @@
                      <td>{{entry.buy_id}}</td>
                      <td>{{entry.material_id}}</td>
                      <td>{{entry.material_name}}</td>
-                     <td>{{entry.num}}</td>
                      <td>{{entry.batch}}</td>
-                     <td><input type="number" name="input_inbound_num_{{entry.material_id}}_{{entry.batch}}"></td>
+                     <td>{{entry.num}}</td>
+                     <td><input type="number" class="text_acce" name="input_inbound_num_{{entry.material_id}}_{{entry.batch}}"></td>
                          <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
                      <td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{entry.batch}}" ></td>
-                     <td><input id="comment_txt" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}">
+                     <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}">
                           <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
                  </tr>
              {% endfor %}
