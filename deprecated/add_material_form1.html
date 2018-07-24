@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block page_content %}
+<form action="{{ url_for('ctr.add_material') }}" method="post">
+    <p>材料名<input type="text" name="input_text_material_name"></p>
+    <p>数量<input type="number" name="input_number_countnum" value=0></p>
+    <p>警戒值<input type="number" name="input_number_alarm_level" value=20></p>
+    <input type="submit" value="新添加提交">
+</form>
+{% endblock %}
+

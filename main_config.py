@@ -68,6 +68,7 @@ class Oprenum(Enum):
     PREPARE=11
     DINITADD=12
     DOUTBOUND=13
+    CINITADD=14
 class CommentType(Enum):
     BUY=1
     REWORK=2
@@ -86,7 +87,8 @@ oprenumCH ={
     Oprenum.RESALE.name:'售后带出',
     Oprenum.PREPARE.name:'备货中',#
     Oprenum.DINITADD.name:'新添加设备',
-    Oprenum.DOUTBOUND.name:'设备出库'
+    Oprenum.DOUTBOUND.name:'设备出库',
+    Oprenum.CINITADD.name:'新添加客户'
 }
 oprenumNum = {
     '新添加材料':Oprenum.INITADD,#
@@ -101,7 +103,8 @@ oprenumNum = {
     '售后带出':Oprenum.RESALE,
     '备货':Oprenum.PREPARE,#
     '新添加设备':Oprenum.DINITADD,
-    '设备出库':Oprenum.DOUTBOUND
+    '设备出库':Oprenum.DOUTBOUND,
+    '新添加客户':Oprenum.CINITADD
 }
 class Sensorname(Enum):
     P25 = 1

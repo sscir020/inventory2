@@ -3,9 +3,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField,IntegerField,PasswordField,BooleanField,SubmitField,SelectField,FieldList,FormField,HiddenField
 from wtforms.validators import DataRequired,EqualTo
 
-class AddOprForm(FlaskForm):
-    materialname=StringField("填写材料/物品名",validators=[DataRequired()])
-    countnum=IntegerField("填写数量",  validators=[DataRequired()])
+class AddMaterialForm(FlaskForm):
+    materialname=StringField("材料名",validators=[DataRequired()])
+    countnum=IntegerField("数量",  validators=[DataRequired()])
+    alarm_level=IntegerField("警戒值",  validators=[DataRequired()])
     submit=SubmitField('添加')
 
 class LoginForm(FlaskForm):

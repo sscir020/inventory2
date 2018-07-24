@@ -121,9 +121,9 @@ def show_join_oprs():
     # flash('操作记录')
     # db.session.flush()
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
-    sql = dbsession.query(Opr.opr_id,Device.device_id,Device.device_name,Material.material_id, Material.material_name,Opr.oprtype, Opr.diff,\
+    sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff,\
                           Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary).\
-                          outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).\
+                          outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).outerjoin(Client,Client.client_id==Opr.client_id).\
                           join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).limit(10)
     # print(sql)
     # page = request.args.get('page', 1, type=int)
@@ -140,9 +140,9 @@ def show_join_oprs_main():
     # flash('操作记录')
     # db.session.flush()
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()#.join(User, User.user_id == Opr.user_id)\.filter(Opr.isgroup==True)
-    sql = dbsession.query(Opr.opr_id,Device.device_id,Device.device_name,Material.material_id, Material.material_name,Opr.oprtype, Opr.diff,\
+    sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff,\
                           Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary\
-                          ).outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).\
+                          ).outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).outerjoin(Client,Client.client_id==Opr.client_id).\
                           join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).filter(Opr.isgroup==True).limit(10)
     # print(sql)
     # print(sql[0])
@@ -211,6 +211,8 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
         pass
     elif oprtype == Oprenum.DOUTBOUND.name:
         pass
+    elif oprtype == Oprenum.CINITADD.name:
+        pass
     else:
         flash("操作类型错误")
         return False
@@ -269,6 +271,8 @@ def material_change_num_rev(m,diff,oprtype,batch):
     elif oprtype == Oprenum.DOUTBOUND.name:
         m.preparenum+=diff
         dbsession.add_all([m])
+    elif oprtype == Oprenum.CINITADD.name:
+        pass
     else:
         flash("操作类型错误")
         value='-1'
@@ -284,12 +288,17 @@ def rollback_opr():
             dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
             dbsession.query(Material).filter_by(material_id=opr.material_id).delete()
             dbsession.commit()
-            flash("回滚成功_主件")
+            flash("回滚成功_主件_新添加材料")
         elif opr.oprtype == Oprenum.DINITADD.name:
             dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
             dbsession.query(Device).filter_by(device_id=opr.device_id).delete()
             dbsession.commit()
-            flash("回滚成功_主件")
+            flash("回滚成功_主件_新添加设备")
+        elif opr.oprtype == Oprenum.CINITADD.name:
+            dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
+            dbsession.query(Client).filter_by(client_id=opr.client_id).delete()
+            dbsession.commit()
+            flash("回滚成功_主件_新添加客户")
         elif opr.oprtype == Oprenum.DOUTBOUND.name:
             d=dbsession.query(Device).filter_by(device_id=opr.device_id).first()
             if d != None:
@@ -312,12 +321,12 @@ def rollback_opr():
                     material_change_num_rev(m=m,diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype)
                     dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                     dbsession.commit()
-                    flash("回滚成功_主件")
+                    flash("回滚成功_主件"+str(m.material_id))
                 else:
-                    flash("回滚失败-数量超标_main"+str(opr.material_id))
+                    flash("回滚失败-数量超标_main"+str(m.material_id))
                     return redirect(url_for('ctr.show_join_oprs_main'))
             else:
-                flash("回滚失败-材料不存在_main"+str(opr.material_id))
+                flash("回滚失败-材料不存在_main"+str(m.material_id))
                 return redirect(url_for('ctr.show_join_oprs_main'))
         opr = dbsession.query(Opr).order_by(Opr.opr_id.desc()).first()
 
@@ -328,12 +337,12 @@ def rollback_opr():
                 material_change_num_rev(m=m,diff=opr.diff,batch=opr.oprbatch,oprtype=opr.oprtype)
                 dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                 dbsession.commit()
-                flash("回滚成功_配件")
+                flash("回滚成功_配件"+str(m.material_id))
             else:
-                flash("回滚操作记录错误-数量超标_配件")
+                flash("回滚操作记录错误-数量超标_配件"+str(m.material_id))
                 return redirect(url_for('ctr.show_join_oprs_main'))
         else:
-            flash("回滚操作记录错误-材料不存在_配件")
+            flash("回滚操作记录错误-材料不存在_配件"+str(m.material_id))
             return redirect(url_for('ctr.show_join_oprs_main'))
         opr = dbsession.query(Opr).order_by(Opr.opr_id.desc()).first()
     # dbsession.close()
@@ -341,10 +350,6 @@ def rollback_opr():
 
 
 
-@ctr.route('/add_material_get',methods=['GET',''])
-@loggedin_required
-def show_add_material():
-    return render_template("add_material_form.html")
 
 @ctr.route('/add_device_get',methods=['GET',''])
 @loggedin_required
@@ -413,3 +418,9 @@ def show_client_table():
 #     # join_oprs=pagination.items
 #     # print(sql[0])
 #     return render_template('join_oprs_main_table.html',join_oprs=sql,oprenumCH=oprenumCH)
+
+#
+# @ctr.route('/add_material_get',methods=['GET',''])
+# @loggedin_required
+# def show_add_material():
+#     return render_template("add_material_form.html")

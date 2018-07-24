@@ -63,7 +63,7 @@ create table devices(
         acces_id int null default 0,
         comment varchar(64) default '',
         primary key(device_id),
-        unique(mn_id),
+        unique(MN_id),
         foreign key (acces_id) references accessories(acces_id)
 );
 create table clients(

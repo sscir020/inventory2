@@ -56,7 +56,7 @@ class Buy(Base):
     material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False)
     batch=Column(String(32),nullable=False,unique=True,index=True)
     num=Column(Integer,nullable=False,default=0)
-    comment=Column(String(20),nullable=True,default='')
+    comment=Column(String(64),nullable=True,default='')
 
 class Rework(Base):
     __tablename__='reworks'
@@ -64,7 +64,7 @@ class Rework(Base):
     material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False)
     batch=Column(String(32),nullable=False,unique=True,index=True)
     num=Column(Integer,nullable=False,default=0)
-    comment=Column(String(20),nullable=True,default='')
+    comment=Column(String(64),nullable=True,default='')
 
 class Opr(Base):
     __tablename__ = 'oprs'
@@ -73,10 +73,11 @@ class Opr(Base):
     diff = Column(Integer, nullable=False)
     material_id = Column(Integer, ForeignKey('materials.material_id'))
     device_id = Column(Integer, ForeignKey('devices.device_id'))
+    client_id = Column(Integer, ForeignKey('clients.client_id'))
     oprtype = Column(String(32), nullable=False)
     oprbatch = Column(String(32), nullable=False,default='')
     isgroup =Column(Boolean,nullable=False,default=0)
-    comment = Column(String(40), nullable=True, default='')
+    comment = Column(String(64), nullable=True, default='')
     momentary = Column(DateTime, index=True,default=datetime.datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
 
     def prt(self):

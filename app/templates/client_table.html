@@ -26,7 +26,7 @@
              </tr>
              {% endfor %}
          </table>
-        <input type="submit" value="备注提交" onclick="form_client.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.CLIENT.name) }}';form_client.submit())">
+        <input type="submit" value="备注提交" onclick="form_client.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.CLIENT.name) }}';form_client.submit()">
     </form>
 </div>
 {% endblock %}

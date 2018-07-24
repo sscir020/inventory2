@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import render_template,url_for,redirect,flash,session,request
 # from flask_login import login_user,logout_user,current_user,login_required
-from .forms import LoginForm,RegistrationForm,AddClientForm #AddOprForm#ColorForm#ListForm,OprForm #EditOprForm,EditReworkOprForm
+from .forms import LoginForm,RegistrationForm,AddClientForm,AddMaterialForm #AddOprForm#ColorForm#ListForm,OprForm #EditOprForm,EditReworkOprForm
 from ..models import Opr,Material,User,Accessory,Buy,Rework,Device,Client
 from . import ctr
 # from ..__init__ import db
@@ -63,14 +63,22 @@ def add_client():
     if form.validate_on_submit():
         if dbsession.query(Client).filter_by(client_name=form.clientname.data).first() == None:
             d=dbsession.query(Device).filter(Device.device_id==form.device_id.data).first()
-            if d.MN_id==form.MN_id.data :
-                c=Client(client_name=form.clientname.data,device_id=form.device_id.data,MN_id=int(form.MN_id.data),comment=form.comment.data)
-                dbsession.add(c)
-                dbsession.commit()
-                flash("客户创建成功")
-                return redirect(url_for('ctr.show_client_table'))
+            if d!=None:
+                if d.MN_id==form.MN_id.data :
+                    c=Client(client_name=form.clientname.data,device_id=form.device_id.data,MN_id=int(form.MN_id.data),comment=form.comment.data)
+                    dbsession.add_all([c])
+                    dbsession.commit()
+                    dbsession.flush()
+                    o=Opr(client_id=c.client_id,diff=0,user_id=session['userid'],oprtype=Oprenum.CINITADD.name, isgroup=True,oprbatch='', \
+                          momentary=datetime.datetime.now())
+                    dbsession.add_all([o])
+                    dbsession.commit()
+                    flash("客户创建成功")
+                    return redirect(url_for('ctr.show_client_table'))
+                else:
+                    flash("设备编号和MN号不一致")
             else:
-                flash("设备编号和MN号不一致")
+                flash("设备编号不存在")
         else:
             flash("客户已存在")
     else:
@@ -78,25 +86,21 @@ def add_client():
     return render_template('add_client_form.html',form=form)
 
 
-
-@ctr.route('/add_material_act', methods=['', 'POST'])
+@ctr.route('/add_material_act', methods=['GET', 'POST'])
 @loggedin_required
 def add_material():
-    if request.method == "POST":
-        materialname=request.form['input_text_material_name']
-        countnum=convert_str_num(request.form['input_number_countnum'])
-        alarm_level=convert_str_num(request.form['input_number_alarm_level'])
-        if materialname!=None and materialname!=''and alarm_level>0 :
-        # if 'input_accessory_list' in request.form:
-        #     list=request.form['input_accessory_list']
-        # list1 = request.form
-        # print(list1)
+    form=AddMaterialForm()
+    if form.validate_on_submit():
+        materialname=form.materialname.data
+        countnum=form.countnum.data
+        alarm_level=form.alarm_level.data
+        if countnum>=0 and alarm_level>=0 :
             if dbsession.query(Material).filter_by(material_name=materialname).first() == None:
                 m = Material(material_name=materialname, countnum=countnum, acces_id=0,alarm_level=alarm_level)
                 dbsession.add(m)
                 dbsession.commit()
                 dbsession.flush()
-                m=dbsession.query(Material).filter_by(material_name=materialname).first()
+                # m=dbsession.query(Material).filter_by(material_name=materialname).first()
                 o=Opr(material_id=m.material_id,diff=countnum,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
                       momentary=datetime.datetime.now())
                 dbsession.add(o)
@@ -107,8 +111,40 @@ def add_material():
             else:
                 flash('材料名已存在')
         else:
-            flash('请正确填写材料名称和数量')
-    return redirect(url_for('ctr.show_add_material'))
+            flash('数量或者警戒值应大于等于0')
+    else:
+        flash('需要填写')
+    return render_template('add_material_form.html',form=form)
+# @ctr.route('/add_material_act', methods=['', 'POST'])
+# @loggedin_required
+# def add_material():
+#     if request.method == "POST":
+#         materialname=request.form['input_text_material_name']
+#         countnum=convert_str_num(request.form['input_number_countnum'])
+#         alarm_level=convert_str_num(request.form['input_number_alarm_level'])
+#         if materialname!=None and materialname!=''and alarm_level>0 :
+#         # if 'input_accessory_list' in request.form:
+#         #     list=request.form['input_accessory_list']
+#         # list1 = request.form
+#         # print(list1)
+#             if dbsession.query(Material).filter_by(material_name=materialname).first() == None:
+#                 m = Material(material_name=materialname, countnum=countnum, acces_id=0,alarm_level=alarm_level)
+#                 dbsession.add(m)
+#                 dbsession.commit()
+#                 dbsession.flush()
+#                 m=dbsession.query(Material).filter_by(material_name=materialname).first()
+#                 o=Opr(material_id=m.material_id,diff=countnum,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
+#                       momentary=datetime.datetime.now())
+#                 dbsession.add(o)
+#                 dbsession.commit()
+#                 dbsession.flush()
+#                 flash('新材料添加成功')
+#                 return redirect(url_for('ctr.show_material_table',page=1))
+#             else:
+#                 flash('材料名已存在')
+#         else:
+#             flash('请正确填写材料名称和数量')
+#     return redirect(url_for('ctr.show_add_material'))
 
 @ctr.route('/add_device_act', methods=['', 'POST'])
 @loggedin_required
@@ -122,47 +158,50 @@ def add_device():
 
         if devicename!=None and devicename!=''and devicetype!=None and devicetype!='' and alarm_level>0 and MN_id>0 :
             if dbsession.query(Device).filter_by(device_name=devicename).first() == None:
-                dict={}
-                for keyid in request.form.keys():
-                    if keyid[0:21]=='input_accessory_check':
-                        # print(key1)
-                        keynum='input_accessory_num_'+keyid[22:]
-                        if(request.form[keynum]==''or  int(request.form[keynum])<=0 ):
-                            flash("数量应是一个正数")
-                            return redirect(url_for('ctr.show_add_device'))
+                if dbsession.query(Device).filter_by(MN_id=MN_id).first() == None:
+                    dict={}
+                    for keyid in request.form.keys():
+                        if keyid[0:21]=='input_accessory_check':
+                            # print(key1)
+                            keynum='input_accessory_num_'+keyid[22:]
+                            if(request.form[keynum]==''or  int(request.form[keynum])<=0 ):
+                                flash("数量应是一个正数")
+                                return redirect(url_for('ctr.show_add_device'))
+                            else:
+                                dict[request.form[keyid]]=request.form[keynum]
+                    acces=json.dumps(dict)
+                    if(len(dict)>0 ):
+                        if dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()==None:
+                            a = Accessory(param_num=len(dict),param_acces=acces)
+                            dbsession.add(a)
+                            dbsession.commit()
+                            dbsession.flush()
                         else:
-                            dict[request.form[keyid]]=request.form[keynum]
-                acces=json.dumps(dict)
-                if(len(dict)>0 ):
-                    if dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()==None:
-                        a = Accessory(param_num=len(dict),param_acces=acces)
-                        dbsession.add(a)
-                        dbsession.commit()
+                            a=dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()
+                        d = Device(device_name=devicename,device_type=devicetype,MN_id=MN_id, countnum=countnum,acces_id=a.acces_id)
+
+                        for material_id in dict:
+                            o = Opr(material_id=material_id, diff=countnum*int(dict[material_id]), user_id=session['userid'], oprtype=Oprenum.DINITADD.name,isgroup=False,oprbatch='',\
+                                    momentary=datetime.datetime.now())
+                            dbsession.add(o)
+                            dbsession.commit()
                         dbsession.flush()
                     else:
-                        a=dbsession.query(Accessory).filter(Accessory.param_acces==acces).first()
-                    d = Device(device_name=devicename,device_type=devicetype,MN_id=MN_id, countnum=countnum,acces_id=a.acces_id)
-
-                    for material_id in dict:
-                        o = Opr(material_id=material_id, diff=countnum*int(dict[material_id]), user_id=session['userid'], oprtype=Oprenum.DINITADD.name,isgroup=False,oprbatch='',\
-                                momentary=datetime.datetime.now())
-                        dbsession.add(o)
-                        dbsession.commit()
+                        flash("请勾选参数")
+                        return redirect(url_for('ctr.show_add_device'))
+                    dbsession.add(d)
+                    dbsession.commit()
                     dbsession.flush()
+                    d=dbsession.query(Device).filter_by(device_name=devicename).first()
+                    o=Opr(device_id=d.device_id,diff=countnum,user_id=session['userid'],oprtype=Oprenum.DINITADD.name, isgroup=True,oprbatch='', \
+                          momentary=datetime.datetime.now())
+                    dbsession.add(o)
+                    dbsession.commit()
+                    dbsession.flush()
+                    flash('新设备添加成功')
+                    return redirect(url_for('ctr.show_device_table',page=1))
                 else:
-                    flash("请勾选参数")
-                    return redirect(url_for('ctr.show_add_device'))
-                dbsession.add(d)
-                dbsession.commit()
-                dbsession.flush()
-                d=dbsession.query(Device).filter_by(device_name=devicename).first()
-                o=Opr(device_id=d.device_id,diff=countnum,user_id=session['userid'],oprtype=Oprenum.DINITADD.name, isgroup=True,oprbatch='', \
-                      momentary=datetime.datetime.now())
-                dbsession.add(o)
-                dbsession.commit()
-                dbsession.flush()
-                flash('新设备添加成功')
-                return redirect(url_for('ctr.show_device_table',page=1))
+                    flash('MN号已存在')
             else:
                 flash('设备名已存在')
         else:
