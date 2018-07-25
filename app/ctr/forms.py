@@ -23,11 +23,14 @@ class RegistrationForm(FlaskForm):
 
 class AddClientForm(FlaskForm):
     clientname=StringField("客户名称",validators=[DataRequired()])
-    device_id=IntegerField("设备编号", validators=[DataRequired()])
+    # device_id=IntegerField("设备编号", validators=[DataRequired()])
     MN_id=IntegerField("设备MN号", validators=[DataRequired()])
     comment = StringField("备注", validators=[DataRequired()])
     submit = SubmitField('添加')
 
+class SearchMNForm(FlaskForm):
+    MN_id=StringField("MN号",validators=[DataRequired])
+    submit=SubmitField("搜索")
 # class ColorForm(FlaskForm):
 #     alarm_level=IntegerField("警戒值",validators=[DataRequired()])
 #     submit=SubmitField("修改")

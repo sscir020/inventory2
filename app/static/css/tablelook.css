@@ -1,10 +1,10 @@
-#table_rework_buy,#table_material,#table_oprs
+.table_orange
 {
 	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
 	width:1280px;
 	border-collapse:collapse;
 }
-#table_material th
+.table_orange th
 {
 	font-size:1.1em;
 	text-align:center;
@@ -14,7 +14,7 @@
 	border-radius: 10px;
 	color:#F0E9E6;
 }
- #table_material td
+ .table_orange td
 {
 	font-size:1em;
 	border:1px solid #FF9975;
@@ -22,79 +22,11 @@
 	border-radius: 10px;
 	color: #7D7775;
 }
- #table_client th
-{
-	font-size:1.1em;
-	text-align:center;
-	padding-top:15px;
-	padding-bottom:15px;
-	background-color:#FF9975;
-	border-radius: 10px;
-	color:#F0E9E6;
+.text_acce{
+    width:50px;
 }
- #table_client td
-{
-	font-size:1em;
-	border:1px solid #FF9975;
-	padding:3px 0px 1px 30px;
-	border-radius: 10px;
-	color: #7D7775;
-}
-#table_device th
-{
-	font-size:1.1em;
-	text-align:center;
-	padding-top:15px;
-	padding-bottom:15px;
-	background-color:#FF9975;
-	border-radius: 10px;
-	color:#F0E9E6;
-}
-#table_device td
-{
-	font-size:1em;
-	border:1px solid #FF9975;
-	padding:3px 0px 1px 30px;
-	border-radius: 10px;
-	color: #7D7775;
-}
-#table_rework_buy th
-{
-	font-size:1.1em;
-	text-align:center;
-	padding-top:15px;
-	padding-bottom:15px;
-	background-color:#FF9975;
-	border-radius: 10px;
-	color:#F0E9E6;
-}
- #table_rework_buy td
- {
-	font-size:1em;
-	border:1px solid #FF9975;
-	padding:5px 0px 5px 40px;
-	border-radius: 10px;
-	color: #7D7775;
-}
-
-#table_oprs th
-{
-	font-size:1.1em;
-	text-align:center;
-	padding-top:15px;
-	padding-bottom:15px;
-	background-color:#FF9975;
-	border-radius: 10px;
-	color:#F0E9E6;
-}
-
-#table_oprs td
-{
-	font-size:1em;
-	border:1px solid #FF9975;
-	padding:5px 5px 5px 20px;
-	border-radius: 10px;
-	color: #7D7775;
+.text_comment{
+    width:280px;
 }
 a
 {
@@ -117,10 +49,4 @@ a
     padding:0;
     margin:0 0 0 40px;
     list-style-type: decimal;
-}
-.text_acce{
-    width:50px;
-}
-.text_comment{
-    width:280px;
 }

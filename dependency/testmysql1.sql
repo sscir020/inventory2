@@ -15,6 +15,7 @@ create table accessories(
         param_num int not null,
         param_acces varchar(2048) not null,
         primary key (acces_id)
+        unique(acces_id)
 );
 
 drop table if EXISTS oprs;
@@ -42,15 +43,19 @@ create table buys(
         unique(batch),
         foreign key (material_id) references materials(material_id)
 );
+
 create table reworks(
         rework_id int not null auto_increment,
-        batch varchar(32) not null,
-        material_id int not null,
+        material_id int,
+        device_id int,
+        MN_id int,
+		batch varchar(32) not null,
         num int not null default 0,
         comment varchar(64) default '',
         primary key(rework_id),
         unique(batch),
-        foreign key (material_id) references materials(material_id)
+        foreign key (material_id) references materials(material_id),
+        foreign key (device_id) references devices(device_id)
 );
 drop table if EXISTS clients;
 drop table if exists devices;
@@ -69,19 +74,20 @@ create table devices(
 create table clients(
         client_id int not null auto_increment,
         client_name varchar(32) not null,
-        device_id int not null,
-        MN_id int not null default 0,
+        MN_id varchar(32) not null default '',
         credit int not null default 0,
         comment varchar(64) default '',
         primary key(client_id),
         unique(client_name),
-        foreign key (device_id) references devices(device_id)
+        unique(MN_id)
 );
+drop table  if exists oprs;
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,
 		material_id int,
 		device_id int,
+		MN_id varchar(32),
 		diff int not null,
 		oprtype varchar(32) not null,
 		oprbatch varchar(32) not null default '',
@@ -89,16 +95,32 @@ create table oprs(
 		comment varchar(64) default '',
 		momentary datetime not null default current_timestamp,
 		primary key (opr_id),
+		unique(opr_id),
 		foreign key (user_id) references users(user_id),
 		foreign key (material_id) references materials(material_id)
 		);
-		
+
+create table customerservice(
+        service_id  int not null auto_increment,
+        MN_id varchar(32) not null default '',
+        material_id int,
+        isdevice TINYINT(1) not null default 0,
+        countnum int not null default 0,
+        comment varchar(64) default '',
+        primary key(service_id),
+		unique(service_id),
+		foreign key (material_id) references materials(material_id)
+);
+
+
 alter table materials convert to character set utf8 collate utf8_unicode_ci;
 alter table users convert to character set utf8 collate utf8_unicode_ci;
 alter table buys convert to character set utf8 collate utf8_unicode_ci;
 alter table reworks convert to character set utf8 collate utf8_unicode_ci;
 alter table accessories convert to character set utf8 collate utf8_unicode_ci;
 alter table oprs convert to character set utf8 collate utf8_unicode_ci;
+alter table device convert to character set utf8 collate utf8_unicode_ci;
+alter table client convert to character set utf8 collate utf8_unicode_ci;
 
 #default-character-set=utf8
 #character-set-server=utf8
@@ -125,6 +147,9 @@ create table total(
 		fruit_id int
 
 )
+
+alter table devices modify MN_id varchar(32) not null;
+alter table devices add unique(MN_id);
 
 insert into users(user_name,user_pass) values('zhang','1234');
 insert into users(user_name,user_pass) values('wang','1234');

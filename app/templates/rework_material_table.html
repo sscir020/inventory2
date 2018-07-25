@@ -5,11 +5,13 @@
 <div>
     <form name="form_rework" method="post">
          <h4>返修中列表</h4>
-         <table class="table table-hover" id="table_rework_buy"><!--table-condensed-->
+         <table class="table table-hover" class="table_orange"><!--table-condensed-->
              <thead>
                  <th>购买ID</th>
                  <th>库存ID</th>
                  <th>库存名称</th>
+                 <!--<th>设备ID</th>-->
+                 <th>MN号</th>
                  <th>返修批次</th>
                  <th>返修数量</th>
                  <th>修好/报废数量</th>
@@ -17,14 +19,14 @@
                  <!--<th>备注选择</th>-->
              </thead>
              {% for entry in reworkbatches %}
-                 <!--{% set index=loop.index %}-->
                  <tr>
                      <td>{{entry.rework_id}}</td>
                      <td>{{entry.material_id}}</td>
                      <td>{{entry.material_name}}</td>
+                     <!--<td>{{entry.device_id}}</td>-->
+                     <td>{{entry.MN_id}}</td>
                      <td>{{entry.batch}}</td>
                      <td>{{entry.num}}</td>
-                     <!--<td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">-->
                      <td><input type="number" class="text_acce" name="input_restore_num_{{entry.material_id}}_{{entry.batch}}"></td>
                      <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}">
                          <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>

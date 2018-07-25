@@ -46,6 +46,7 @@ class Material(Base):
     oprs = relationship('Opr', backref='materials', lazy='dynamic')
     buybatches = relationship('Buy', backref='materials', lazy='dynamic')
     reworkbatches = relationship('Rework', backref='materials', lazy='dynamic')
+    customerservices= relationship('Customerservice', backref='materials', lazy='dynamic')
 
     def prt(self):
         print(self.material_id, self.material_name, self.countnum,self.reworknum,self.buynum)
@@ -61,8 +62,10 @@ class Buy(Base):
 class Rework(Base):
     __tablename__='reworks'
     rework_id=Column(Integer,nullable=False,primary_key=True)
-    material_id = Column(Integer,ForeignKey('materials.material_id'), nullable=False)
-    batch=Column(String(32),nullable=False,unique=True,index=True)
+    material_id = Column(Integer,ForeignKey('materials.material_id'))
+    device_id = Column(Integer,ForeignKey('devices.device_id'))
+    MN_id = Column(Integer, nullable=False, default=0)
+    batch=Column(String(32),nullable=False,unique=True,index=True,default='')
     num=Column(Integer,nullable=False,default=0)
     comment=Column(String(64),nullable=True,default='')
 
@@ -93,7 +96,7 @@ class Accessory(Base):
 class Device(Base):
     __tablename__='devices'
     device_id = Column(Integer, nullable=False, primary_key=True)
-    MN_id = Column(Integer, nullable=False)
+    MN_id = Column(String(32), nullable=False)
     device_type = Column(String(32), nullable=False,default='')
     device_name = Column(String(32), nullable=False, default='')
     countnum = Column(Integer, nullable=False,default=0)
@@ -110,11 +113,20 @@ class Client(Base):
     MN_id = Column(Integer,nullable=False,default=0)
     credit=Column(Integer,nullable=True,default=0)
     comment = Column(String(64), nullable=True,default='')
+
+class Customerservice(Base):
+    __tablename__='customerservice'
+    service_id= Column(Integer, nullable=False, primary_key=True)
+    MN_id=Column(String(32), nullable=False)
+    material_id=Column(Integer,ForeignKey('materials.material_id'))
+    isdevice=Column(Boolean,nullable=False,default=0)
+    countnum= Column(Integer, nullable=False,default=0)
+    comment= Column(String(64), nullable=True,default='')
 # class AnonymousUser(AnonymousUserMixin):
 #     def can(self, permissions):
 #         return False
 #
-#     def is_administrator(self):
+#     def is_administrator(self):pytho
 #         return False
 #
 # login_manager.anonymous_user = AnonymousUser

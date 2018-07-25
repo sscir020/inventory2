@@ -124,7 +124,7 @@ def show_join_oprs():
     sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff,\
                           Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary).\
                           outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).outerjoin(Client,Client.client_id==Opr.client_id).\
-                          join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).limit(10)
+                          join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).limit(50)
     # print(sql)
     # page = request.args.get('page', 1, type=int)
     # pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
@@ -143,7 +143,7 @@ def show_join_oprs_main():
     sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff,\
                           Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary\
                           ).outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).outerjoin(Client,Client.client_id==Opr.client_id).\
-                          join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).filter(Opr.isgroup==True).limit(10)
+                          join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).filter(Opr.isgroup==True).limit(50)
     # print(sql)
     # print(sql[0])
     return render_template('join_oprs_main_table.html',join_oprs=sql,oprenumCH=oprenumCH)
@@ -291,16 +291,19 @@ def rollback_opr():
             dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
             dbsession.query(Material).filter_by(material_id=opr.material_id).delete()
             dbsession.commit()
+            dbsession.flush()
             flash("回滚成功_主件_新添加材料")
         elif opr.oprtype == Oprenum.DINITADD.name:
             dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
             dbsession.query(Device).filter_by(device_id=opr.device_id).delete()
             dbsession.commit()
+            dbsession.flush()
             flash("回滚成功_主件_新添加设备")
         elif opr.oprtype == Oprenum.CINITADD.name:
             dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
             dbsession.query(Client).filter_by(client_id=opr.client_id).delete()
             dbsession.commit()
+            dbsession.flush()
             flash("回滚成功_主件_新添加客户")
         elif opr.oprtype == Oprenum.DOUTBOUND.name:
             d=dbsession.query(Device).filter_by(device_id=opr.device_id).first()
@@ -313,6 +316,7 @@ def rollback_opr():
                     dbsession.add(d)
                     dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                     dbsession.commit()
+                    dbsession.flush()
                     flash("回滚成功_主件")
             else:
 
@@ -324,6 +328,7 @@ def rollback_opr():
                     material_change_num_rev(m=m,diff=opr.diff, batch=str(opr.oprbatch), oprtype=opr.oprtype)
                     dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                     dbsession.commit()
+                    dbsession.flush()
                     flash("回滚成功_主件"+str(m.material_id))
                 else:
                     flash("回滚失败-数量超标_main"+str(m.material_id))
@@ -340,6 +345,7 @@ def rollback_opr():
                 material_change_num_rev(m=m,diff=opr.diff,batch=opr.oprbatch,oprtype=opr.oprtype)
                 dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                 dbsession.commit()
+                dbsession.flush()
                 flash("回滚成功_配件"+str(m.material_id))
             else:
                 flash("回滚操作记录错误-数量超标_配件"+str(m.material_id))

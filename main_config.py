@@ -69,11 +69,15 @@ class Oprenum(Enum):
     DINITADD=12
     DOUTBOUND=13
     CINITADD=14
+    CINBOUND=15
+    CREWORK=16
+    DRESALE=17
 class CommentType(Enum):
     BUY=1
     REWORK=2
     DEVICE=4
     CLIENT = 3
+    COSTOMSERVICE=4
 oprenumCH ={
     Oprenum.INITADD.name: '新添加材料',#
     Oprenum.INBOUND.name: '入库',
@@ -88,7 +92,10 @@ oprenumCH ={
     Oprenum.PREPARE.name:'备货中',#
     Oprenum.DINITADD.name:'新添加设备',
     Oprenum.DOUTBOUND.name:'设备出库',
-    Oprenum.CINITADD.name:'新添加客户'
+    Oprenum.CINITADD.name:'新添加客户',
+    Oprenum.CINBOUND.name:'售后入库',
+    Oprenum.CREWORK.name:'售后返修',#
+    Oprenum.DRESALE.name:'设备售后带出'
 }
 oprenumNum = {
     '新添加材料':Oprenum.INITADD,#
@@ -104,7 +111,10 @@ oprenumNum = {
     '备货':Oprenum.PREPARE,#
     '新添加设备':Oprenum.DINITADD,
     '设备出库':Oprenum.DOUTBOUND,
-    '新添加客户':Oprenum.CINITADD
+    '新添加客户':Oprenum.CINITADD,
+    '售后入库':Oprenum.CINBOUND,
+    '售后返修':Oprenum.CREWORK,#
+    '设备售后带出':Oprenum.DRESALE
 }
 class Sensorname(Enum):
     P25 = 1
