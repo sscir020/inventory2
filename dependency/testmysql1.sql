@@ -32,7 +32,7 @@ create table materials(
 		unique(material_name)
 		);
 drop table if exists buys;
-drop table if exists reworks;
+
 create table buys(
         buy_id int not null auto_increment,
         batch varchar(32) not null,
@@ -43,7 +43,7 @@ create table buys(
         unique(batch),
         foreign key (material_id) references materials(material_id)
 );
-
+drop table if exists reworks;
 create table reworks(
         rework_id int not null auto_increment,
         material_id int,
@@ -64,7 +64,8 @@ create table devices(
         MN_id int not null,
         device_type varchar(20) not null,
         device_name varchar(32) not null default '',
-        countnum int not null,
+        storenum int not null default 0,
+        salenum int not null default 0,
         acces_id int null default 0,
         comment varchar(64) default '',
         primary key(device_id),
@@ -105,7 +106,7 @@ create table customerservice(
         MN_id varchar(32) not null default '',
         material_id int,
         isdevice TINYINT(1) not null default 0,
-        countnum int not null default 0,
+        recyclenum int not null default 0,
         comment varchar(64) default '',
         primary key(service_id),
 		unique(service_id),

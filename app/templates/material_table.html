@@ -13,26 +13,30 @@
                  <th>库存数量</th>
                  <th>备货数量</th>
                  <th>总数量</th>
+                 <th>售出数量</th>
+                 <th>售后售出数量</th>
                  <th>警戒值</th>
                  <th>参数模板ID</th>
-                 <th>操作数量-MN号-操作类型</th>
+                 <th>数量-设备MN号-操作类型</th>
              </thead>
              {% for entry in materials %}
              <tr id="tr_entry">
                  <td>{{entry.material_id}}</td>
                  <td>{{entry.material_name}}</td>
-                 {% if entry.countnum < entry.alarm_level  %}
-                 <td  style="color:red">{{entry.countnum}}</td>
+                 {% if entry.storenum < entry.alarm_level  %}
+                 <td  style="color:red">{{entry.storenum}}</td>
                  {% else %}
-                 <td>{{entry.countnum}}</td>
+                 <td>{{entry.storenum}}</td>
                  {% endif %}
                  <td>{{entry.preparenum}}</td>
-                 <td>{{entry.countnum+entry.preparenum}}</td>
+                 <td>{{entry.storenum+entry.preparenum}}</td>
+                 <td>{{entry.salenum}}</td>
+                 <td>{{entry.resalenum}}</td>
                  <td>{{entry.alarm_level}}</td>
                  <td>{{entry.acces_id}}</td>
                  <td>
                      <input id="numcls1"  name="input_number_{{entry.material_id}}" type="number" class="text_acce">
-                     <input id="numcls2"  name="input_text_MN_{{entry.material_id}}" type="text" class="text_acce">
+                     <input id="numcls2"  name="input_text_MN_{{entry.material_id}}" type="text">
                      <input id="numcls3"  name="input_oprlist_{{entry.material_id}}"  list="operations" >
                      <datalist id="operations">
                          <option value="购买">

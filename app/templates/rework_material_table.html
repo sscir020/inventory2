@@ -33,9 +33,11 @@
                  </tr>
              {% endfor %}
          </table>
-         <input type="submit" name="input_restore_btn" value="修好提交" onclick="form_rework.action='{{ url_for('ctr.form_change_restore_num') }}';form_buy.submit()">
-         <input type="submit" name="input_cancel_btn" value="报废提交" onclick="form_rework.action='{{ url_for('ctr.form_change_scrap') }}';form_buy.submit()">
-         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_rework.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.REWORK.name) }}';form_buy.submit()">
+         <input type="submit" name="input_submit_restore" value="修好提交"       onclick="form_rework.action='{{ url_for('ctr.form_change_restore_num') }}';form_rework.submit()">
+         <input type="submit" name="input_submit_scrap" value="报废提交"         onclick="form_rework.action='{{ url_for('ctr.form_change_scrap') }}';form_rework.submit()">
+         <input type="submit" name="input_submit_crestore" value="售后修好提交" onclick="form_rework.action='{{ url_for('ctr.form_change_crestore_num') }}';form_rework.submit()">
+         <input type="submit" name="input_submit_cscrap" value="售后报废提交"   onclick="form_rework.action='{{ url_for('ctr.form_change_cscrap') }}';form_rework.submit()">
+         <input type="submit" name="input_submit_comment" value="备注提交"      onclick="form_rework.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.REWORK.name) }}';form_rework.submit()">
     </form>
 </div>
 

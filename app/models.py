@@ -39,8 +39,11 @@ class Material(Base):
     __tablename__ = 'materials'
     material_id=Column(Integer,nullable=False,primary_key=True)
     material_name=Column(String(64),nullable=False, unique=True, index=True)##### no defalut
-    countnum=Column(Integer,nullable=False,default=0)
+    storenum=Column(Integer,nullable=False,default=0)
+    scrapnum=Column(Integer,nullable=False,default=0)
     preparenum=Column(Integer,nullable=False,default=0)
+    salenum=Column(Integer,nullable=False,default=0)
+    resalenum=Column(Integer,nullable=False,default=0)
     alarm_level=Column(Integer,nullable=False,default=0)
     acces_id=Column(Integer, ForeignKey('accessories.acces_id'))
     oprs = relationship('Opr', backref='materials', lazy='dynamic')
@@ -99,7 +102,8 @@ class Device(Base):
     MN_id = Column(String(32), nullable=False)
     device_type = Column(String(32), nullable=False,default='')
     device_name = Column(String(32), nullable=False, default='')
-    countnum = Column(Integer, nullable=False,default=0)
+    storenum = Column(Integer, nullable=False,default=0)
+    salenum = Column(Integer, nullable=False,default=0)
     acces_id = Column(Integer, ForeignKey('accessories.acces_id'), nullable=False)
     comment = Column(String(64), nullable=True,default='')
     clients = relationship('Client', backref='devices', lazy='dynamic')
@@ -109,7 +113,6 @@ class Client(Base):
     __tablename__='clients'
     client_id = Column(Integer, nullable=False, primary_key=True)
     client_name = Column(String(32), nullable=False)
-    device_id = Column(Integer,ForeignKey('devices.device_id'), nullable=False)
     MN_id = Column(Integer,nullable=False,default=0)
     credit=Column(Integer,nullable=True,default=0)
     comment = Column(String(64), nullable=True,default='')
@@ -120,7 +123,7 @@ class Customerservice(Base):
     MN_id=Column(String(32), nullable=False)
     material_id=Column(Integer,ForeignKey('materials.material_id'))
     isdevice=Column(Boolean,nullable=False,default=0)
-    countnum= Column(Integer, nullable=False,default=0)
+    recyclenum= Column(Integer, nullable=False,default=0)
     comment= Column(String(64), nullable=True,default='')
 # class AnonymousUser(AnonymousUserMixin):
 #     def can(self, permissions):

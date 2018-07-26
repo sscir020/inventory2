@@ -152,7 +152,7 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     if diff<0:
         flash("数量小于等于0")##
         return False
-        # if diff> self.countnum:
+        # if diff> self.storenum:
         #     flash("取消新添加数量大于库存数量")##
         #     return False
     # elif oprtype == Oprenum.OUTBOUND.name:
@@ -176,11 +176,11 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
             flash("取消返修数量不等于返修批次数量")
             return False
     elif oprtype==Oprenum.INBOUND.name:
-        if diff>m.countnum:# 5 2  -> 7 0
+        if diff>m.storenum:# 5 2  -> 7 0
             flash("取消入库数量大于库存数量")
             return False
     elif oprtype == Oprenum.RESTORE.name:#返修
-        if diff>m.countnum:
+        if diff>m.storenum:
             flash("取消修好数量大于库存数量")
             return False
     # elif oprtype == Oprenum.SCRAP.name:
@@ -226,15 +226,15 @@ def material_change_num_rev(m,diff,oprtype,batch):
     if oprtype==Oprenum.OUTBOUND.name:####
         m.preparenum += diff
         dbsession.add_all([m])
-    #     self.countnum -= diff
+    #     self.storenum -= diff
     elif oprtype == Oprenum.BUYING.name:#++++
         dbsession.query(Buy).filter(Buy.batch == batch).delete()
     elif oprtype == Oprenum.REWORK.name:#++++
-        m.countnum += diff
+        m.storenum += diff
         dbsession.query(Rework).filter(Rework.batch == batch).delete()
         dbsession.add_all([m])
     elif oprtype==Oprenum.INBOUND.name:#----
-        m.countnum -= diff
+        m.storenum -= diff
         b = dbsession.query(Buy).filter(Buy.batch == batch).first()
         if b==None:
             b=Buy(batch=batch,material_id=m.material_id,num=diff)
@@ -242,7 +242,7 @@ def material_change_num_rev(m,diff,oprtype,batch):
             b.num+=diff
         dbsession.add_all([m,b])
     elif oprtype == Oprenum.RESTORE.name:#----
-        m.countnum -= diff
+        m.storenum -= diff
         b = dbsession.query(Rework).filter(Rework.batch == batch).first()
         if b==None:
             b = Rework(batch=batch, material_id=m.material_id, num=diff)
@@ -262,12 +262,12 @@ def material_change_num_rev(m,diff,oprtype,batch):
     elif oprtype == Oprenum.RECYCLE.name:
         dbsession.query(Rework).filter(Rework.batch == batch).delete()
     elif oprtype == Oprenum.RESALE.name:
-        m.countnum += diff
+        m.storenum += diff
         dbsession.add_all([m])
     elif oprtype == Oprenum.INITADD.name:####
         pass
     elif oprtype == Oprenum.PREPARE.name:
-        m.countnum+=diff
+        m.storenum+=diff
         m.preparenum-=diff
     elif oprtype == Oprenum.DINITADD.name:
         pass
@@ -308,11 +308,11 @@ def rollback_opr():
         elif opr.oprtype == Oprenum.DOUTBOUND.name:
             d=dbsession.query(Device).filter_by(device_id=opr.device_id).first()
             if d != None:
-                if opr.diff > d.countnum:
-                    flash("回滚失败_主件_数量超标"+ str(opr.diff)+">" + str(d.countnum))
+                if opr.diff > d.storenum:
+                    flash("回滚失败_主件_数量超标"+ str(opr.diff)+">" + str(d.storenum))
                     return redirect(url_for('ctr.show_join_oprs_main'))
                 else:
-                    d.countnum-=opr.diff
+                    d.storenum-=opr.diff
                     dbsession.add(d)
                     dbsession.query(Opr).filter_by(opr_id=opr.opr_id).delete()
                     dbsession.commit()

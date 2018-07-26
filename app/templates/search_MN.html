@@ -23,43 +23,45 @@
              <th>用户</th>
              <th>时间</th>
          </thead>
-         {% for entry in join_oprs %}
-         <tr>
-             <td>{{entry.opr_id}}</td>
-             <td>{% if entry.material_id != None %}
-                 {{entry.material_id}}
-                 {% endif %}
-             </td>
-             <td>{% if entry.material_name != None %}
-                 {{entry.material_name}}
-                 {% endif %}
-             </td>
-             <td>{% if entry.device_id != None %}
-                 {{entry.device_id}}
-                 {% endif %}
-             </td>
-             <td>{% if entry.device_name != None %}
-                 {{entry.device_name}}
-                 {% endif %}
-             </td>
-             <td>{% if entry.client_id != None %}
-                 {{entry.client_id}}
-                 {% endif %}
-             </td>
-             <td>{% if entry.client_name != None %}
-                 {{entry.client_name}}
-                 {% endif %}
-             </td>
-             <td>{{oprenumCH[entry.oprtype]}}</td>
-             <td>{{entry.MN_id}}</td>
-             <td>{{entry.diff}}</td>
-             <td>{{entry.oprbatch}}</td>
-             <td>{{entry.isgroup}}</td>
-             <td>{{entry.comment}}</td>
-             <td>{{entry.user_name}}</td>
-             <td>{{entry.momentary}}</td>
-         </tr>
-         {% endfor %}
+         {% if join_oprs!=None %}
+             {% for entry in join_oprs %}
+             <tr>
+                 <td>{{entry.opr_id}}</td>
+                 <td>{% if entry.material_id != None %}
+                     {{entry.material_id}}
+                     {% endif %}
+                 </td>
+                 <td>{% if entry.material_name != None %}
+                     {{entry.material_name}}
+                     {% endif %}
+                 </td>
+                 <td>{% if entry.device_id != None %}
+                     {{entry.device_id}}
+                     {% endif %}
+                 </td>
+                 <td>{% if entry.device_name != None %}
+                     {{entry.device_name}}
+                     {% endif %}
+                 </td>
+                 <td>{% if entry.client_id != None %}
+                     {{entry.client_id}}
+                     {% endif %}
+                 </td>
+                 <td>{% if entry.client_name != None %}
+                     {{entry.client_name}}
+                     {% endif %}
+                 </td>
+                 <td>{{oprenumCH[entry.oprtype]}}</td>
+                 <td>{{entry.MN_id}}</td>
+                 <td>{{entry.diff}}</td>
+                 <td>{{entry.oprbatch}}</td>
+                 <td>{{entry.isgroup}}</td>
+                 <td>{{entry.comment}}</td>
+                 <td>{{entry.user_name}}</td>
+                 <td>{{entry.momentary}}</td>
+             </tr>
+             {% endfor %}
+        {% endif %}
     </table>
 </div>
 {% endblock %}
