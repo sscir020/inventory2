@@ -5,7 +5,7 @@
 {% block page_content %}
 <form action="{{ url_for('ctr.add_device') }}" method="post">
     <p>设备名称<input type="text" name="input_text_device_name"></p>
-    <p>设备MN号<input type="number" name="input_number_MN"></p>
+    <p>设备MN号<input type="text" name="input_text_MN"></p>
     <p>设备类型<input type="text" name="input_text_device_type"></p>
     <!--<p>数量<input type="number" name="input_number_countnum" value=0></p>-->
     <!--<p>警戒值<input type="number" name="input_number_alarm_level" value=20></p>-->

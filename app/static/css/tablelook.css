@@ -1,10 +1,10 @@
-.table_orange
+#table_orange
 {
 	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
 	width:1280px;
 	border-collapse:collapse;
 }
-.table_orange th
+#table_orange th
 {
 	font-size:1.1em;
 	text-align:center;
@@ -14,12 +14,12 @@
 	border-radius: 10px;
 	color:#F0E9E6;
 }
- .table_orange td
+#table_orange td
 {
 	font-size:1em;
 	border:1px solid #FF9975;
-	padding:3px 0px 1px 30px;
-	border-radius: 10px;
+	padding:3px 0px 1px 3px;
+	border-radius: 5px;
 	color: #7D7775;
 }
 .text_acce{
@@ -35,7 +35,7 @@ a
 }
 #accessory_list
 {
-    width:1200px;
+    width:1980px;
     overflow:hidden;
 }
 #accessory_list ul

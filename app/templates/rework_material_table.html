@@ -5,9 +5,9 @@
 <div>
     <form name="form_rework" method="post">
          <h4>返修中列表</h4>
-         <table class="table table-hover" class="table_orange"><!--table-condensed-->
+         <table class="table table-hover" id="table_orange"><!--table-condensed-->
              <thead>
-                 <th>购买ID</th>
+                 <th>返修ID</th>
                  <th>库存ID</th>
                  <th>库存名称</th>
                  <!--<th>设备ID</th>-->
@@ -15,6 +15,7 @@
                  <th>返修批次</th>
                  <th>返修数量</th>
                  <th>修好/报废数量</th>
+                 <th>操作类型</th>
                  <th>备注(不超过64个字,请勾选右侧)</th>
                  <!--<th>备注选择</th>-->
              </thead>
@@ -27,16 +28,26 @@
                      <td>{{entry.MN_id}}</td>
                      <td>{{entry.batch}}</td>
                      <td>{{entry.num}}</td>
-                     <td><input type="number" class="text_acce" name="input_restore_num_{{entry.material_id}}_{{entry.batch}}"></td>
-                     <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}">
-                         <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
+                     <td><input type="number" class="text_acce" name="input_number_{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}"></td>
+                     <td>
+                         <input id="numcls3"  name="input_oprlist_{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}"  list="operations" >
+                         <datalist id="operations">
+                             {% if entry.MN_id==None or entry.MN_id=='' %}
+                             <option value="修好">
+                             <option value="报废">
+                             {% else %}
+                             <option value="售后修好">
+                             <option value="售后报废">
+                             {% endif %}
+                        </datalist>
+                     </td>
+                     <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}" value="{{entry.comment}}">
+                         <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}" ></td>
                  </tr>
              {% endfor %}
          </table>
-         <input type="submit" name="input_submit_restore" value="修好提交"       onclick="form_rework.action='{{ url_for('ctr.form_change_restore_num') }}';form_rework.submit()">
-         <input type="submit" name="input_submit_scrap" value="报废提交"         onclick="form_rework.action='{{ url_for('ctr.form_change_scrap') }}';form_rework.submit()">
-         <input type="submit" name="input_submit_crestore" value="售后修好提交" onclick="form_rework.action='{{ url_for('ctr.form_change_crestore_num') }}';form_rework.submit()">
-         <input type="submit" name="input_submit_cscrap" value="售后报废提交"   onclick="form_rework.action='{{ url_for('ctr.form_change_cscrap') }}';form_rework.submit()">
+
+         <input type="submit" name="input_submit_act" value="操作提交"      onclick="form_rework.action='{{ url_for('ctr.form_change_rework') }}';form_rework.submit()">
          <input type="submit" name="input_submit_comment" value="备注提交"      onclick="form_rework.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.REWORK.name) }}';form_rework.submit()">
     </form>
 </div>

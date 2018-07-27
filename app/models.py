@@ -77,6 +77,7 @@ class Opr(Base):
     opr_id = Column(Integer, nullable=False, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     diff = Column(Integer, nullable=False)
+    MN_id = Column(String(32), nullable=True,default='')
     material_id = Column(Integer, ForeignKey('materials.material_id'))
     device_id = Column(Integer, ForeignKey('devices.device_id'))
     client_id = Column(Integer, ForeignKey('clients.client_id'))
@@ -106,7 +107,6 @@ class Device(Base):
     salenum = Column(Integer, nullable=False,default=0)
     acces_id = Column(Integer, ForeignKey('accessories.acces_id'), nullable=False)
     comment = Column(String(64), nullable=True,default='')
-    clients = relationship('Client', backref='devices', lazy='dynamic')
     oprs = relationship('Opr', backref='devices', lazy='dynamic')
 
 class Client(Base):
@@ -123,8 +123,30 @@ class Customerservice(Base):
     MN_id=Column(String(32), nullable=False)
     material_id=Column(Integer,ForeignKey('materials.material_id'))
     isdevice=Column(Boolean,nullable=False,default=0)
-    recyclenum= Column(Integer, nullable=False,default=0)
+    originnum= Column(Integer, nullable=False,default=0)
+    goodnum= Column(Integer, nullable=False,default=0)
+    brokennum= Column(Integer, nullable=False,default=0)
+    restorenum= Column(Integer, nullable=False,default=0)
+    scrapnum= Column(Integer, nullable=False,default=0)
+    inboundnum= Column(Integer, nullable=False,default=0)
+    resalenum= Column(Integer, nullable=False,default=0)
     comment= Column(String(64), nullable=True,default='')
+
+class Customerservice_his(Base):
+    __tablename__='customerservice_his'
+    service_id= Column(Integer, nullable=False, primary_key=True)
+    MN_id=Column(String(32), nullable=False)
+    material_id=Column(Integer,ForeignKey('materials.material_id'))
+    isdevice=Column(Boolean,nullable=False,default=0)
+    originnum= Column(Integer, nullable=False,default=0)
+    goodnum= Column(Integer, nullable=False,default=0)
+    brokennum= Column(Integer, nullable=False,default=0)
+    restorenum= Column(Integer, nullable=False,default=0)
+    scrapnum= Column(Integer, nullable=False,default=0)
+    inboundnum= Column(Integer, nullable=False,default=0)
+    resalenum= Column(Integer, nullable=False,default=0)
+    comment= Column(String(64), nullable=True,default='')
+
 # class AnonymousUser(AnonymousUserMixin):
 #     def can(self, permissions):
 #         return False

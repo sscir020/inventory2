@@ -29,7 +29,7 @@ class AddClientForm(FlaskForm):
     submit = SubmitField('添加')
 
 class SearchMNForm(FlaskForm):
-    MN_id=StringField("MN号",validators=[DataRequired])
+    MN_id=StringField("MN号",validators=[DataRequired()])
     submit=SubmitField("搜索")
 # class ColorForm(FlaskForm):
 #     alarm_level=IntegerField("警戒值",validators=[DataRequired()])

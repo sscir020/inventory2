@@ -4,20 +4,22 @@
 {% block page_content %}
 <div>
     <h4>库存列表</h4>
-    <form action="{{ url_for('ctr.form_change_num',page=page) }}" method="post">
+    <form action="{{ url_for('ctr.form_change_material',page=page) }}" method="post">
 
-        <table class="table table-hover" class="table_orange">
+        <table class="table table-hover" id="table_orange">
              <thead>
                  <th>库存ID</th>
                  <th>库存名</th>
                  <th>库存数量</th>
-                 <th>备货数量</th>
+                 <th>修好数量</th>
+                 <th>报废数量</th>
                  <th>总数量</th>
+                 <th>备货数量</th>
                  <th>售出数量</th>
                  <th>售后售出数量</th>
                  <th>警戒值</th>
                  <th>参数模板ID</th>
-                 <th>数量-设备MN号-操作类型</th>
+                 <th>数量--操作类型--设备MN号</th>
              </thead>
              {% for entry in materials %}
              <tr id="tr_entry">
@@ -28,24 +30,27 @@
                  {% else %}
                  <td>{{entry.storenum}}</td>
                  {% endif %}
-                 <td>{{entry.preparenum}}</td>
+                 <td>{{entry.restorenum}}</td>
+                 <td>{{entry.scrapnum}}</td>
                  <td>{{entry.storenum+entry.preparenum}}</td>
+                 <td>{{entry.preparenum}}</td>
                  <td>{{entry.salenum}}</td>
                  <td>{{entry.resalenum}}</td>
                  <td>{{entry.alarm_level}}</td>
                  <td>{{entry.acces_id}}</td>
                  <td>
                      <input id="numcls1"  name="input_number_{{entry.material_id}}" type="number" class="text_acce">
-                     <input id="numcls2"  name="input_text_MN_{{entry.material_id}}" type="text">
                      <input id="numcls3"  name="input_oprlist_{{entry.material_id}}"  list="operations" >
                      <datalist id="operations">
                          <option value="购买">
                          <option value="返修">
-                         <option value="出库">
                          <option value="备货">
+                         <option value="出库">
+                         <option value="修好入库">
                          <option value="售后带回">
                          <option value="售后带出">
                     </datalist>
+                     <input id="numcls2"  name="input_text_MN_{{entry.material_id}}" type="text">
                  </td>
              </tr>
              {% endfor %}

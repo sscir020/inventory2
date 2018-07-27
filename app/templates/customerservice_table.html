@@ -4,41 +4,57 @@
 
 {% block page_content %}
 <div>
+    <h4>售后列表</h4>
     <form name="form_customerservice" method="post" >
-         <table  class="table table-hover" class="table_orange">
+         <table  class="table table-hover" id="table_orange">
              <thead>
                  <th>售后ID</th>
                  <th>MN号</th>
                  <th>材料ID</th>
-                 <th>数量</th>
+                 <th>总数量</th>
+                 <th>完好数量</th>
+                 <th>损坏数量</th>
+                 <th>修好数量</th>
+                 <th>报废数量</th>
+                 <th>入库数量</th>
                  <th>修改数量</th>
+                 <th>操作类型</th>
                  <th>备注(请勾选右侧)</th>
              </thead>
-             {% for entry in clients %}
+             {% for entry in customerservice %}
              <tr>
                  <td>{{entry.service_id}}</td>
                  <td>{{entry.MN_id}}</td>
                  <td>{{entry.material_id}}</td>
                  <!--<td>{{entry.isdevice}}</td>-->
-                 <td>{{entry.countnum}}</td>
-                 <td><input type="number" name="input_number_{{entry.service_id}}_{{entry.MN_id}}"></td>
+                 <td>{{entry.originnum}}</td>
+                 <td>{{entry.goodnum}}</td>
+                 <td>{{entry.brokennum}}</td>
+                 <td>{{entry.restorenum}}</td>
+                 <td>{{entry.scrapnum}}</td>
+                 <td>{{entry.inboundnum}}</td>
+                 <td><input type="number" name="input_number_{{entry.service_id}}_{{entry.material_id}}_{{entry.MN_id}}" max="{{entry.originnum}}"></td>
                  <td>
-                     <!--<input id="numcls3"  name="input_oprlist_{{entry.material_id}}"  list="operations" >-->
-                     <!--<datalist id="operations">-->
-                         <!--<option value="入库">-->
-                         <!--<option value="返修">-->
-                         <!--<option value="售后售出">-->
-                    <!--</datalist>-->
+                     <input id="numcls3"  name="input_oprlist_{{entry.service_id}}_{{entry.material_id}}_{{entry.MN_id}}"  list="operations" >
+                     <datalist id="operations">
+                         {% if entry.material_id==None or entry.material_id=='' %}
+                         <option value="设备售后售出">
+                         {% else %}
+                         <option value="售后损坏">
+                         <option value="售后返修">
+                         <option value="售后完好入库">
+                         <option value="售后修好入库">
+                         {% endif %}
+                    </datalist>
                  </td>
-                 <td><input class="text_comment" type="text" name="input_comment_{{entry.service_id}}_{{entry.MN_id}}" value="{{entry.comment}}">
-                     <input type="checkbox" name="input_checkbox_comment" value="{{entry.service_id}}_{{entry.MN_id}}"></td>
+                 <td><input class="text_comment" type="text" name="input_comment_{{entry.service_id}}_{{entry.material_id}}_{{entry.MN_id}}" value="{{entry.comment}}">
+                     <input type="checkbox" name="input_checkbox_comment" value="{{entry.service_id}}_{{entry.material_id}}_{{entry.MN_id}}"></td>
              </tr>
              {% endfor %}
          </table>
-         <input type="submit" name="input_submit_cinbound" value="材料售后入库提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_cinbound') }}';form_customerservice.submit()">
-         <input type="submit" name="input_submit_crework" value="材料售后返修提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_crework') }}';form_customerservice.submit()">
-         <input type="submit" name="input_submit_dresale" value="设备售后带出提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_dresale') }}';form_customerservice.submit()">
-        <input type="submit" value="备注提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.CUSTOMERSERVICE.name) }}';form_customerservice.submit()">
+         <input type="submit" name="input_submit_customerservice" value="操作提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_customerservice') }}';form_customerservice.submit()">
+         <!--<input type="submit" value="备注提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.CUSTOMERSERVICE.name) }}';form_customerservice.submit()">-->
+         <input type="submit" value="备注提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.CUSTOMERSERVICE.name) }}';form_customerservice.submit()">
     </form>
 </div>
 {% endblock %}

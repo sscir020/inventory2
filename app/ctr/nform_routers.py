@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import render_template,url_for,redirect,flash,session,request,current_app
 # from flask_login import login_user,logout_user,login_required,current_user
-from ..models import Opr,Material,User,Accessory,Buy,Rework,Device,Client
+from ..models import Opr,Material,User,Accessory,Buy,Rework,Device,Client,Customerservice
 from . import ctr
 # from ..__init__ import db
 from ..decorators import loggedin_required
@@ -84,7 +84,7 @@ def show_rework_materials():
     # pagination = dbsession.query(Rework).order_by(Rework.batch.desc()).\
     #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
     # reworkbatches=pagination.items
-    reworkbatches = dbsession.query(Rework.rework_id,Rework.material_id,Material.material_name,Rework.batch,Rework.num,Rework.comment). \
+    reworkbatches = dbsession.query(Rework.rework_id,Rework.material_id,Rework.MN_id,Material.material_name,Rework.batch,Rework.num,Rework.comment). \
         outerjoin(Material, Material.material_id == Rework.material_id).order_by(Rework.batch.desc()).all()
     return render_template('rework_material_table.html',reworkbatches=reworkbatches,json=json,CommentType=CommentType )
 
@@ -121,8 +121,8 @@ def show_join_oprs():
     # flash('操作记录')
     # db.session.flush()
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()
-    sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff,\
-                          Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary).\
+    sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff, \
+                          Opr.MN_id,Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary).\
                           outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).outerjoin(Client,Client.client_id==Opr.client_id).\
                           join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).limit(50)
     # print(sql)
@@ -141,7 +141,7 @@ def show_join_oprs_main():
     # db.session.flush()
     # sql1=db.session.query(Opr.opr_id,Opr.diff,User.user_name).join(User,User.user_id==Opr.user_id).all()#.join(User, User.user_id == Opr.user_id)\.filter(Opr.isgroup==True)
     sql = dbsession.query(Opr.opr_id,Material.material_id, Material.material_name,Device.device_id,Device.device_name,Client.client_id,Client.client_name,Opr.oprtype, Opr.diff,\
-                          Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary\
+                          Opr.MN_id,Opr.isgroup,Opr.oprbatch,Opr.comment, User.user_name,Opr.momentary\
                           ).outerjoin(Material,Material.material_id==Opr.material_id).outerjoin(Device,Device.device_id==Opr.device_id).outerjoin(Client,Client.client_id==Opr.client_id).\
                           join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).filter(Opr.isgroup==True).limit(50)
     # print(sql)
@@ -159,7 +159,7 @@ def material_isvalid_num_rev (m,diff,oprtype,batch):
     #     if diff<=0:
     #         flash("取消出库数量小于等于0")##
     #         return False
-    if oprtype == Oprenum.BUYING.name:
+    if oprtype == Oprenum.BUY.name:
         b = dbsession.query(Buy).filter(Buy.batch == batch).first()
         if b==None:
             flash("购买批次不存在"+str(batch))
@@ -227,7 +227,7 @@ def material_change_num_rev(m,diff,oprtype,batch):
         m.preparenum += diff
         dbsession.add_all([m])
     #     self.storenum -= diff
-    elif oprtype == Oprenum.BUYING.name:#++++
+    elif oprtype == Oprenum.BUY.name:#++++
         dbsession.query(Buy).filter(Buy.batch == batch).delete()
     elif oprtype == Oprenum.REWORK.name:#++++
         m.storenum += diff
@@ -381,6 +381,13 @@ def show_client_table():
     # db.session.flush()
     clients = dbsession.query(Client).all()
     return render_template("client_table.html", clients=clients,CommentType=CommentType)
+
+@ctr.route('/show_customerservice_table_get', methods=['GET', ''])
+@loggedin_required
+def show_customerservice_table():
+    # db.session.flush()
+    customerservice = dbsession.query(Customerservice).all()
+    return render_template("customerservice_table.html", customerservice=customerservice, CommentType=CommentType)
 #
 # @ctr.route('/rollback')
 # def rollback_opr():

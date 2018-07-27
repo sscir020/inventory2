@@ -5,7 +5,7 @@
 <div>
     <form name="form_buy" method="post">
         <h4>购买中列表</h4>
-         <table class="table table-hover" class="table_orange"><!--table-condensed-->
+         <table class="table table-hover" id="table_orange"><!--table-condensed-->
              <thead>
                  <th>购买ID</th>
                  <th>库存ID</th>
@@ -25,18 +25,22 @@
                      <td>{{entry.material_name}}</td>
                      <td>{{entry.batch}}</td>
                      <td>{{entry.num}}</td>
-                     <td><input type="number" class="text_acce" name="input_inbound_num_{{entry.material_id}}_{{entry.batch}}"></td>
-                         <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
-                     <td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{entry.batch}}" ></td>
+                     <td><input type="number" class="text_acce" name="input_number_{{entry.material_id}}_{{entry.batch}}"></td>
+                     <td>
+                         <input id="numcls3"  name="input_oprlist_{{entry.material_id}}_{{entry.batch}}"  list="operations" >
+                         <datalist id="operations">
+                             <option value="入库">
+                             <option value="取消订单">
+                        </datalist>
+                     </td>
                      <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}" value="{{entry.comment}}">
                           <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}" ></td>
                  </tr>
              {% endfor %}
          </table>
-         <input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">
-         <input type="submit" name="input_cancel_btn" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">
-         <input type="submit" name="input_comment_btn" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.BUY.name) }}';form_buy.submit()">
-
+         <!--<input type="submit" name="input_submit_cancel" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_change_buy') }}';form_buy.submit()">-->
+         <input type="submit" name="input_submit_opr" value="操作提交" onclick="form_buy.action='{{ url_for('ctr.form_change_buy') }}';form_buy.submit()">
+         <input type="submit" name="input_submit_comment" value="备注提交" onclick="form_buy.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.BUY.name) }}';form_buy.submit()">
     </form>
 </div>
 

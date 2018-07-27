@@ -58,49 +58,61 @@ from enum import Enum
 class CommentType(Enum):
     BUY=1
     REWORK=2
-    DEVICE=4
-    CLIENT = 3
-    COSTOMSERVICE=4
+    DEVICE=3
+    CLIENT =4
+    CUSTOMERSERVICE=5
+
+
 class Oprenum(Enum):
     INITADD = 1
     INBOUND = 2
     OUTBOUND = 3
     RESTORE = 4
     REWORK = 5
-    BUYING = 6
+    BUY = 6
     CANCELBUY=7
     SCRAP=8
     RECYCLE=9
     RESALE=10
     PREPARE=11
     DINITADD=12
-    DOUTBOUND=13
-    DRESALE = 14
-    CINITADD=15
-    CSINBOUND=16
-    CSREWORK=17
-    CSRESTORE=18
-    CSSCRAP=19
+    DPREPARE=13
+    DOUTBOUND=14
+    DRECYCLE=15
+    CINITADD=16
+    CSGINBOUND=17
+    CSRINBOUND=18
+    CSREWORK=19
+    CSRESTORE=20
+    CSSCRAP=21
+    CSBROKEN=22
+    CSRESALE =23
+    RINBOUND =24
 oprenumCH ={
     Oprenum.INITADD.name: '新添加材料',#
     Oprenum.INBOUND.name: '入库',
     Oprenum.OUTBOUND.name: '出库',
     Oprenum.RESTORE.name: '修好',
     Oprenum.REWORK.name: '返修中',
-    Oprenum.BUYING.name:"购买中",#
+    Oprenum.BUY.name:"购买中",#
     Oprenum.CANCELBUY.name:'取消购买',
     Oprenum.SCRAP.name:'报废',
     Oprenum.RECYCLE.name:'售后带回',
-    Oprenum.RESALE.name:'售后带出',
-    Oprenum.PREPARE.name:'备货中',#
+    Oprenum.RESALE.name:'售后售出',
+    Oprenum.PREPARE.name:'备货',#
     Oprenum.DINITADD.name:'新添加设备',
+    Oprenum.DPREPARE.name:'设备备货',
     Oprenum.DOUTBOUND.name:'设备出库',
-    Oprenum.DRESALE.name:'设备售后售出',
-    Oprenum.CINITADD.name:'新添加客户',
-    Oprenum.CSINBOUND.name:'售后入库',
-    Oprenum.CSREWORK.name:'售后返修',#
-    Oprenum.CSRESTORE.name:'售后修好',#
+    Oprenum.DRECYCLE.name:'设备售后带回',
+    Oprenum.CINITADD.name:'新添加客户',#
+    Oprenum.CSGINBOUND.name:'售后完好入库',
+    Oprenum.CSRINBOUND.name:'售后修好入库',
+    Oprenum.CSREWORK.name:'售后返修',
+    Oprenum.CSRESTORE.name:'售后修好',
     Oprenum.CSSCRAP.name:'售后报废',#
+    Oprenum.CSBROKEN.name:'售后损坏',
+    Oprenum.CSRESALE.name:'设备售后售出',
+    Oprenum.RINBOUND.name:'修好入库',
 }
 oprenumNum = {
     '新添加材料':Oprenum.INITADD,#
@@ -108,20 +120,25 @@ oprenumNum = {
     '出库':Oprenum.OUTBOUND,
     '修好':Oprenum.RESTORE,
     '返修':Oprenum.REWORK,
-    '购买':Oprenum.BUYING,#
+    '购买':Oprenum.BUY,#
     '取消购买':Oprenum.CANCELBUY,
     '报废':Oprenum.SCRAP,
     '售后带回':Oprenum.RECYCLE,
     '售后带出':Oprenum.RESALE,
     '备货':Oprenum.PREPARE,#
     '新添加设备':Oprenum.DINITADD,
+    '设备备货':Oprenum.DPREPARE,
     '设备出库':Oprenum.DOUTBOUND,
-    '设备售后售出':Oprenum.DRESALE,
+    '设备售后带回':Oprenum.DRECYCLE,
     '新添加客户':Oprenum.CINITADD,
-    '售后入库':Oprenum.CSINBOUND,#
+    '售后完好入库':Oprenum.CSGINBOUND,#
+    '售后修好入库':Oprenum.CSRINBOUND,#
     '售后返修':Oprenum.CSREWORK,
     '售后修好': Oprenum.CSRESTORE,
     '售后报废':Oprenum.CSSCRAP,
+    '售后损坏':Oprenum.CSBROKEN,
+    '设备售后售出':Oprenum.CSRESALE,
+    '修好入库':Oprenum.RINBOUND,
 }
 class Sensorname(Enum):
     P25 = 1
@@ -159,6 +176,12 @@ class Param(Enum):
     PARAM_5 = 5
     PARAM_3 = 3
     PARAM_0 = 0
+
+class Prt():
+    def prt(start='',arg1='',arg2='',arg3='',arg4='',arg5=''):
+        print("*********************************************************************")
+        print(str(start)+"-"+str(arg1)+"-"+str(arg2)+"-"+str(arg3)+"-"+str(arg4)+"-"+str(arg5))
+        print("---------------------------------------------------------------------")
 
 
 

@@ -4,8 +4,9 @@
 
 {% block page_content %}
 <div>
+    <h4>设备列表</h4>
     <form name="form_device" method="post">
-         <table  class="table table-hover" class="table_orange">
+         <table  class="table table-hover" id="table_orange">
              <thead>
                  <th>设备ID</th>
                  <th>MN号</th>
@@ -18,6 +19,7 @@
                  <th>配件组ID</th>
                  <th>配件组</th>
                  <th>出库数量</th>
+                 <th>操作</th>
                  <th>备注(请勾选右侧)</th>
              </thead>
              {% for entry in devices %}
@@ -42,13 +44,20 @@
                      {% endfor %}
                  </td>
                  <td><input type="number" name="input_number_{{entry.device_id}}_{{entry.MN_id}}" class="text_acce"></td>
+                 <td>
+                     <input id="numcls3"  name="input_oprlist_{{entry.material_id}}_{{entry.batch}}"  list="operations" >
+                     <datalist id="operations">
+                         <option value="备货">
+                         <option value="设备售后带回">
+                         <option value="设备出库">
+                     </datalist>
+                 </td>
                  <td><input type="text" class="text_comment"  name="input_comment_{{entry.device_id}}_{{entry.MN_id}}" value="{{entry.comment}}">
                      <input type="checkbox" name="input_checkbox_comment" value="{{entry.device_id}}_{{entry.MN_id}}"></td>
              </tr>
              {% endfor %}
         </table>
-        <input type="submit" name="input_submit_recycle" value="售后带回" onclick="form_device.action='{{ url_for('ctr.form_change_device_recycle') }}';form_device.submit()">
-        <input type="submit" name="input_submit_outbound" value="出库提交" onclick="form_device.action='{{ url_for('ctr.form_change_device_outbound') }}';form_device.submit()">
+        <input type="submit" name="input_submit_opr" value="操作提交" onclick="form_device.action='{{ url_for('ctr.form_change_device') }}';form_device.submit()">
         <input type="submit" name="input_submit_comment" value="备注提交" onclick="form_device.action='{{ url_for('ctr.form_change_comment',comment_type=CommentType.DEVICE.name) }}';form_device.submit()">
 
     </form>

@@ -23,7 +23,18 @@
 {% endfor %}
 </form>
 {% endblock %}
+         <!--<input type="submit" name="input_submit_cbroken" value="材料售后损坏提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_cbroken') }}';form_customerservice.submit()">-->
+         <!--<input type="submit" name="input_submit_cinbound" value="材料售后入库提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_cinbound') }}';form_customerservice.submit()">-->
+         <!--<input type="submit" name="input_submit_crework" value="材料售后返修提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_crework') }}';form_customerservice.submit()">-->
+        <!--<input type="submit" name="input_submit_recycle" value="售后带回" onclick="form_device.action='{{ url_for('ctr.form_change_device_recycle') }}';form_device.submit()">-->
+        <!--<input type="submit" name="input_submit_outbound" value="出库提交" onclick="form_device.action='{{ url_for('ctr.form_change_device_outbound') }}';form_device.submit()">-->
+                         <!--<input type="hidden" name="input_hidden_{{index}}_{{loop.index}}"  value="{{entry.material_id}}_{{batch}}"></td>-->
+                     <!--<td><input type="checkbox" name="input_checkbox_cancel" value="{{entry.material_id}}_{{entry.batch}}" ></td>-->
+<!--# materialid = request.form["input_hidden_" + str(index)]-->
 <!--onclick="form_buy.action='url_for(ctr.form_cancel_buy)';form_buy.submit()"-->
+
+         <!--<input type="submit" name="input_inbound_btn" value="到货提交" onclick="form_buy.action='{{ url_for('ctr.form_change_inbound_num') }}';form_buy.submit()">-->
+         <!--<input type="submit" name="input_cancel_btn" value="取消订单提交" onclick="form_buy.action='{{ url_for('ctr.form_cancel_buy') }}';form_buy.submit()">-->
 
 <!--{{Sensorname(key|int).name}}:{{acces[key]}}-->
 
@@ -32,3 +43,8 @@
                  <!--{% set index=loop.index %}-->
 
 <!--<td><input type="hidden" name="input_hidden_{{index}}_{{loop.index}}" value="{{entry.material_id}}_{{batch}}">-->
+
+         <!--<input type="submit" name="input_submit_restore" value="修好提交"       onclick="form_rework.action='{{ url_for('ctr.form_change_restore_num') }}';form_rework.submit()">-->
+         <!--<input type="submit" name="input_submit_scrap" value="报废提交"         onclick="form_rework.action='{{ url_for('ctr.form_change_scrap') }}';form_rework.submit()">-->
+         <!--<input type="submit" name="input_submit_crestore" value="售后修好提交" onclick="form_rework.action='{{ url_for('ctr.form_change_crestore_num') }}';form_rework.submit()">-->
+         <!--<input type="submit" name="input_submit_cscrap" value="售后报废提交"   onclick="form_rework.action='{{ url_for('ctr.form_change_cscrap') }}';form_rework.submit()">-->
