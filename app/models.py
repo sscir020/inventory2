@@ -40,6 +40,7 @@ class Material(Base):
     material_id=Column(Integer,nullable=False,primary_key=True)
     material_name=Column(String(64),nullable=False, unique=True, index=True)##### no defalut
     storenum=Column(Integer,nullable=False,default=0)
+    restorenum=Column(Integer,nullable=False,default=0)
     scrapnum=Column(Integer,nullable=False,default=0)
     preparenum=Column(Integer,nullable=False,default=0)
     salenum=Column(Integer,nullable=False,default=0)
@@ -122,7 +123,7 @@ class Customerservice(Base):
     service_id= Column(Integer, nullable=False, primary_key=True)
     MN_id=Column(String(32), nullable=False)
     material_id=Column(Integer,ForeignKey('materials.material_id'))
-    isdevice=Column(Boolean,nullable=False,default=0)
+    device_id=Column(Integer,ForeignKey('devices.device_id'))
     originnum= Column(Integer, nullable=False,default=0)
     goodnum= Column(Integer, nullable=False,default=0)
     brokennum= Column(Integer, nullable=False,default=0)

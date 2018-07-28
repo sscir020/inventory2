@@ -23,6 +23,9 @@
 {% endfor %}
 </form>
 {% endblock %}
+<!--{% if entry.material_id=='None' %}-->
+                             <!--{% if entry.MN_id != '0' %}-->
+<!--# or entry.MN_id != '' or entry.MN_id != 'None' or -->
          <!--<input type="submit" name="input_submit_cbroken" value="材料售后损坏提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_cbroken') }}';form_customerservice.submit()">-->
          <!--<input type="submit" name="input_submit_cinbound" value="材料售后入库提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_cinbound') }}';form_customerservice.submit()">-->
          <!--<input type="submit" name="input_submit_crework" value="材料售后返修提交" onclick="form_customerservice.action='{{ url_for('ctr.form_change_crework') }}';form_customerservice.submit()">-->

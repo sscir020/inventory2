@@ -86,10 +86,12 @@ drop table  if exists oprs;
 create table oprs(
 		opr_id int not null auto_increment,
 		user_id int not null,
-		material_id int,
-		device_id int,
-		MN_id varchar(32),
-		diff int not null,
+		material_id int null,
+		device_id int null,
+		client_id int null,
+		service_id int null,
+		MN_id varchar(32) default '',
+		diff int not null default 0,
 		oprtype varchar(32) not null,
 		oprbatch varchar(32) not null default '',
 		isgroup tinyint(1) not null default 0,
@@ -98,7 +100,10 @@ create table oprs(
 		primary key (opr_id),
 		unique(opr_id),
 		foreign key (user_id) references users(user_id),
-		foreign key (material_id) references materials(material_id)
+		foreign key (material_id) references materials(material_id),
+		foreign key (device_id) references devices(device_id),
+		foreign key (client_id) references clients(client_id),
+		foreign key (service_id) references customerservice(service_id)
 		);
 
 create table customerservice(

@@ -13,8 +13,8 @@
                  <th>库存数量</th>
                  <th>修好数量</th>
                  <th>报废数量</th>
-                 <th>总数量</th>
                  <th>备货数量</th>
+                 <th>总数量</th>
                  <th>售出数量</th>
                  <th>售后售出数量</th>
                  <th>警戒值</th>
@@ -32,8 +32,8 @@
                  {% endif %}
                  <td>{{entry.restorenum}}</td>
                  <td>{{entry.scrapnum}}</td>
-                 <td>{{entry.storenum+entry.preparenum}}</td>
                  <td>{{entry.preparenum}}</td>
+                 <td>{{entry.storenum+entry.restorenum+entry.preparenum}}</td>
                  <td>{{entry.salenum}}</td>
                  <td>{{entry.resalenum}}</td>
                  <td>{{entry.alarm_level}}</td>

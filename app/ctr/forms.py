@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired,EqualTo
 
 class AddMaterialForm(FlaskForm):
     materialname=StringField("材料名",validators=[DataRequired()])
-    countnum=IntegerField("数量",  validators=[DataRequired()])
+    storenum=IntegerField("数量",  validators=[DataRequired()])
     alarm_level=IntegerField("警戒值",  validators=[DataRequired()])
     submit=SubmitField('添加')
 
