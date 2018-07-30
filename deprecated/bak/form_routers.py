@@ -270,18 +270,45 @@ def material_isvalid_num(m,diff,oprtype,batch,MN_id):
         if diff > m.preparenum:
             flash("设备出库数量大于备货数量"+str(diff)+">"+str(m.preparenum))
             return False
-
+    elif oprtype == Oprenum.CSRESTORE.name:
+        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+        if b == None:
+            flash("返修批次不存在" + str(batch))
+            return False
+        if diff > b.num :
+            flash("修好数量大于返修批次数量"+str(diff)+">"+str(b.num))
+            return False
+    elif oprtype == Oprenum.CSSCRAP.name:
+        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+        if b == None:
+            flash("返修批次不存在" + str(batch))
+            return False
+        if diff > b.num :
+            flash("报废数量大于返修批次数量"+str(diff)+">"+str(b.num))
+            return False
+    elif oprtype == Oprenum.CSGINBOUND.name:
+        c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(Customerservice.MN_id == MN_id).first()
+        if diff > c.goodnum:
+            flash("入库数量大于售后完好数量"+str(diff)+">"+str(c.goodnum))
+            return False
+        if c.inboundnum + diff > c.goodnum + c.restorenum:
+            flash("入库数量大于售后带回数量"+str(diff)+str(c.inboundnum)+">"+str(c.goodnum))+str(c.restorenum)
+            return False
+        else:
+            c.inboundnum+=diff
+    elif oprtype == Oprenum.CSRINBOUND.name:
+        c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(Customerservice.MN_id == MN_id).first()
+        if diff > c.restorenum:
+            flash("入库数量大于售后修好数量"+str(diff)+">"+str(c.goodnum))
+            return False
+        if c.inboundnum + diff > c.goodnum + c.restorenum:
+            flash("入库数量大于售后带回数量"+str(diff)+str(c.inboundnum)+">"+str(c.goodnum))+str(c.restorenum)
+            return False
+        else:
+            c.inboundnum+=diff
     elif oprtype == Oprenum.RINBOUND.name:
         if diff > m.restorenum:
             flash("修好入库数量大于修好数量")
-    elif oprtype == Oprenum.CSRESTORE.name:
-        pass
-    elif oprtype == Oprenum.CSSCRAP.name:
-        pass
-    elif oprtype == Oprenum.CSGINBOUND.name:
-        pass
-    elif oprtype == Oprenum.CSRINBOUND.name:
-        pass
     else:
         flash("操作类型错误_判断"+str(oprtype))
         return False
@@ -369,17 +396,42 @@ def material_change_num(m,diff,oprtype,batch,MN_id):
         elif oprtype == Oprenum.DOUTBOUND.name:
             m.preparenum -= diff
             m.salenum += diff
+        elif oprtype == Oprenum.CSRESTORE.name:
+            b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+            c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(Customerservice.MN_id == MN_id).first()
+            b.num -= diff
+            c.reworknum-=diff
+            c.restorenum+=diff
+            if b.num == 0:
+                dbsession.query(Rework).filter(Rework.batch == batch).delete()
+            else:
+                dbsession.add_all([b,c])
+        elif oprtype == Oprenum.CSSCRAP.name:
+            b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+            c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(Customerservice.MN_id == MN_id).first()
+            b.num -= diff
+            c.reworknum -= diff
+            c.scrapnum+=diff
+            if b.num == 0:
+                dbsession.query(Rework).filter(Rework.batch == batch).delete()
+            else:
+                dbsession.add_all([b,c])
+        elif oprtype == Oprenum.CSGINBOUND.name:
+            c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(Customerservice.MN_id == MN_id).first()
+            c.goodnum-=diff
+            c.inboundnum+=diff
+            m.storenum+=diff
+            dbsession.add_all([c])
+        elif oprtype == Oprenum.CSRINBOUND.name:
+            c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+                Customerservice.MN_id == MN_id).first()
+            c.restorenum-= diff
+            c.inboundnum += diff
+            m.storenum += diff
+            dbsession.add_all([c])
         elif oprtype == Oprenum.RINBOUND.name:
             m.restorenum-=diff
             m.storenum+=diff
-        elif oprtype == Oprenum.CSRESTORE.name:
-            pass
-        elif oprtype == Oprenum.CSSCRAP.name:
-            pass
-        elif oprtype == Oprenum.CSGINBOUND.name:
-            pass
-        elif oprtype == Oprenum.CSRINBOUND.name:
-            pass
         else:
             flash("操作类型错误_变量"+str(oprtype))
             value='-1'
@@ -500,7 +552,7 @@ def form_change_customerservice():
                     # string = request.form["input_hidden_" + str(index)]
                     break
         if diff > 0:
-            # print(request.form)
+            print(request.form)
             Prt.prt(string)
             oprtypech=request.form["input_oprlist_" + str(string)]
             if oprtypech!='' and oprtypech in oprenumNum.keys():
@@ -558,13 +610,13 @@ def form_change_customerservice():
                             c.sleep(1)
                             batch = datetime.datetime.now()
                             b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-                        b = Rework(batch=batch, material_id=c.material_id,service_id=service_id, num=diff, MN_id=MN_id)
+                        b = Rework(batch=batch, material_id=c.material_id, num=diff, MN_id=MN_id)
                         if diff>c.brokennum:
                             flash("返修数量大于损坏数量")
                         else:
                             c.brokennum -= diff
                             c.reworknum += diff
-                            o = Opr(material_id=c.material_id,MN_id=MN_id,service_id=service_id, diff=diff, user_id=session['userid'],
+                            o = Opr(material_id=c.material_id,MN_id=MN_id, diff=diff, user_id=session['userid'],
                                     oprtype=Oprenum.CSREWORK.name,
                                     isgroup=True, oprbatch='',  comment=c.comment, \
                                     momentary=datetime.datetime.now())
@@ -586,8 +638,7 @@ def form_change_customerservice():
                             # if diff <= c.restorenum:
                             c.inboundnum+=diff
                             # else:
-                            flash("入库数量大于修好"
-                                  "量")
+                            flash("入库数量大于修好数量")
                     else:
                         flash("操作类型错误")
                 else:
@@ -743,93 +794,7 @@ def form_change_buy():
         else:
             flash("请正确填写数量")
     return redirect(url_for('ctr.show_buy_materials'))
-def customerservice_change_num(cs,m,diff, oprtype, batch,MN_id):
-    if oprtype == Oprenum.CSRESTORE.name:
-        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-        if b == None:
-            flash("返修批次不存在" + str(batch))
-            return False
-        if diff > b.num:
-            flash("修好数量大于返修批次数量" + str(diff) + ">" + str(b.num))
-            return False
-    elif oprtype == Oprenum.CSSCRAP.name:
-        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-        if b == None:
-            flash("返修批次不存在" + str(batch))
-            return False
-        if diff > b.num:
-            flash("报废数量大于返修批次数量" + str(diff) + ">" + str(b.num))
-            return False
-    elif oprtype == Oprenum.CSGINBOUND.name:
-        if diff > cs.goodnum:
-            flash("入库数量大于售后完好数量" + str(diff) + ">" + str(cs.goodnum))
-            return False
-        if cs.inboundnum + diff > cs.goodnum + cs.restorenum:
-            flash("入库数量大于售后带回数量" + str(diff) + str(cs.inboundnum) + ">" + str(cs.goodnum)) + str(cs.restorenum))
-            return False
-    elif oprtype == Oprenum.CSRINBOUND.name:
-        if diff > cs.restorenum:
-            flash("入库数量大于售后修好数量" + str(diff) + ">" + str(cs.goodnum))
-            return False
-        if cs.inboundnum + diff > cs.goodnum + cs.restorenum:
-            flash("入库数量大于售后带回数量" + str(diff) + str(cs.inboundnum) + ">" + str(cs.goodnum)) + str(cs.restorenum))
-            return False
-     return True
 
-def customerservice_change_num(cs,m,diff, oprtype, batch,MN_id):
-    value=0
-    if oprtype == Oprenum.CSRESTORE.name:
-        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-        b.num -= diff
-        cs.reworknum-=diff
-        cs.restorenum+=diff
-        if b.num == 0:
-            dbsession.query(Rework).filter(Rework.batch == batch).delete()
-        else:
-            dbsession.add_all([b,cs])
-    elif oprtype == Oprenum.CSSCRAP.name:
-        b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-        b.num -= diff
-        cs.reworknum -= diff
-        cs.scrapnum+=diff
-        if b.num == 0:
-            dbsession.query(Rework).filter(Rework.batch == batch).delete()
-        else:
-            dbsession.add_all([b,cs])
-    elif oprtype == Oprenum.CSGINBOUND.name:
-        cs.goodnum -= diff
-        cs.inboundnum += diff
-        m.storenum += diff
-        dbsession.add_all([cs])
-    elif oprtype == Oprenum.CSRINBOUND.name:
-        cs.restorenum -= diff
-        cs.inboundnum += diff
-        m.storenum += diff
-        dbsession.add_all([cs])
-    return value
-
-def customerservice_change_num(oprtype,materialid, service_id,MN_id,diff,isgroup,batch,comment):#BUY,REWORK,OUTBOUND,INBOUND,RESTORE,SCRAP #INITADD,CANCELBUY
-    Prt.prt('service_id:' + str(service_id) ,'MN_id:' + str(MN_id) ,  "diff:" + str(diff) , "oprtype:" + str(oprtype) , "batch:" + str(batch))
-    s = dbsession.query(Customerservice).filter(Customerservice.service_id==service_id).first()
-    m = dbsession.query(Material).filter(Material.material_id==materialid).first()
-    if s == None:
-        flash("售后不存在")
-        return False
-    elif m == None:
-        flash("材料名不存在")
-        return False
-    elif material_isvalid_num(m=m,diff=diff, oprtype=oprtype, batch=batch,MN_id=MN_id) == False:
-        flash("数量超标")
-        return False
-    else:
-        value=customerservice_change_num(s=s,m=m,diff=diff, oprtype=oprtype, batch=batch,MN_id=MN_id)
-        o = Opr(service_id=service_id, MN_id=MN_id, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=isgroup,
-                oprbatch=value,comment=comment, momentary=datetime.datetime.now())
-        dbsession.add_all([s,o])
-        dbsession.commit()
-        dbsession.flush()
-        # dbsession.close()
-    return True
 
 @ctr.route('/form_change_rework_act', methods=['', 'POST'])
 @loggedin_required
@@ -852,7 +817,6 @@ def form_change_rework():
                 list = string.split('_')
                 materialid = list[0]
                 batch = list[1]
-                service_id = list[2]
                 MN_id = list[2]
                 # print("MN_id"+str(MN_id))
                 if oprtype==Oprenum.RESTORE.name:
@@ -866,22 +830,15 @@ def form_change_rework():
                     else:
                         flash("返修列表-报废更新失败")
                 elif oprtype == Oprenum.CSRESTORE.name:
-                    Prt.prt(list)
-                    if materialid=='None':
-                        if change_customerservice_oprs_db(oprtype=oprtype, materialid=materialid, service_id=service_id,MN_id=MN_id,diff=diff, isgroup=True,batch=batch, comment=comment):
-                            flash("售后列表-售后修好更新成功")
-                        else:
-                            flash("售后列表-售后修好更新失败")
+                    if change_materials_oprs_db(oprtype=oprtype, materialid=materialid, MN_id=MN_id,diff=diff, isgroup=True,batch=batch, comment=comment):
+                        flash("返修列表-售后修好更新成功")
                     else:
-                        flash("返修列表-不是售后")
+                        flash("返修列表-售后修好更新失败")
                 elif oprtype == Oprenum.CSSCRAP.name:
-                    if materialid == 'None':
-                        if change_customerservice_oprs_db(oprtype=oprtype, materialid=materialid, service_id=service_id,MN_id=MN_id, diff=diff, isgroup=True, batch=batch, comment=comment):
-                            flash("售后列表-售后报废更新成功")
-                        else:
-                            flash("售后列表-售后报废更新失败")
+                    if change_materials_oprs_db(oprtype=oprtype, materialid=materialid, MN_id=MN_id, diff=diff, isgroup=True, batch=batch, comment=comment):
+                        flash("返修列表-售后报废更新成功")
                     else:
-                        flash("返修列表-不是售后")
+                        flash("返修列表-售后报废更新失败")
                 else:
                     flash("操作类型错误")
             else:
@@ -972,4 +929,3 @@ def form_change_comment(comment_type):
     else:
         flash("备注类型错误")
 
-#

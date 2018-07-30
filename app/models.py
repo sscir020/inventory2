@@ -67,7 +67,7 @@ class Rework(Base):
     __tablename__='reworks'
     rework_id=Column(Integer,nullable=False,primary_key=True)
     material_id = Column(Integer,ForeignKey('materials.material_id'))
-    device_id = Column(Integer,ForeignKey('devices.device_id'))
+    service_id = Column(Integer,ForeignKey('Customerservice.service_id'))
     MN_id = Column(String(32), nullable=True, default='')
     batch=Column(String(32),nullable=False,unique=True,index=True,default='')
     num=Column(Integer,nullable=False,default=0)
@@ -129,6 +129,7 @@ class Customerservice(Base):
     originnum= Column(Integer, nullable=True,default=0)
     goodnum= Column(Integer, nullable=True,default=0)
     brokennum= Column(Integer, nullable=True,default=0)
+    reworknum= Column(Integer, nullable=True,default=0)
     restorenum= Column(Integer, nullable=True,default=0)
     scrapnum= Column(Integer, nullable=True,default=0)
     inboundnum= Column(Integer, nullable=True,default=0)

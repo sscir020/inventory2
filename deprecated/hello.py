@@ -346,3 +346,319 @@ if __name__ == '__main__':
         #     else:
         #         flash("需要填写")
         #     return render_template('add_client_form1.html')
+
+    # @ctr.route('/form_chang_scrap_act', methods=['', 'POST'])
+    # @loggedin_required
+    # def form_change_scrap():
+    #     if request.method=="POST":
+    #         diff=0
+    #         for key in request.form:
+    #             if "input_restore_num_" in key and request.form[key]!='':
+    #                 diff = convert_str_num(request.form[key])
+    #                 if diff > 0:
+    #                     string=key[18:]
+    #                     # string = request.form["input_hidden_" + str(index)]
+    #                     break
+    #         if diff > 0:
+    #             comment=request.form['input_comment_'+string]
+    #             list = string.split('_')
+    #             materialid = list[0]
+    #             batch = list[1]
+    #             change_materials_oprs_db(oprtype=Oprenum.SCRAP.name, materialid=materialid, diff=diff, isgroup=True, batch=batch, comment=comment)
+    #         else:
+    #             flash("请正确填写修好数量")
+    #     return redirect(url_for('ctr.show_rework_materials'))
+
+    #
+    # @ctr.route('/form_change_device_outbound_act',methods=['','POST'])
+    # @loggedin_required
+    # def form_device_outbound():
+    #     device_id=0
+    #     if request.method=="POST":
+    #         diff=0
+    #         for key in request.form:
+    #             if "input_number_" in key and request.form[key]!='':
+    #                 diff = convert_str_num(request.form[key])
+    #                 if diff > 0:
+    #                     string=key[13:]#input_number_
+    #                     break
+    #         if diff > 0:
+    #             comment=request.form['input_comment_'+string]
+    #             list = string.split('_')
+    #             device_id = list[0]
+    #             MN_id = list[1]
+    #             d=dbsession.query(Device).filter(Device.device_id==device_id).first()
+    #             if d!= None:
+    #                 if diff <= d.preparenum:
+    #                     if d.acces_id != None and d.acces_id != 0:
+    #                         a = dbsession.query(Accessory).filter_by(acces_id=d.acces_id).first()
+    #                         if a!=None:
+    #                             data = json.loads(a.param_acces)
+    #                             for materialid in data:
+    #                                 num = int(data[materialid])
+    #                                 num = num * diff
+    #                                 m=dbsession.query(Material).filter_by(material_id=materialid).first()
+    #                                 if material_isvalid_num(m=m,diff=num, oprtype=Oprenum.DOUTBOUND, batch='') ==False:
+    #                                     flash("配件数量不足")
+    #                                     return redirect(url_for('ctr.show_device_table'))
+    #                             for materialid in data:
+    #                                 num = int(data[materialid])
+    #                                 num = num * diff
+    #                                 change_materials_oprs_db(oprtype=Oprenum.DOUTBOUND, materialid=materialid, diff=num, isgroup=False,batch='', comment='')
+    #                             d.preparenum -= diff
+    #                             d.salenum += diff
+    #                             # d.preparenum += diff
+    #                             o = Opr(device_id=device_id, diff=diff, user_id=session['userid'],oprtype=Oprenum.DOUTBOUND.name, isgroup=True, oprbatch='', comment=d.comment, \
+    #                                     MN_id=d.MN_id,momentary=datetime.datetime.now())  # .strftime("%Y-%m-%d %H:%M:%S")
+    #                             dbsession.add_all([d,o])
+    #                             dbsession.commit()
+    #                             dbsession.flush()
+    #                             flash("设备出库更新成功")
+    #                         else:
+    #                             flash("设备参数不存在")
+    #                     else:
+    #                         flash("设备参数等于空或0")
+    #                 else:
+    #                     flash("出货数量大于备货数量")
+    #             else:
+    #                 flash("设备不存在")
+    #         else:
+    #             flash("请正确填写修好数量")
+    #     return redirect(url_for('ctr.show_device_table'))
+
+    #
+    # @ctr.route('/form_cancel_buy_act', methods=['', 'POST'])
+    # @loggedin_required
+    # def form_cancel_buy():
+    #     if request.method=="POST":
+    #         # print(request.form)
+    #         if "input_checkbox_cancel" in request.form:
+    #             list=request.form["input_checkbox_cancel"].split('_')
+    #             materialid=list[0]
+    #             batch=list[1]
+    #             b = dbsession.query(Buy).filter(Buy.batch==batch).first()
+    #             diff=b.num
+    #             o = Opr(material_id=materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.CANCELBUY.name, isgroup=True,oprbatch=batch,comment=b.comment, \
+    #                     momentary=datetime.datetime.now())#.strftime("%Y-%m-%d %H:%M:%S")
+    #             dbsession.query(Buy).filter(Buy.batch==batch).delete()
+    #             # dbsession.commit()
+    #             dbsession.add(o)
+    #             dbsession.commit()
+    #             dbsession.flush()
+    #             flash("订单取消成功")
+    #         else:
+    #             flash("请勾选订单并提交")
+    #     return redirect(url_for('ctr.show_buy_materials'))
+    # @ctr.route('/add_material_act', methods=['', 'POST'])
+    # @loggedin_required
+    # def add_material():
+    #     if request.method == "POST":
+    #         materialname=request.form['input_text_material_name']
+    #         storenum=convert_str_num(request.form['input_number_countnum'])
+    #         alarm_level=convert_str_num(request.form['input_number_alarm_level'])
+    #         if materialname!=None and materialname!=''and alarm_level>0 :
+    #         # if 'input_accessory_list' in request.form:
+    #         #     list=request.form['input_accessory_list']
+    #         # list1 = request.form
+    #         # print(list1)
+    #             if dbsession.query(Material).filter_by(material_name=materialname).first() == None:
+    #                 m = Material(material_name=materialname, storenum=storenum, acces_id=0,alarm_level=alarm_level)
+    #                 dbsession.add(m)
+    #                 dbsession.commit()
+    #                 dbsession.flush()
+    #                 m=dbsession.query(Material).filter_by(material_name=materialname).first()
+    #                 o=Opr(material_id=m.material_id,diff=storenum,user_id=session['userid'],oprtype=Oprenum.INITADD.name, isgroup=True,oprbatch='', \
+    #                       momentary=datetime.datetime.now())
+    #                 dbsession.add(o)
+    #                 dbsession.commit()
+    #                 dbsession.flush()
+    #                 flash('新材料添加成功')
+    #                 return redirect(url_for('ctr.show_material_table',page=1))
+    #             else:
+    #                 flash('材料名已存在')
+    #         else:
+    #             flash('请正确填写材料名称和数量')
+    #     return redirect(url_for('ctr.show_add_material'))
+
+    # @ctr.route('/form_change_dresale_act', methods=['', 'POST'])
+    # @loggedin_required
+    # def form_change_dresale():
+    #     if request.method=="POST":
+    #         diff=0
+    #         for key in request.form:
+    #             if "input_number_" in key and request.form[key]!='':
+    #                 diff = convert_str_num(request.form[key])
+    #                 if diff > 0:
+    #                     string=key[13:]
+    #                     # string = request.form["input_hidden_" + str(index)]
+    #                     break
+    #         if diff > 0:
+    #             comment=request.form['input_comment_'+string]
+    #             list = string.split('_')
+    #             device_id = list[0]
+    #             MN_id = list[1]
+    #             c=dbsession.query(Customerservice).filter(Customerservice.MN_id==MN_id).first()
+    #             d=dbsession.query(Device).filter(Device.MN_id==MN_id).first()
+    #             if c==None:
+    #                 flash("售后不存在")
+    #             elif d==None:
+    #                 flash("设备不存在")
+    #             else:
+    #                 if diff>c.recyclenum:
+    #                     flash("售后带出数量大于售后带回数量")
+    #                 else:
+    #                     c.recyclenum-=diff
+    #                     d.resalenum+=diff
+    #                     o = Opr(device_id=d.device_id, diff=diff, user_id=session['userid'], oprtype=Oprenum.DRESALE.name,
+    #                             isgroup=True, oprbatch='', MN_id=MN_id,comment=c.comment, momentary=datetime.datetime.now())
+    #                     if c.recyclenum==0:
+    #                         dbsession.query(Customerservice).filter(Customerservice.MN_id==MN_id).delete()
+    #                         dbsession.add_all([d,o])
+    #                         dbsession.commit()
+    #                         dbsession.flush()
+    #                     else:
+    #                         dbsession.add_all([c,d,o])
+    #                         dbsession.commit()
+    #                         dbsession.flush()
+    #         else:
+    #             flash("请正确填写修好数量")
+    #     return redirect(url_for('ctr.show_device_table'))
+
+
+    # @ctr.route('/form_change_crework_act', methods=['', 'POST'])
+    # @loggedin_required
+    # def form_change_crework():
+    #     if request.method=="POST":
+    #         diff=0
+    #         for key in request.form:
+    #             if "input_number_" in key and request.form[key]!='':
+    #                 diff = convert_str_num(request.form[key])
+    #                 if diff > 0:
+    #                     string=key[13:]
+    #                     # string = request.form["input_hidden_" + str(index)]
+    #                     break
+    #         if diff > 0:
+    #             comment=request.form['input_comment_'+string]
+    #             list = string.split('_')
+    #             service_id = list[0]
+    #             MN_id = list[1]
+    #             c = dbsession.query(Customerservice).filter(Customerservice.MN_id == MN_id).first()
+    #             batch=datetime.datetime.now()
+    #             b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+    #             while b!=None:
+    #                 c.sleep(1)
+    #                 batch = datetime.datetime.now()
+    #                 b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+    #             b=Rework(batch=batch,material_id=c.material_id,num=diff,MN_id=MN_id)
+    #             c.recyclenum -= diff
+    #             o = Opr(materialid=c.materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.CSREWORK.name,
+    #                     isgroup=True, oprbatch='', MN_id=MN_id, comment=c.comment, \
+    #                     momentary=datetime.datetime.now())
+    #
+    #             dbsession.add_all([b,c,o])
+    #             dbsession.commit()
+    #             dbsession.flush()
+    #         else:
+    #             flash("请正确填写返修数量")
+    #     return redirect(url_for('ctr.show_customerservice'))
+
+    # @ctr.route('/form_change_cinbound_act', methods=['', 'POST'])
+    # @loggedin_required
+    # def form_change_cinbound():
+    #     if request.method=="POST":
+    #         diff=0
+    #         for key in request.form:
+    #             if "input_number_" in key and request.form[key]!='':
+    #                 diff = convert_str_num(request.form[key])
+    #                 if diff > 0:
+    #                     string=key[13:]
+    #                     # string = request.form["input_hidden_" + str(index)]
+    #                     break
+    #         if diff > 0:
+    #             comment=request.form['input_comment_'+string]
+    #             list = string.split('_')
+    #             service_id = list[0]
+    #             MN_id = list[1]
+    #             c=dbsession.query(Customerservice).filter(Customerservice.MN_id==MN_id).first()
+    #             m=dbsession.query(Material).filter(Material.material_id==c.materialid).first()
+    #             if c==None:
+    #                 flash("售后不存在")
+    #             elif m==None:
+    #                 flash("材料不存在")
+    #             else:
+    #                 if diff>c.recyclenum:
+    #                     flash("入库数量大于售后带回数量")
+    #                 else:
+    #                     c.recyclenum-=diff
+    #                     m.storenum+=diff
+    #                     o = Opr(materialid=c.materialid, diff=diff, user_id=session['userid'], oprtype=Oprenum.CSINBOUND.name,
+    #                             isgroup=True, oprbatch='', MN_id=MN_id,comment=c.comment, \
+    #                             momentary=datetime.datetime.now())
+    #                     if c.recyclenum==0:
+    #                         dbsession.query(Customerservice).filter(Customerservice.MN_id==MN_id).delete()
+    #                         dbsession.add_all([m,o])
+    #                         dbsession.commit()
+    #                         dbsession.flush()
+    #                     else:
+    #                         dbsession.add_all([c, m, o])
+    #                         dbsession.commit()
+    #                         dbsession.flush()
+    #         else:
+    #             flash("请正确填写修好数量")
+    #     return redirect(url_for('ctr.show_customerservice'))
+
+# def change_materials_oprs_db(oprtype,materialid,MN_id,diff,isgroup,batch,comment):#BUY,REWORK,OUTBOUND,INBOUND,RESTORE,SCRAP #INITADD,CANCELBUY
+#     print('materialid:' + str(materialid) +'MN_id:' + str(MN_id) +  ",diff:" + str(diff) + ",oprtype:" + str(oprtype) + ",batch:" + str(batch))
+#     m = dbsession.query(Material).filter(Material.material_id==materialid).first()
+#     if m == None:
+#         flash("材料名不存在")
+#         return False
+#     elif material_isvalid_num(m=m,diff=diff, oprtype=oprtype, batch=batch,MN_id=MN_id) == False:
+#         flash("数量超标")
+#         return False
+#     else:
+#         value=material_change_num(m=m,diff=diff, oprtype=oprtype, batch=batch,MN_id=MN_id)
+#         o = Opr(material_id=materialid, MN_id=MN_id, diff=diff, user_id=session['userid'], oprtype=oprtype, isgroup=isgroup,
+#                 oprbatch=value,comment=comment, momentary=datetime.datetime.now())
+#         dbsession.add_all([m,o])
+#         dbsession.commit()
+#         dbsession.flush()
+#         # dbsession.close()
+#     return True
+
+# elif oprtype == Oprenum.CSRESTORE.name:
+# b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+# c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#     Customerservice.MN_id == MN_id).first()
+# b.num -= diff
+# c.reworknum -= diff
+# c.restorenum += diff
+# if b.num == 0:
+#     dbsession.query(Rework).filter(Rework.batch == batch).delete()
+# else:
+#     dbsession.add_all([b, c])
+# elif oprtype == Oprenum.CSSCRAP.name:
+# b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+# c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#     Customerservice.MN_id == MN_id).first()
+# b.num -= diff
+# c.reworknum -= diff
+# c.scrapnum += diff
+# if b.num == 0:
+#     dbsession.query(Rework).filter(Rework.batch == batch).delete()
+# else:
+#     dbsession.add_all([b, c])
+# elif oprtype == Oprenum.CSGINBOUND.name:
+# c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#     Customerservice.MN_id == MN_id).first()
+# c.goodnum -= diff
+# c.inboundnum += diff
+# m.storenum += diff
+# dbsession.add_all([c])
+# elif oprtype == Oprenum.CSRINBOUND.name:
+# c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#     Customerservice.MN_id == MN_id).first()
+# c.restorenum -= diff
+# c.inboundnum += diff
+# m.storenum += diff
+# dbsession.add_all([c])

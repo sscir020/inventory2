@@ -10,7 +10,7 @@
                  <th>返修ID</th>
                  <th>库存ID</th>
                  <th>库存名称</th>
-                 <!--<th>设备ID</th>-->
+                 <th>售后ID</th>
                  <th>MN号</th>
                  <th>返修批次</th>
                  <th>返修数量</th>
@@ -24,7 +24,7 @@
                      <td>{{entry.rework_id}}</td>
                      <td>{{entry.material_id}}</td>
                      <td>{{entry.material_name}}</td>
-                     <!--<td>{{entry.device_id}}</td>-->
+                     <td>{{entry.service_id}}</td>
                       <td>
                           {% if entry.MN_id != '0' %}
                           {{entry.MN_id}}
@@ -32,18 +32,23 @@
                      </td>
                      <td>{{entry.batch}}</td>
                      <td>{{entry.num}}</td>
-                     <td><input type="number" class="text_acce" name="input_number_{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}"></td>
+                     <td><input type="number" class="text_acce" name="input_number_{{entry.material_id}}_{{entry.batch}}_{{entry.service_id}}_{{entry.MN_id}}"></td>
                      <td>
-                         <input id="numcls3"  name="input_oprlist_{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}"  list="operations" >
+                         <input   name="input_oprlist_{{entry.material_id}}_{{entry.batch}}_{{entry.service_id}}_{{entry.MN_id}}"  list="operations" >
                          <datalist id="operations">
+                            {% set mn=MN_id %}
+                            {% set id=material_id %}
+                             {% if id==None %}
+                                <option value="qwert">
+                             {% endif %}
                              <option value="售后修好">
                              <option value="售后报废">
                              <option value="修好">
                              <option value="报废">
                         </datalist>
                      </td>
-                     <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}" value="{{entry.comment}}">
-                         <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}_{{entry.MN_id}}" ></td>
+                     <td><input class="text_comment" type="text" name="input_comment_{{entry.material_id}}_{{entry.batch}}_{{entry.service_id}}_{{entry.MN_id}}" value="{{entry.comment}}">
+                         <input type="checkbox" name="input_checkbox_comment" value="{{entry.material_id}}_{{entry.batch}}_{{entry.service_id}}_{{entry.MN_id}}" ></td>
                  </tr>
              {% endfor %}
          </table>
