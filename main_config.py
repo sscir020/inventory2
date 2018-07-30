@@ -5,6 +5,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # reload(sys)
 # sys.setdefaultencoding('utf8')
 
+class Uri:
+	DEVELOPMENT_SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hard_guess@localhost:3306/testdb1?charset=utf8&autocommit=true'
+	DEVELOPMENT_SQLALCHEMY_DATABASE_URI_1 = 'sqlite:///D:\\projects\\inventory2\\database\\data.sqlite'
+	TESTING_SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Aosien2016@120.76.207.142:3306/inventory?charset=utf8&autocommit=true'
+
 class Config:
     SECRET_KEY =  '1AR4bnTnLHZyHaKt' #os.environ.get('SECRET_KEY') or
     # SQLALCHEMY_POOL_SIZE = 100
@@ -18,6 +23,7 @@ class Config:
     # SESSION_KEY_PREFIX='sessionp'
     # ALARM_LEVEL=0
     MAX_CHAR_PER_COMMENT = 64
+    DATABASE_URI=Uri.DEVELOPMENT_SQLALCHEMY_DATABASE_URI
 
     @staticmethod
     def init_app(app):
@@ -26,7 +32,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hard_guess@localhost:3306/testdb1?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hard_guess@localhost:3306/testdb1?charset=utf88&autocommit=true'
 
 class Development2Config(Config):
     # basedir = os.path.abspath(os.path.dirname(__file__))
@@ -38,11 +44,11 @@ class Development2Config(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Aosien2016@120.76.207.142:3306/inventory?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Aosien2016@120.76.207.142:3306/inventory?charset=utf88&autocommit=true'
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Aosien2016@120.76.207.142:3306/inventory?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Aosien2016@120.76.207.142:3306/inventory?charset=utf88&autocommit=true'
 
 
 config = {
