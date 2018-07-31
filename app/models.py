@@ -67,7 +67,7 @@ class Rework(Base):
     __tablename__='reworks'
     rework_id=Column(Integer,nullable=False,primary_key=True)
     material_id = Column(Integer,ForeignKey('materials.material_id'))
-    service_id = Column(Integer,ForeignKey('Customerservice.service_id'))
+    service_id = Column(Integer,ForeignKey('customerservice.service_id'))
     MN_id = Column(String(32), nullable=True, default='')
     batch=Column(String(32),nullable=False,unique=True,index=True,default='')
     num=Column(Integer,nullable=False,default=0)
@@ -82,6 +82,7 @@ class Opr(Base):
     material_id = Column(Integer, ForeignKey('materials.material_id'))
     device_id = Column(Integer, ForeignKey('devices.device_id'))
     client_id = Column(Integer, ForeignKey('clients.client_id'))
+    service_id = Column(Integer,ForeignKey('customerservice.service_id'))
     oprtype = Column(String(32), nullable=False)
     oprbatch = Column(String(32), nullable=False,default='')
     isgroup =Column(Boolean,nullable=False,default=0)
@@ -135,21 +136,9 @@ class Customerservice(Base):
     inboundnum= Column(Integer, nullable=True,default=0)
     resalenum= Column(Integer, nullable=True,default=0)
     comment= Column(String(64), nullable=True,default='')
+    isold =Column(Boolean,nullable=False,default=0)
 
-class Customerservice_his(Base):
-    __tablename__='customerservice_his'
-    service_id= Column(Integer, nullable=False, primary_key=True)
-    MN_id=Column(String(32), nullable=False)
-    material_id=Column(Integer,ForeignKey('materials.material_id'))
-    device_id=Column(Integer,ForeignKey('devices.device_id'))
-    originnum= Column(Integer, nullable=False,default=0)
-    goodnum= Column(Integer, nullable=False,default=0)
-    brokennum= Column(Integer, nullable=False,default=0)
-    restorenum= Column(Integer, nullable=False,default=0)
-    scrapnum= Column(Integer, nullable=False,default=0)
-    inboundnum= Column(Integer, nullable=False,default=0)
-    resalenum= Column(Integer, nullable=False,default=0)
-    comment= Column(String(64), nullable=True,default='')
+
 # class AnonymousUser(AnonymousUserMixin):
 #     def can(self, permissions):
 #         return False

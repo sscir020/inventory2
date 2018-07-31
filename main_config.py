@@ -111,8 +111,8 @@ oprenumCH ={
     Oprenum.DOUTBOUND.name:'设备出库',
     Oprenum.DRECYCLE.name:'设备售后带回',
     Oprenum.CINITADD.name:'新添加客户',#
-    Oprenum.CSGINBOUND.name:'售后完好入库',
-    Oprenum.CSRINBOUND.name:'售后修好入库',
+    Oprenum.CSGINBOUND.name:'材料售后完好入库',
+    Oprenum.CSRINBOUND.name:'材料售后修好入库',
     Oprenum.CSREWORK.name:'售后返修',
     Oprenum.CSRESTORE.name:'售后修好',
     Oprenum.CSSCRAP.name:'售后报废',#
@@ -137,8 +137,8 @@ oprenumNum = {
     '设备出库':Oprenum.DOUTBOUND,
     '设备售后带回':Oprenum.DRECYCLE,
     '新添加客户':Oprenum.CINITADD,
-    '售后完好入库':Oprenum.CSGINBOUND,#
-    '售后修好入库':Oprenum.CSRINBOUND,#
+    '材料售后完好入库':Oprenum.CSGINBOUND,#
+    '材料售后修好入库':Oprenum.CSRINBOUND,#
     '售后返修':Oprenum.CSREWORK,
     '售后修好': Oprenum.CSRESTORE,
     '售后报废':Oprenum.CSSCRAP,
@@ -184,9 +184,9 @@ class Param(Enum):
     PARAM_0 = 0
 
 class Prt():
-    def prt(start='',arg1='',arg2='',arg3='',arg4='',arg5=''):
+    def prt(start='',arg1='',arg2='',arg3='',arg4='',arg5='',arg6='',arg7='',arg8='',arg9='',arg10=''):
         print("*********************************************************************")
-        print(str(start)+"-"+str(arg1)+"-"+str(arg2)+"-"+str(arg3)+"-"+str(arg4)+"-"+str(arg5))
+        print(str(start)+","+str(arg1)+","+str(arg2)+","+str(arg3)+","+str(arg4)+","+str(arg5)+","+str(arg6)+","+str(arg7)+","+str(arg8)+","+str(arg9)+","+str(arg10))
         print("---------------------------------------------------------------------")
 
 

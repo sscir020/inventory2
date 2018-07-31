@@ -84,7 +84,7 @@ def show_rework_materials():
     # pagination = dbsession.query(Rework).order_by(Rework.batch.desc()).\
     #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE_LIST'],error_out=False)
     # reworkbatches=pagination.items
-    reworkbatches = dbsession.query(Rework.rework_id,Rework.material_id,Rework.MN_id,Material.material_name,Rework.batch,Rework.num,Rework.comment). \
+    reworkbatches = dbsession.query(Rework.rework_id,Rework.material_id,Rework.service_id,Rework.MN_id,Material.material_name,Rework.batch,Rework.num,Rework.comment). \
         outerjoin(Material, Material.material_id == Rework.material_id).order_by(Rework.batch.desc()).all()
     return render_template('rework_material_table.html',reworkbatches=reworkbatches,json=json,CommentType=CommentType )
 

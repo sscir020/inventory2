@@ -7,7 +7,7 @@ create table users(
 		role int not null default 1 ,
 		primary key (user_id),
 		unique(user_name)
-		);
+		)default charset=utf8;
 
 drop table if exists accessories;
 create table accessories(
@@ -16,7 +16,7 @@ create table accessories(
         param_acces varchar(2048) not null,
         primary key (acces_id)
         unique(acces_id)
-);
+)default charset=utf8;
 
 drop table if EXISTS oprs;
 drop table if exists materials;
@@ -30,7 +30,7 @@ create table materials(
 		acces_id int not null default 0,
 		primary key (material_id),
 		unique(material_name)
-		);
+		)default charset=utf8;
 drop table if exists buys;
 
 create table buys(
@@ -42,26 +42,28 @@ create table buys(
         primary key(buy_id),
         unique(batch),
         foreign key (material_id) references materials(material_id)
-);
+)default charset=utf8;
+
 drop table if exists reworks;
 create table reworks(
         rework_id int not null auto_increment,
         material_id int,
-        device_id int,
-        MN_id int,
+        service_id int,
+        MN_id varchar(32) not null default '',
 		batch varchar(32) not null,
         num int not null default 0,
         comment varchar(64) default '',
         primary key(rework_id),
         unique(batch),
         foreign key (material_id) references materials(material_id),
-        foreign key (device_id) references devices(device_id)
-);
+        foreign key (service_id) references Customerservice(service_id)
+)default charset=utf8;
+
 drop table if EXISTS clients;
 drop table if exists devices;
 create table devices(
         device_id int not null auto_increment,
-        MN_id int not null,
+        MN_id varchar(32) not null default '',
         device_type varchar(20) not null,
         device_name varchar(32) not null default '',
         storenum int not null default 0,
@@ -71,7 +73,7 @@ create table devices(
         primary key(device_id),
         unique(MN_id),
         foreign key (acces_id) references accessories(acces_id)
-);
+)default charset=utf8;
 create table clients(
         client_id int not null auto_increment,
         client_name varchar(32) not null,
@@ -81,7 +83,7 @@ create table clients(
         primary key(client_id),
         unique(client_name),
         unique(MN_id)
-);
+)default charset=utf8;
 drop table  if exists oprs;
 create table oprs(
 		opr_id int not null auto_increment,
@@ -104,7 +106,7 @@ create table oprs(
 		foreign key (device_id) references devices(device_id),
 		foreign key (client_id) references clients(client_id),
 		foreign key (service_id) references customerservice(service_id)
-		);
+		)default charset=utf8;
 
 create table customerservice(
         service_id  int not null auto_increment,
@@ -114,14 +116,18 @@ create table customerservice(
         originnum int not null default 0,
         goodnum int not null default 0,
         brokennum int not null default 0,
+        reworknum int not null default 0,
         restorenum int not null default 0,
         scrapnum int not null default 0,
         inboundnum int not null default 0,
+        resalenum int not null default 0,
+        fee int not null default 0,
         comment varchar(64) default '',
+        isold tinyint(1) default 0,
         primary key(service_id),
 		unique(service_id),
 		foreign key (material_id) references materials(material_id)
-);
+)default charset=utf8;
 
 
 alter table materials convert to character set utf8 collate utf8_unicode_ci;
