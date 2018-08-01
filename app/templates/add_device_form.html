@@ -13,7 +13,7 @@
     <ul id="accessory_list">
     {% for item in materials %}
          <li><input type="checkbox" name="input_accessory_check_{{item.material_id}}" value="{{item.material_id}}">
-         {{item.material_name}}<input type="number" name="input_accessory_num_{{item.material_id}}" class="text_acce" value="1"></li>
+         {{item.material_name}}<input type="number" name="input_accessory_num_{{item.material_id}}" class="text_acce" value="1" min='1'></li>
     {% endfor %}
     </ul>
     <input type="submit" value="新添加提交">

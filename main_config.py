@@ -94,6 +94,7 @@ class Oprenum(Enum):
     CSBROKEN=22
     CSRESALE =23
     RINBOUND =24
+    CSFEE=25
 oprenumCH ={
     Oprenum.INITADD.name: '新添加材料',#
     Oprenum.INBOUND.name: '入库',
@@ -119,6 +120,7 @@ oprenumCH ={
     Oprenum.CSBROKEN.name:'售后损坏',
     Oprenum.CSRESALE.name:'设备售后售出',
     Oprenum.RINBOUND.name:'修好入库',
+    Oprenum.CSFEE.name:'增加售后售出费用',
 }
 oprenumNum = {
     '新添加材料':Oprenum.INITADD,#
@@ -145,6 +147,7 @@ oprenumNum = {
     '售后损坏':Oprenum.CSBROKEN,
     '设备售后售出':Oprenum.CSRESALE,
     '修好入库':Oprenum.RINBOUND,
+    '增加售后售出费用':Oprenum.CSFEE,
 }
 class Sensorname(Enum):
     P25 = 1

@@ -43,7 +43,7 @@
                           {{m.material_name}}:{{acces[key]}}&nbsp;&nbsp;
                      {% endfor %}
                  </td>
-                 <td><input type="number" name="input_number_{{entry.device_id}}_{{entry.MN_id}}" class="text_acce"></td>
+                 <td><input type="number" name="input_number_{{entry.device_id}}_{{entry.MN_id}}" class="text_acce" min='1'></td>
                  <td>
                      <input id="numcls3"  name="input_oprlist_{{entry.device_id}}_{{entry.MN_id}}"  list="operations" >
                      <datalist id="operations">

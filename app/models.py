@@ -135,6 +135,7 @@ class Customerservice(Base):
     scrapnum= Column(Integer, nullable=True,default=0)
     inboundnum= Column(Integer, nullable=True,default=0)
     resalenum= Column(Integer, nullable=True,default=0)
+    fee= Column(Integer, nullable=True,default=0)
     comment= Column(String(64), nullable=True,default='')
     isold =Column(Boolean,nullable=False,default=0)
 

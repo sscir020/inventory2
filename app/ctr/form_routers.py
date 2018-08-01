@@ -646,6 +646,18 @@ def form_change_customerservice():
                                 flash("材料不存在")
                         else:
                             flash("不是材料")
+                    elif oprtype == Oprenum.CSFEE.name:  # 22
+                        fee = diff
+                        Prt.prt('fee',fee,fee=='0',fee==0)
+                        fee = convert_str_num(fee)
+                        if fee>0:
+                            cs.fee+=fee
+                            dbsession.add_all([cs])
+                            dbsession.commit()
+                            dbsession.flush()
+                            dbsession.close()
+                        else:
+                            ("数值应是整数")
                     else:
                         flash("操作类型错误")
                 else:
