@@ -516,7 +516,7 @@ def form_change_customerservice():
         for key in request.form:
             if "input_number_" in key and request.form[key]!='':
                 diff = convert_str_num(request.form[key])
-                if diff > 0:
+                if diff >0:
                     string=key[13:]
                     # string = request.form["input_hidden_" + str(index)]
                     break
@@ -534,39 +534,51 @@ def form_change_customerservice():
                 cs=dbsession.query(Customerservice).filter(Customerservice.service_id==service_id).first()
                 if cs!=None:
                     if oprtype == Oprenum.CSRESALE.name:#18
+                        if cs.goodnum + cs.restorenum == 0:
+                            flash("没有完好或修好的设备")
+                            return redirect(url_for('ctr.show_customerservice_table'))
                         if material_id=='None':
                             services = dbsession.query(Customerservice).filter(Customerservice.MN_id == MN_id).filter(Customerservice.isold==False).all()
-                            Prt.prt(services,services.count())
-                            # for cs in services:
-                            #     Prt.prt('material_id', cs.material_id,'cs.service_id',cs.service_id,material_id=='None' )
-                            #     if material_id!='None':
-                            #         m=dbsession.query(Material).filter(Material.material_id==cs.material_id).first()
-                            #     # if m!=None:
-                            #         Prt.prt('material_id', m.material_id, 'cs.resalenum', cs.resalenum,m == None)
-                            #         cs.resalenum = cs.goodnum + cs.restorenum
-                            #         m.resalenum+=cs.resalenum
-                            #         # hiscs = Customerservice_his(MN_id=cs.MN_id,material_id=cs.material_id,device_id=cs.device_id,
-                            #         #                             originnum=cs.originnum,goodnum=cs.goodnum, brokennum=cs.brokennum,reworknum=cs.reworknum,
-                            #         #                             restorenum=cs.restorenum,scrapnum=cs.scrapnum,inboundnum=cs.inboundnum, resalenum=cs.resalenum,
-                            #         #                             comment=cs.comment)
-                            #         dbsession.add_all([cs,m])#hiscs
-                            #         dbsession.commit()
-                            #         dbsession.flush()
-                            #         dbsession.close()
-                            #     else:
-                            #         d=dbsession.query(Device).filter(Device.MN_id==MN_id).first()
-                            #         s=dbsession.query(Customerservice).filter(Customerservice.service_id==cs.service_id).first()
-                            #         d.resalenum+=s.resalenum
-                            #         # services.delete()
-                            #         # dbsession.query(Customerservice).filter(Customerservice.MN_id == MN_id).delete()
-                            #         dbsession.add_all([d])
-                            #         dbsession.commit()
-                            #         dbsession.flush()
-                            #         dbsession.close()
+                            # services=list(customerservices)
+                            # Prt.prt(services,services.count(Customerservice))
+                            print(services)
+                            for s in services:
+                                print(s)
+                                print(s.material_id)
+                                # Prt.prt('for material_id', str(s.material_id),'cs.service_id',s.service_id,s.material_id==None )
+                                if s.material_id!=None:
+                                    m=dbsession.query(Material).filter(Material.material_id==s.material_id).first()
+                                    if m!=None:
+                                #     Prt.prt('material_id', m.material_id, 'cs.resalenum', cs.resalenum,m == None)
+                                        s.resalenum = s.goodnum + s.restorenum
+                                        m.resalenum+=s.resalenum
+                                        s.goodnum=0
+                                        s.restorenum=0
+                                        s.isold = True
+                                        dbsession.add(s)#hiscs
+                                        dbsession.add(m)#hiscs
+                                else:
+                                #     # Prt.prt('MN_id', MN_id, 'cs.resalenum', cs.resalenum)
+                                    d=dbsession.query(Device).filter(Device.MN_id==MN_id).first()
+                                    if d != None:
+                                        s.resalenum = s.goodnum + s.restorenum
+                                        d.resalenum+=s.resalenum
+                                        s.goodnum=0
+                                        s.restorenum=0
+                                        s.isold=True
+                                    #     # services.delete()
+                                    #     # dbsession.query(Customerservice).filter(Customerservice.MN_id == MN_id).delete()
+                                        dbsession.add(s)
+                                        dbsession.add(d)
+
+                            # dbsession.add(services)
+                            dbsession.commit()
+                            dbsession.flush()
+                            dbsession.close()
                         else:
                             flash("不是设备")
                     elif oprtype == Oprenum.CSBROKEN.name:#19
-                        if diff > cs.originnum:
+                        if diff > cs.originnum-(cs.brokennum):
                             flash("损坏数量大于售后带回数量")
                         else:
                             if cs.goodnum==0 and cs.brokennum==0:

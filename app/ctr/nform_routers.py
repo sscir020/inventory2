@@ -41,7 +41,9 @@ def show_users():
     # pagination = Accessory.query.order_by(Accessory.acces_id).\
     #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     # accessories=pagination.items
-    return render_template('user_table.html',users=dbsession.query(User).all() )
+    users = dbsession.query(User).all()
+    dbsession.close()
+    return render_template('user_table.html',users=users )
 # @ctr.route('/materials_table_normal2')
 # @loggedin_required
 # def show_material_table_normal2():
@@ -71,6 +73,7 @@ def show_material_table():
     # materials=pagination.items
     # print(pagination==None)
     materials= dbsession.query(Material).order_by(Material.material_id.desc()).all()
+    dbsession.close()
     return render_template('material_table.html',materials=materials,Param=Param,json=json )
     # return render_template('material_table.html',materials=Material.query.all())
 
@@ -86,6 +89,7 @@ def show_rework_materials():
     # reworkbatches=pagination.items
     reworkbatches = dbsession.query(Rework.rework_id,Rework.material_id,Rework.service_id,Rework.MN_id,Material.material_name,Rework.batch,Rework.num,Rework.comment). \
         outerjoin(Material, Material.material_id == Rework.material_id).order_by(Rework.batch.desc()).all()
+    dbsession.close()
     return render_template('rework_material_table.html',reworkbatches=reworkbatches,json=json,CommentType=CommentType )
 
 
@@ -101,6 +105,7 @@ def show_buy_materials():
     # buybatches=pagination.items
     buybatches=dbsession.query(Buy.buy_id,Buy.material_id,Material.material_name,Buy.batch,Buy.num,Buy.comment).\
         outerjoin(Material,Material.material_id==Buy.material_id).order_by(Buy.batch.desc()).all()
+    dbsession.close()
     return render_template('buy_material_table.html',buybatches=buybatches,json=json,CommentType=CommentType )
 
 @ctr.route('/param_accessory_table',methods=['GET',''])
@@ -113,6 +118,7 @@ def show_param_accessory():
     #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     # accessories=pagination.items
     accessories=dbsession.query(Accessory).order_by(Accessory.acces_id).all()
+    dbsession.close()
     return render_template('param_accessory_table.html',accessories=accessories,json=json,Material=Material,dbsession=dbsession )
 
 @ctr.route('/join_oprs_table',methods=['GET',''])
@@ -130,6 +136,7 @@ def show_join_oprs():
     # pagination = sql.paginate(page, per_page=current_app.config['FLASK_NUM_PER_PAGE'], error_out=False)
     # join_oprs=pagination.items
     # print(sql[0])
+    dbsession.close()
     return render_template('join_oprs_table.html',join_oprs=sql,oprenumCH=oprenumCH)
 
 
@@ -146,6 +153,7 @@ def show_join_oprs_main():
                           join(User,User.user_id==Opr.user_id).order_by(Opr.opr_id.desc()).filter(Opr.isgroup==True).limit(50)
     # print(sql)
     # print(sql[0])
+    dbsession.close()
     return render_template('join_oprs_main_table.html',join_oprs=sql,oprenumCH=oprenumCH)
 
 def material_isvalid_num_rev (m,diff,oprtype,batch):
@@ -354,7 +362,7 @@ def rollback_opr():
             flash("回滚操作记录错误-材料不存在_配件"+str(m.material_id))
             return redirect(url_for('ctr.show_join_oprs_main'))
         opr = dbsession.query(Opr).order_by(Opr.opr_id.desc()).first()
-    # dbsession.close()
+    dbsession.close()
     return redirect(url_for('ctr.show_join_oprs_main'))
 
 
@@ -365,6 +373,7 @@ def rollback_opr():
 def show_add_device():
     # db.session.flush()
     m=dbsession.query(Material).filter_by(acces_id=0).all()
+    dbsession.close()
     return render_template("add_device_form.html",materials=m)
 
 
@@ -373,6 +382,7 @@ def show_add_device():
 def show_device_table():
     # db.session.flush()
     devices= dbsession.query(Device).all()
+    dbsession.close()
     return render_template("device_table.html", devices=devices,CommentType=CommentType,dbsession=dbsession,Accessory=Accessory,json=json,Material=Material)
 
 @ctr.route('/show_client_table_get', methods=['GET', ''])
@@ -380,6 +390,7 @@ def show_device_table():
 def show_client_table():
     # db.session.flush()
     clients = dbsession.query(Client).all()
+    dbsession.close()
     return render_template("client_table.html", clients=clients,CommentType=CommentType)
 
 @ctr.route('/show_customerservice_table_get', methods=['GET', ''])
@@ -387,6 +398,7 @@ def show_client_table():
 def show_customerservice_table():
     # db.session.flush()
     customerservice = dbsession.query(Customerservice).all()
+    dbsession.close()
     return render_template("customerservice_table.html", customerservice=customerservice, CommentType=CommentType)
 #
 # @ctr.route('/rollback')

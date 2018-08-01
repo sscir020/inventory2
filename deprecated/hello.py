@@ -626,43 +626,46 @@ if __name__ == '__main__':
 #         # dbsession.close()
 #     return True
 
-elif oprtype == Oprenum.CSRESTORE.name:
-    b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-    c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
-        Customerservice.MN_id == MN_id).first()
-    b.num -= diff
-    c.reworknum -= diff
-    c.restorenum += diff
-    if b.num == 0:
-        dbsession.query(Rework).filter(Rework.batch == batch).delete()
-    else:
-        dbsession.add_all([b, c])
-elif oprtype == Oprenum.CSSCRAP.name:
-    b = dbsession.query(Rework).filter(Rework.batch == batch).first()
-    c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
-        Customerservice.MN_id == MN_id).first()
-    b.num -= diff
-    c.reworknum -= diff
-    c.scrapnum += diff
-    if b.num == 0:
-        dbsession.query(Rework).filter(Rework.batch == batch).delete()
-    else:
-        dbsession.add_all([b, c])
-elif oprtype == Oprenum.CSGINBOUND.name:
-    c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
-        Customerservice.MN_id == MN_id).first()
-    c.goodnum -= diff
-    c.inboundnum += diff
-    m.storenum += diff
-    dbsession.add_all([c])
-elif oprtype == Oprenum.CSRINBOUND.name:
-    c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
-        Customerservice.MN_id == MN_id).first()
-    c.restorenum -= diff
-    c.inboundnum += diff
-    m.storenum += diff
-    dbsession.add_all([c])
-
+# elif oprtype == Oprenum.CSRESTORE.name:
+#     b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+#     c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#         Customerservice.MN_id == MN_id).first()
+#     b.num -= diff
+#     c.reworknum -= diff
+#     c.restorenum += diff
+#     if b.num == 0:
+#         dbsession.query(Rework).filter(Rework.batch == batch).delete()
+#     else:
+#         dbsession.add_all([b, c])
+# elif oprtype == Oprenum.CSSCRAP.name:
+#     b = dbsession.query(Rework).filter(Rework.batch == batch).first()
+#     c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#         Customerservice.MN_id == MN_id).first()
+#     b.num -= diff
+#     c.reworknum -= diff
+#     c.scrapnum += diff
+#     if b.num == 0:
+#         dbsession.query(Rework).filter(Rework.batch == batch).delete()
+#     else:
+#         dbsession.add_all([b, c])
+# elif oprtype == Oprenum.CSGINBOUND.name:
+#     c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#         Customerservice.MN_id == MN_id).first()
+#     c.goodnum -= diff
+#     c.inboundnum += diff
+#     m.storenum += diff
+#     dbsession.add_all([c])
+# elif oprtype == Oprenum.CSRINBOUND.name:
+#     c = dbsession.query(Customerservice).filter(Customerservice.material_id == m.material_id).filter(
+#         Customerservice.MN_id == MN_id).first()
+#     c.restorenum -= diff
+#     c.inboundnum += diff
+#     m.storenum += diff
+#     dbsession.add_all([c])
+    #     # hiscs = Customerservice_his(MN_id=cs.MN_id,material_id=cs.material_id,device_id=cs.device_id,
+    #     #                             originnum=cs.originnum,goodnum=cs.goodnum, brokennum=cs.brokennum,reworknum=cs.reworknum,
+    #     #                             restorenum=cs.restorenum,scrapnum=cs.scrapnum,inboundnum=cs.inboundnum, resalenum=cs.resalenum,
+    #     #                             comment=cs.comment)
 #
 # def customerservice_isvalid_num(cs,m,diff, oprtype, batch,MN_id):
 #     if oprtype == Oprenum.CSRESTORE.name:
