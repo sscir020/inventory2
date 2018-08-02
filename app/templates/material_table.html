@@ -3,14 +3,14 @@
 
 {% block page_content %}
 <div>
-    <h4>库存列表</h4>
+    <h4>材料列表</h4>
     <form action="{{ url_for('ctr.form_change_material',page=page) }}" method="post">
 
         <table class="table table-hover" id="table_orange">
              <thead>
-                 <th>库存ID</th>
-                 <th>库存名</th>
-                 <th>库存数量</th>
+                 <th>材料ID</th>
+                 <th>材料名</th>
+                 <th>材料数量</th>
                  <th>修好数量</th>
                  <th>报废数量</th>
                  <th>备货数量</th>

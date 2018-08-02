@@ -578,7 +578,8 @@ def form_change_customerservice():
                         else:
                             flash("不是设备")
                     elif oprtype == Oprenum.CSBROKEN.name:#19
-                        if diff > cs.originnum-(cs.brokennum):
+                        # if diff > cs.originnum-(cs.brokennum+cs.reworknum+cs.restorenum+cs.inboundnum+cs.scrapnum):
+                        if diff >cs.goodnum:
                             flash("损坏数量大于售后带回数量")
                         else:
                             if cs.goodnum==0 and cs.brokennum==0:
@@ -589,15 +590,15 @@ def form_change_customerservice():
                                 dbsession.flush()
                                 dbsession.close()
                             else:
-                                if cs.brokennum+diff<=cs.originnum:
-                                    cs.goodnum-=diff
-                                    cs.brokennum+=diff
-                                    dbsession.add_all([cs])
-                                    dbsession.commit()
-                                    dbsession.flush()
-                                    dbsession.close()
-                                else:
-                                    flash("损害的数量大于售后带回总数量")
+                                # if cs.brokennum+diff<=cs.originnum:
+                                cs.goodnum-=diff
+                                cs.brokennum+=diff
+                                dbsession.add_all([cs])
+                                dbsession.commit()
+                                dbsession.flush()
+                                dbsession.close()
+                                # else:
+                                #     flash("损害的数量大于售后带回总数量")
                     elif oprtype == Oprenum.CSREWORK.name:#20
                         # c = dbsession.query(Customerservice).filter(Customerservice.service_id == service_id).first()
                         batch = datetime.datetime.now()
@@ -962,7 +963,7 @@ def form_change_rework():
                         flash("返修列表-报废更新失败")
                 elif oprtype == Oprenum.CSRESTORE.name:
                     Prt.prt(list)
-                    if materialid=='None':
+                    if service_id!='None':
                         if change_customerservice_oprs_db(oprtype=oprtype, materialid=materialid, service_id=service_id,MN_id=MN_id,diff=diff, isgroup=True,batch=batch, comment=comment):
                             flash("返修列表-售后修好更新成功")
                         else:
@@ -970,7 +971,7 @@ def form_change_rework():
                     else:
                         flash("返修列表-不是售后")
                 elif oprtype == Oprenum.CSSCRAP.name:
-                    if materialid == 'None':
+                    if service_id != 'None':
                         if change_customerservice_oprs_db(oprtype=oprtype, materialid=materialid, service_id=service_id,MN_id=MN_id, diff=diff, isgroup=True, batch=batch, comment=comment):
                             flash("返修列表-售后报废更新成功")
                         else:

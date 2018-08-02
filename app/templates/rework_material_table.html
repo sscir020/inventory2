@@ -22,10 +22,16 @@
              {% for entry in reworkbatches %}
                  <tr>
                      <td>{{entry.rework_id}}</td>
-                     <td>{{entry.material_id}}</td>
+                     <td>{% if entry.material_id != None %}
+                         {{entry.material_id}}
+                         {% endif %}
+                     </td>
                      <td>{{entry.material_name}}</td>
-                     <td>{{entry.service_id}}</td>
-                      <td>
+                     <td>{% if entry.service_id != None %}
+                         {{entry.service_id}}
+                         {% endif %}
+                     </td>
+                     <td>
                           {% if entry.MN_id != '0' %}
                           {{entry.MN_id}}
                           {% endif %}

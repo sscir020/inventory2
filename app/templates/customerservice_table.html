@@ -12,7 +12,7 @@
                  <th>材料ID</th>
                  <th>设备ID</th>
                  <th>MN号</th>
-                 <th>总数量</th>
+                 <th>初始数量</th>
                  <th>完好数量</th>
                  <th>损坏数量</th>
                  <th>返修数量</th>
@@ -21,14 +21,21 @@
                  <th>入库数量</th>
                  <th>售后售出数量</th>
                  <th>售后售出费用</th>
+                 <th>已经售出</th>
                  <th>修改数量-操作类型</th>
                  <th>备注(请勾选右侧)</th>
              </thead>
              {% for entry in customerservice %}
              <tr>
                  <td>{{entry.service_id}}</td>
-                 <td>{{entry.material_id}}</td>
-                 <td>{{entry.device_id}}</td>
+                 <td>{% if entry.material_id != None %}
+                     {{entry.material_id}}
+                     {% endif %}
+                 </td>
+                 <td>{% if entry.device_id != None %}
+                     {{entry.device_id}}
+                     {% endif %}
+                 </td>
                  <td>{{entry.MN_id}}</td>
                  <td>{{entry.originnum}}</td>
                  <td>{{entry.goodnum}}</td>
@@ -39,6 +46,7 @@
                  <td>{{entry.inboundnum}}</td>
                  <td>{{entry.resalenum}}</td>
                  <td>{{entry.fee}}</td>
+                 <td>{{entry.isold}}</td>
                  <td><input type="number" name="input_number_{{entry.service_id}}_{{entry.material_id}}_{{entry.MN_id}}" min='1' max="{{entry.originnum}}" class="text_acce">
                     <input name="input_oprlist_{{entry.service_id}}_{{entry.material_id}}_{{entry.MN_id}}"  list="operations1" >
                     <datalist id="operations1">

@@ -41,7 +41,7 @@ def show_users():
     # pagination = Accessory.query.order_by(Accessory.acces_id).\
     #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     # accessories=pagination.items
-    users = dbsession.query(User).all()
+    users = dbsession.query(User).order_by(User.user_id.desc()).all()
     dbsession.close()
     return render_template('user_table.html',users=users )
 # @ctr.route('/materials_table_normal2')
@@ -117,7 +117,7 @@ def show_param_accessory():
     # pagination = Accessory.query.order_by(Accessory.acces_id).\
     #     paginate(page,per_page=current_app.config['FLASK_NUM_PER_PAGE'],error_out=False)
     # accessories=pagination.items
-    accessories=dbsession.query(Accessory).order_by(Accessory.acces_id).all()
+    accessories=dbsession.query(Accessory).order_by(Accessory.acces_id.desc()).all()
     dbsession.close()
     return render_template('param_accessory_table.html',accessories=accessories,json=json,Material=Material,dbsession=dbsession )
 
@@ -381,7 +381,7 @@ def show_add_device():
 @loggedin_required
 def show_device_table():
     # db.session.flush()
-    devices= dbsession.query(Device).all()
+    devices= dbsession.query(Device).order_by(Device.device_id.desc()).all()
     dbsession.close()
     return render_template("device_table.html", devices=devices,CommentType=CommentType,dbsession=dbsession,Accessory=Accessory,json=json,Material=Material)
 
@@ -389,7 +389,7 @@ def show_device_table():
 @loggedin_required
 def show_client_table():
     # db.session.flush()
-    clients = dbsession.query(Client).all()
+    clients = dbsession.query(Client).order_by(Client.client_id.desc()).all()
     dbsession.close()
     return render_template("client_table.html", clients=clients,CommentType=CommentType)
 
@@ -397,7 +397,7 @@ def show_client_table():
 @loggedin_required
 def show_customerservice_table():
     # db.session.flush()
-    customerservice = dbsession.query(Customerservice).all()
+    customerservice = dbsession.query(Customerservice).order_by(Customerservice.service_id.desc()).all()
     dbsession.close()
     return render_template("customerservice_table.html", customerservice=customerservice, CommentType=CommentType)
 #
